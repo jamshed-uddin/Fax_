@@ -9,11 +9,15 @@ const generateToken = require("../utils/generateToken");
 //access public
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  //   const user = await User.findOne({ email });
-  const user = true;
+  const user = await User.findOne({ email });
 
-  if (user) {
-    res.status(201).send({ message: "User logged in" });
+  if (user && (await user.matchPassword(password))) {
+    res.status(201).send({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      token: generateToken(user._id),
+    });
   } else {
     res.status(400);
     throw new Error("Invalid email or password");
@@ -51,5 +55,7 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("Invalid user info");
   }
 });
+
+//
 
 module.exports = { authUser, registerUser };

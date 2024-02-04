@@ -26,6 +26,5 @@ app.use(notFound);
 app.use(errorHandler);
 
 app.listen(port, () => {
-  console.log(process.env.PORT);
   console.log(`chat app is running on port ${port}`);
 });
