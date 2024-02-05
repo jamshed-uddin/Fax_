@@ -28,7 +28,7 @@ const authUser = asyncHandler(async (req, res) => {
 // route POST api/user/logout
 // access public
 const logoutUser = asyncHandler(async (req, res) => {
-  res.cookie("jwt", "", {
+  res.cookie("jwtToken", "", {
     httpOnly: true,
     expires: new Date(0),
   });
@@ -73,13 +73,13 @@ const registerUser = asyncHandler(async (req, res) => {
 //access private
 
 const searchUsers = asyncHandler(async (req, res) => {
-  console.log(req);
+  const searchQuery = req.query.query;
   const user = await User.findOne({ _id: req.user?._id });
   if (!user) {
     res.status(401);
     throw new Error("Unauthorized action");
   }
-  const searchQuery = req.query.query;
+
   console.log(searchQuery);
   if (searchQuery) {
     const searchResult = await User.find({
@@ -90,6 +90,8 @@ const searchUsers = asyncHandler(async (req, res) => {
     }).select("-password -token -isAdmin");
 
     res.status(200).send(searchResult);
+  } else {
+    res.status(200).json([]);
   }
 });
 module.exports = { authUser, registerUser, searchUsers, logoutUser };
