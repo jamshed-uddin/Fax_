@@ -5,7 +5,7 @@ const ChatPage = () => {
   const { user } = useAuthProvider();
   console.log(user);
 
-  return <div>ChatPage</div>;
+  return <div className="my-container">ChatPage</div>;
 };
 
 export default ChatPage;

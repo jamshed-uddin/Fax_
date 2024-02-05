@@ -56,9 +56,22 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  const userLogout = () => {
-    setUser(null);
-    localStorage.removeItem("userInfo");
+  const userLogout = async () => {
+    try {
+      const result = await axios.post("api/user/logout");
+      setUser(null);
+      localStorage.removeItem("userInfo");
+      return result.data;
+    } catch (error) {
+      if (
+        error.response &&
+        (error.response.status === 400 || error.response.status === 401)
+      ) {
+        throw new Error(error.response.data.message);
+      } else {
+        throw new Error("Something went wrong");
+      }
+    }
   };
 
   const authOptions = { user, registerUser, userSignIn, userLogout };

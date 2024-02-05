@@ -1,8 +1,10 @@
 import { useState } from "react";
+import useGetSearchResult from "../hooks/useGetSearchResult";
 
 const Searchbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  console.log(searchQuery);
+  const result = useGetSearchResult(searchQuery);
+  console.log(result);
   return (
     <div className="form-control">
       <input

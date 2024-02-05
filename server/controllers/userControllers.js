@@ -12,16 +12,28 @@ const authUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email });
 
   if (user && (await user.matchPassword(password))) {
+    generateToken(res, user._id);
     res.status(201).send({
       _id: user._id,
       name: user.name,
       email: user.email,
-      token: generateToken(user._id),
     });
   } else {
     res.status(400);
     throw new Error("Invalid email or password");
   }
+});
+
+// @desc user logout
+// route POST api/user/logout
+// access public
+const logoutUser = asyncHandler(async (req, res) => {
+  res.cookie("jwt", "", {
+    httpOnly: true,
+    expires: new Date(0),
+  });
+
+  res.status(200).send({ message: "User logged out" });
 });
 
 //@desc create user
@@ -44,11 +56,11 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   if (user) {
+    generateToken(res, user._id);
     res.status(201).send({
       _id: user._id,
       name: user.name,
       email: user.email,
-      token: generateToken(user._id),
     });
   } else {
     res.status(400);
@@ -61,13 +73,14 @@ const registerUser = asyncHandler(async (req, res) => {
 //access private
 
 const searchUsers = asyncHandler(async (req, res) => {
+  console.log(req);
   const user = await User.findOne({ _id: req.user?._id });
   if (!user) {
     res.status(401);
     throw new Error("Unauthorized action");
   }
   const searchQuery = req.query.query;
-
+  console.log(searchQuery);
   if (searchQuery) {
     const searchResult = await User.find({
       $or: [
@@ -79,4 +92,4 @@ const searchUsers = asyncHandler(async (req, res) => {
     res.status(200).send(searchResult);
   }
 });
-module.exports = { authUser, registerUser, searchUsers };
+module.exports = { authUser, registerUser, searchUsers, logoutUser };
