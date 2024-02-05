@@ -1,13 +1,23 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import useAuthProvider from "../hooks/useAuthProvider";
 
 const Signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { user, userSignIn } = useAuthProvider();
+  console.log(user);
+  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -17,6 +27,19 @@ const Signin = () => {
 
     const body = { email, password };
     console.log(body);
+    setLoading(true);
+
+    try {
+      await userSignIn(body).then((result) => {
+        console.log(result);
+        setLoading(false);
+        navigate("/chat");
+      });
+    } catch (error) {
+      setLoading(false);
+      setError(error?.message);
+      console.log(error.message);
+    }
   };
 
   return (

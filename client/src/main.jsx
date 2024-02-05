@@ -6,6 +6,10 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import HomePage from "./pages/HomePage.jsx";
 import Signup from "./pages/Signup.jsx";
 import ChatPage from "./pages/ChatPage.jsx";
+import AuthProvider from "./providers/AuthProvider.jsx";
+import Profile from "./pages/Profile.jsx";
+import Signin from "./pages/Signin.jsx";
+import PrivateRoute from "./privateRoutes/PrivateRoute.jsx";
 
 const router = createBrowserRouter([
   {
@@ -17,8 +21,28 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: "/signup",
+        path: "signin",
+        element: <Signin />,
+      },
+      {
+        path: "signup",
         element: <Signup />,
+      },
+      {
+        path: "profile",
+        element: (
+          <PrivateRoute>
+            <Profile />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "chat",
+        element: (
+          <PrivateRoute>
+            <ChatPage />
+          </PrivateRoute>
+        ),
       },
     ],
   },
@@ -26,6 +50,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </React.StrictMode>
 );

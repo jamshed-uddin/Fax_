@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import useAuthProvider from "../hooks/useAuthProvider";
 
 const Signup = () => {
-  const [user] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const { user, registerUser } = useAuthProvider();
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -17,7 +19,7 @@ const Signup = () => {
     }
   }, [user, navigate]);
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -30,7 +32,17 @@ const Signup = () => {
     }
 
     const body = { name, email, password };
-    console.log(body);
+
+    setLoading(true);
+    try {
+      const result = await registerUser(body);
+      setLoading(false);
+      console.log(result);
+    } catch (error) {
+      setLoading(false);
+      setError(error?.message);
+      console.log(error.message);
+    }
   };
 
   return (

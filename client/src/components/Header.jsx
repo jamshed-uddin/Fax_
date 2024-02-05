@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import Searchbar from "./Searchbar";
-import { useState } from "react";
+
+import useAuthProvider from "../hooks/useAuthProvider";
 
 const Header = () => {
-  const [user] = useState(false);
+  const { user } = useAuthProvider();
   return (
     <div className=" shadow">
       <div className="navbar  w-[97%] lg:w-[90%] mx-auto">
@@ -12,25 +13,31 @@ const Header = () => {
             <span className="text-2xl font-bold">Chat</span>
           </Link>
         </div>
-        <div className="flex-none gap-2">
-          {!user && <Searchbar />}
-          <div className="dropdown dropdown-end">
-            <Link to={"/profile"}>
-              <div
-                tabIndex={0}
-                role="button"
-                className="btn btn-ghost btn-circle avatar"
-              >
-                <div className="w-10 rounded-full">
-                  <img
-                    alt="Tailwind CSS Navbar component"
-                    src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
-                  />
+        {user ? (
+          <div className="flex-none gap-2">
+            <Searchbar />
+            <div className="dropdown dropdown-end">
+              <Link to={"/profile"}>
+                <div
+                  tabIndex={0}
+                  role="button"
+                  className="btn btn-ghost btn-circle avatar"
+                >
+                  <div className="w-10 rounded-full">
+                    <img
+                      alt="Tailwind CSS Navbar component"
+                      src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
+                    />
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
+            </div>
           </div>
-        </div>
+        ) : (
+          <Link to={"/signin"} className="btn btn-primary btn-sm">
+            Sign in
+          </Link>
+        )}
       </div>
     </div>
   );
