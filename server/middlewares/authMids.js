@@ -7,7 +7,7 @@ const verifyJWT = async (req, res, next) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      req.user = await User.findOne(decoded.id).select("-password");
+      req.user = await User.findOne({ _id: decoded.id }).select("-password");
       next();
     } catch (error) {
       res.status(401);
