@@ -15,7 +15,6 @@ const Header = () => {
         </div>
         {user ? (
           <div className="flex-none gap-2">
-            <Searchbar />
             <div className="dropdown dropdown-end">
               <Link to={"/profile"}>
                 <div
