@@ -1,39 +1,33 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Searchbar from "./Searchbar";
+import Users from "./Users";
+import Chats from "./Chats";
 
-const SideChats = () => {
-  const [searchResult, setSearchResult] = useState(null);
+import useChatProvider from "../hooks/useChatProvider";
 
-  console.log(searchResult);
+const SideChats = ({ setHideSideChat }) => {
+  const [searchResult, setSearchResult] = useState([]);
+
+  const { isSideChatOpen } = useChatProvider();
+  console.log(isSideChatOpen);
   return (
-    <div>
-      <div className="p-1">
-        <Searchbar setSearchResult={setSearchResult} />
-      </div>
-      {/* search result */}
-      <div className="transition-all duration-500 ">
-        {searchResult?.map((user) => (
-          <div key={user?._id}>
-            <Link to={`inbox/${user?._id}`}>
-              <div className="h-24 w-full bg-red-500 rounded-xl mb-3 text-white">
-                <h1>{user?.name}</h1>
-              </div>
-            </Link>
-          </div>
-        ))}
-      </div>
-      <div>
-        <h1>chats</h1>
-        {[
-          1, 2, 3, 4, 5, 6, 7, 8, 3, 4, 2, 3, 4, 4, 5, 5, 6, 6, 7, 5, 4, 4, 4,
-        ].map((el, index) => (
-          <div key={index}>
-            <Link to={`inbox/${el}`}>
-              <div className="h-24 w-full bg-slate-500 rounded-xl mb-3"></div>
-            </Link>
-          </div>
-        ))}
+    <div className="h-full overflow-y-auto">
+      <div className="h-max">
+        <div className="p-1 mb-1">
+          <Searchbar setSearchResult={setSearchResult} />
+        </div>
+        {/* search result */}
+
+        <div>
+          {!!searchResult?.users?.length && <Users />}
+          {!!searchResult?.chats?.length && <Chats />}
+        </div>
+
+        {/* existing chats */}
+        <div>
+          <Chats chats={[1, 2, 3, 4, 5, 6, 7, 8, 9, 34, 23, 34]} />
+        </div>
       </div>
     </div>
   );

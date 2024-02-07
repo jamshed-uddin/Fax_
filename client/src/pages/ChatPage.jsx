@@ -1,21 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import useAuthProvider from "../hooks/useAuthProvider";
 import SideChats from "../components/SideChats";
 import { Outlet } from "react-router-dom";
+import "./chatPage.css";
+import ChatsProvider from "../providers/ChatsProvider";
 
 const ChatPage = () => {
   const { user } = useAuthProvider();
-  console.log(user);
+  const [hideSideChat, setHideSideChat] = useState(false);
 
   return (
-    <div className="my-container h-[calc(100vh-5rem)] max-h-[calc(100vh-5rem)] mt-1">
-      <div className="flex h-full ">
-        <div className="lg:w-[30%]  overflow-y-auto">
-          <div className="h-min">
-            <SideChats />
-          </div>
+    <div className="my-container h-screen  py-4">
+      <div className="lg:flex h-full gap-2 ">
+        <div className="lg:w-[40%] lg:shadow-md  lg:rounded-md pt-2 pl-2  ">
+          <SideChats setHideSideChat={setHideSideChat} />
         </div>
-        <div className="border-2 border-red-500 flex-1">
+
+        <div className="h-full flex-grow lg:shadow-md lg:rounded-md pt-2 ">
           <Outlet />
         </div>
       </div>

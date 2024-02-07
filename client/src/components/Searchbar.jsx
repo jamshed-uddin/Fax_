@@ -15,8 +15,17 @@ const Searchbar = ({ setSearchResult }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const result = await axios.get(`api/user?query=${bouncedQuery || ""}`);
-      setSearchResult(result.data);
+      if (!bouncedQuery) return;
+      setLoading(true);
+      try {
+        const result = await axios.get(`api/user?query=${bouncedQuery}`);
+        console.log(result);
+        setSearchResult(result.data);
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        console.log(error);
+      }
     };
 
     fetchData();
