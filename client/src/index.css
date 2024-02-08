@@ -5,3 +5,14 @@
 .my-container {
   @apply w-[97%] lg:w-[90%] mx-auto;
 }
+
+@media only screen and (min-width: 800px) {
+  ::-webkit-scrollbar {
+    width: 7px;
+  }
+
+  :hover::-webkit-scrollbar-thumb {
+    background-color: rgba(220, 220, 220, 0.776);
+    border-radius: 10px;
+  }
+}

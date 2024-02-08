@@ -4,21 +4,20 @@ import axios from "axios";
 export const AuthContext = createContext(null);
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [userLoading, setUserLoading] = useState(true);
 
-  //   get userInfo from local
-  //   useEffect(() => {
-  //     setUser(JSON.parse(localStorage.getItem("userInfo")));
-  //   }, [user]);
   useEffect(() => {
-    const userFromLocal = JSON.parse(localStorage.getItem("userInfo"));
+    setUserLoading(false);
+    const userFromLocal = JSON.parse(localStorage.getItem("chatUserInfo"));
     if (user === null) {
       setUser(userFromLocal || null);
+      setUserLoading(true);
     }
   }, [user]);
 
   useEffect(() => {
     if (user !== null) {
-      localStorage.setItem("userInfo", JSON.stringify(user));
+      localStorage.setItem("chatUserInfo", JSON.stringify(user));
     }
   }, [user]);
 
@@ -58,9 +57,9 @@ const AuthProvider = ({ children }) => {
 
   const userLogout = async () => {
     try {
-      const result = await axios.post("api/user/logout");
+      const result = await axios.post("/api/user/logout");
       setUser(null);
-      localStorage.removeItem("userInfo");
+      localStorage.removeItem("chatUserInfo");
       return result.data;
     } catch (error) {
       if (
@@ -74,7 +73,13 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  const authOptions = { user, registerUser, userSignIn, userLogout };
+  const authOptions = {
+    user,
+    userLoading,
+    registerUser,
+    userSignIn,
+    userLogout,
+  };
 
   return (
     <AuthContext.Provider value={authOptions}>{children}</AuthContext.Provider>

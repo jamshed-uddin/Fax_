@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuthProvider from "../hooks/useAuthProvider";
 
@@ -8,7 +8,7 @@ const Signin = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { user, userSignIn } = useAuthProvider();
-  console.log(user);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,14 +31,14 @@ const Signin = () => {
 
     try {
       await userSignIn(body).then((result) => {
-        console.log(result);
-        setLoading(false);
-        navigate("/chat");
+        if (result) {
+          setLoading(false);
+          navigate("/");
+        }
       });
     } catch (error) {
       setLoading(false);
       setError(error?.message);
-      console.log(error.message);
     }
   };
 

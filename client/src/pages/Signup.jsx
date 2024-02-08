@@ -15,7 +15,7 @@ const Signup = () => {
   const navigate = useNavigate();
   useEffect(() => {
     if (user) {
-      navigate("/chat");
+      navigate("/");
     }
   }, [user, navigate]);
 
@@ -37,6 +37,7 @@ const Signup = () => {
     try {
       const result = await registerUser(body);
       setLoading(false);
+      navigate("/");
       console.log(result);
     } catch (error) {
       setLoading(false);

@@ -1,13 +1,14 @@
-import React, { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
 
 import useChatProvider from "../hooks/useChatProvider";
-import { ArrowLeftIcon } from "@heroicons/react/24/solid";
+import { PaperAirplaneIcon, PhotoIcon } from "@heroicons/react/24/outline";
+import NavigateBack from "../components/NavigateBack";
 
 const ChatInbox = () => {
   const { chatId } = useParams();
   const { setIsSideChatOpen } = useChatProvider();
-  const navigate = useNavigate();
+
   useEffect(() => {
     setIsSideChatOpen(!chatId);
   }, [chatId, setIsSideChatOpen]);
@@ -15,18 +16,10 @@ const ChatInbox = () => {
   return (
     <div className="h-full flex flex-col  ">
       {/* inbox header */}
-      <div className="shadow-sm  flex items-center gap-3  py-1 px-3">
-        <div
-          className="cursor-pointer "
-          onClick={() => {
-            navigate(-1);
-            setIsSideChatOpen(true);
-          }}
-        >
-          <ArrowLeftIcon className="w-6 h-6 " />
-        </div>
+      <div className="shadow-sm  flex items-center gap-2  pb-1 px-4">
+        <NavigateBack />
         <div className="flex items-center gap-2">
-          <div className="h-12 w-12 rounded-full bg-slate-200"></div>
+          <div className="h-11 w-11 rounded-full bg-slate-200"></div>
           <h1 className="text-xl font-medium leading-4">user info {chatId}</h1>
         </div>
         <div></div>
@@ -46,15 +39,20 @@ const ChatInbox = () => {
         </div>
       </div>
       {/* send message input */}
-      <div className=" flex items-center ">
+      <div className=" flex items-center  gap-2 lg:px-3 mb-2">
+        <span>
+          <PhotoIcon className="w-8 h-8" />
+        </span>
         <input
           type="text"
           placeholder="Send message"
-          className=" border-[1px] border-black focus:border-[1px] focus:border-black focus:outline-0  w-full rounded-lg input input-md "
+          className=" border-[1px] border-black focus:border-[1px] focus:border-black focus:outline-0  w-full rounded-lg input input-sm "
           name="messageInput"
         />
 
-        <span className="border-2 border-black rounded-xl px-3 py-1">Send</span>
+        <span>
+          <PaperAirplaneIcon className="w-8 h-8" />
+        </span>
       </div>
     </div>
   );

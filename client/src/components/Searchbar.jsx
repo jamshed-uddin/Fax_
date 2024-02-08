@@ -34,7 +34,7 @@ const Searchbar = ({ setSearchResult }) => {
   return (
     <div className="form-control">
       <div className="flex w-full items-center relative overflow-hidden  rounded-lg">
-        <span className=" mx-1">
+        <span className=" mr-1">
           {searchQuery ? (
             <ArrowLeftIcon className="w-5 h-5" />
           ) : (
