@@ -3,11 +3,11 @@ import useAuthProvider from "../hooks/useAuthProvider";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import UserSettings from "../components/userSettings";
 import WentWrong from "../components/WentWrong";
 import ProfileSkeleton from "../components/ProfileSkeleton";
 import NavigateBack from "../components/NavigateBack";
 import useChatProvider from "../hooks/useChatProvider";
+import Settings from "../components/Settings";
 
 const Profile = () => {
   const { userId } = useParams();
@@ -59,7 +59,7 @@ const Profile = () => {
       <div className="flex justify-between items-center  py-2 px-4">
         <NavigateBack />
         <div className="w-fit">
-          {user?._id === userData?._id && <UserSettings />}
+          {user?._id === userData?._id && <Settings placedIn={"profile"} />}
         </div>
       </div>
       <div className="flex flex-col items-center">

@@ -6,12 +6,20 @@ import Chats from "./Chats";
 import SideHeader from "./SideHeader";
 import CardSkeleton from "./CardSkeleton";
 import useChatProvider from "../hooks/useChatProvider";
+import useGetChat from "../hooks/useGetChat";
 
 const SideChats = () => {
   const [searchResult, setSearchResult] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const { myChats, myChatsLoading } = useChatProvider();
+
+  const {
+    data: myChats,
+    isLoading: myChatsLoading,
+    error: myChatsError,
+    refetch: myChatsRefetch,
+  } = useGetChat("/api/chat");
+
   return (
     <div className="h-full overflow-y-auto relative">
       <div className="sticky top-0 left-0 right-0 z-20">
@@ -47,7 +55,11 @@ const SideChats = () => {
 
         {/* existing chats */}
         <div>
-          <Chats chats={myChats} />
+          {myChatsLoading ? (
+            <CardSkeleton cardAmount={5} />
+          ) : (
+            <Chats chats={myChats} />
+          )}
         </div>
       </div>
     </div>

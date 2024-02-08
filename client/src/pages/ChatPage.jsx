@@ -8,7 +8,6 @@ import Hero from "../components/Hero";
 const ChatPage = () => {
   const { isSideChatOpen } = useChatProvider();
   const { user, userLoading } = useAuthProvider();
-  console.log(userLoading);
 
   if (userLoading) {
     return <div className="h-screen bg-white"></div>;
