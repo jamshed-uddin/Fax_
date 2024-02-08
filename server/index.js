@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const connectDB = require("./config/db");
 const userRoute = require("./routes/userRoute");
 const chatRoute = require("./routes/chatRoutes");
+const messageRoute = require("./routes/messageRoutes");
 const dotenv = require("dotenv");
 const { notFound, errorHandler } = require("./middlewares/errorMiddlewares");
 dotenv.config();
@@ -25,6 +26,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/user", userRoute);
 app.use("/api/chat", chatRoute);
+app.use("/api/message", messageRoute);
 
 app.use(notFound);
 app.use(errorHandler);

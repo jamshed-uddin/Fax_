@@ -83,7 +83,7 @@ const getSignleChat = asyncHandler(async (req, res) => {
   try {
     const allChat = await Chat.findOne({ _id: req.params.chatId })
       .populate("latestMessage")
-      .populate("user", "-password -email")
+      .populate("users", "-password -email")
       .populate({ path: "latestMessage.sender", select: "name email pic" });
 
     res.status(200).send(allChat);
