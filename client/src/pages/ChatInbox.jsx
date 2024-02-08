@@ -41,17 +41,17 @@ const ChatInbox = () => {
       {/* send message input */}
       <div className=" flex items-center  gap-2 lg:px-3 mb-2">
         <span>
-          <PhotoIcon className="w-8 h-8" />
+          <PhotoIcon className="w-7 h-7 text-slate-600" />
         </span>
         <input
           type="text"
           placeholder="Send message"
-          className=" border-[1px] border-black focus:border-[1px] focus:border-black focus:outline-0  w-full rounded-lg input input-sm "
+          className="input input-bordered focus:outline-0 input-sm w-full "
           name="messageInput"
         />
 
         <span>
-          <PaperAirplaneIcon className="w-8 h-8" />
+          <PaperAirplaneIcon className="w-7 h-7 text-slate-600" />
         </span>
       </div>
     </div>

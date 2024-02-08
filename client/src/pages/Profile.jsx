@@ -45,6 +45,7 @@ const Profile = () => {
     enabled: !!userId,
   });
 
+  console.log(userData);
   if (userDataError) {
     return <WentWrong refetch={userDataRefetch} />;
   }
@@ -65,7 +66,7 @@ const Profile = () => {
         <div className="h-40 w-40">
           <img
             className="h-full w-full object-cover rounded-full"
-            src={userData?.pic}
+            src={userData?.photoURL}
             alt={`Profile image of ${userData?.name}`}
           />
         </div>

@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import useAuthProvider from "../hooks/useAuthProvider";
 import SideChats from "../components/SideChats";
 import { Outlet } from "react-router-dom";
@@ -9,8 +8,13 @@ import Hero from "../components/Hero";
 const ChatPage = () => {
   const { isSideChatOpen } = useChatProvider();
   const { user, userLoading } = useAuthProvider();
+  console.log(userLoading);
 
-  if (!user && userLoading) {
+  if (userLoading) {
+    return <div className="h-screen bg-white"></div>;
+  }
+
+  if (!user) {
     return <Hero />;
   }
 

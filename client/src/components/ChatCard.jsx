@@ -8,11 +8,17 @@ const ChatCard = ({ chat, clickFunc }) => {
       className="h-14 w-full rounded-lg  flex items-center gap-2"
     >
       {/* image */}
-      <div className="h-12 w-12 rounded-full bg-slate-200"></div>
+      <div className="h-11 w-11 rounded-full  overflow-hidden">
+        <img
+          className="w-full h-full object-cover rounded-full"
+          src={chat?.chatPhotoURL}
+          alt=""
+        />
+      </div>
       {/* other info */}
       <div>
-        <h1 className="text-lg font-medium leading-4">Chat name</h1>
-        <h2>Last message</h2>
+        <h1 className="text-lg font-medium leading-4">{chat?.chatName}</h1>
+        <h2>{chat?.lastMessage}</h2>
       </div>
     </div>
   );

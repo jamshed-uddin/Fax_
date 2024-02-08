@@ -7,12 +7,12 @@ const AuthProvider = ({ children }) => {
   const [userLoading, setUserLoading] = useState(true);
 
   useEffect(() => {
-    setUserLoading(false);
+    // setUserLoading(true);
     const userFromLocal = JSON.parse(localStorage.getItem("chatUserInfo"));
     if (user === null) {
       setUser(userFromLocal || null);
-      setUserLoading(true);
     }
+    setUserLoading(false);
   }, [user]);
 
   useEffect(() => {

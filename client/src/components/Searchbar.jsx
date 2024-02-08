@@ -2,53 +2,52 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import useDebounce from "../hooks/useDebouce";
-import {
-  ArrowLeftIcon,
-  MagnifyingGlassIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/solid";
-const Searchbar = ({ setSearchResult }) => {
+import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/solid";
+
+const Searchbar = ({ setSearchResult, setIsSearching, setSearchLoading }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [inputOnFocus, setInputOnFocus] = useState(false);
   const bouncedQuery = useDebounce(searchQuery, 600);
-  const [loading, setLoading] = useState(false);
-  // const [searchResult, setSearchResult] = useState();
+
+  // useEffect(() => {
+  //   setIsSearching(!!searchQuery);
+  // }, [searchQuery, setIsSearching]);
 
   useEffect(() => {
+    setSearchLoading(true);
+    if (!inputOnFocus) return;
+
     const fetchData = async () => {
-      if (!bouncedQuery) return;
-      setLoading(true);
       try {
-        const result = await axios.get(`api/user?query=${bouncedQuery}`);
+        const result = await axios.get(`/api/user?query=${bouncedQuery}`);
         console.log(result);
         setSearchResult(result.data);
-        setLoading(false);
+        setSearchLoading(false);
       } catch (error) {
-        setLoading(false);
+        setSearchLoading(false);
         console.log(error);
       }
     };
 
     fetchData();
-  }, [bouncedQuery, setSearchResult]);
+  }, [bouncedQuery, inputOnFocus, setSearchLoading, setSearchResult]);
 
   return (
-    <div className="form-control">
-      <div className="flex w-full items-center relative overflow-hidden  rounded-lg">
+    <div className="form-control  ">
+      <div className="flex w-full items-center relative overflow-hidden  rounded-lg  py-1 pr-1">
         <span className=" mr-1">
-          {searchQuery ? (
-            <ArrowLeftIcon className="w-5 h-5" />
-          ) : (
-            <MagnifyingGlassIcon className="w-6 h-6" />
-          )}
+          <MagnifyingGlassIcon className="w-6 h-6" />
         </span>
         <input
           type="text"
           placeholder="Search"
-          className="input input-bordered input-sm w-full "
+          className="input input-bordered focus:outline-0 input-sm w-full "
           name="searchInput"
           value={searchQuery}
+          onFocus={() => setInputOnFocus(true)}
           onChange={(e) => {
             setSearchQuery(e.target.value);
+            setIsSearching(e.target.value);
           }}
         />
         {searchQuery && (
