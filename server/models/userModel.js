@@ -6,7 +6,7 @@ const userSchema = mongoose.Schema(
     name: { type: "String", required: true },
     email: { type: "String", unique: true, required: true },
     password: { type: "String", required: true },
-    pic: {
+    photoURL: {
       type: "String",
       default: "https://i.ibb.co/Twp960D/default-profile-400x400.png",
     },
@@ -17,7 +17,7 @@ const userSchema = mongoose.Schema(
       default: false,
     },
   },
-  { timestaps: true }
+  { timestamps: true }
 );
 
 userSchema.pre("save", async function (next) {

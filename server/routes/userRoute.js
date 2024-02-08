@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.post("/auth", authUser);
 router.post("/", registerUser);
-router.post("/logout", logoutUser);
+router.post("/logout", verifyJWT, logoutUser);
 router.get("/", verifyJWT, searchUsers);
 router.get("/singleUser", singleUser);
 

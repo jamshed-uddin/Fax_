@@ -1,7 +1,7 @@
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const generateToken = require("../utils/generateToken");
-
+const Chat = require("../models/chatModel");
 //@desc auth user
 //route POST/api/user/auth
 //access public
@@ -27,12 +27,12 @@ const authUser = asyncHandler(async (req, res) => {
 // access private
 const singleUser = asyncHandler(async (req, res) => {
   const userId = req.query.userId;
-  console.log(userId);
+
   try {
     const user = await User.findById({ _id: userId }).select(
       "-password -email -isAdmin"
     );
-    console.log(user);
+
     if (user) {
       res.status(200).send(user);
     } else {
@@ -40,7 +40,6 @@ const singleUser = asyncHandler(async (req, res) => {
       throw new Error("User not found");
     }
   } catch (error) {
-    console.log(error);
     res.status(404);
     throw new Error(error.message);
   }
@@ -96,21 +95,24 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const searchUsers = asyncHandler(async (req, res) => {
   const searchQuery = req.query.query;
-  const user = await User.findOne({ _id: req.user?._id });
-  if (!user) {
-    res.status(401);
-    throw new Error("Unauthorized action");
-  }
 
   if (searchQuery) {
-    const searchResult = await User.find({
+    const users = await User.find({
       $or: [
         { name: { $regex: new RegExp(searchQuery, "i") } },
         { email: { $regex: new RegExp(searchQuery, "i") } },
       ],
-    }).select("-password  -isAdmin");
+    }).select("-password  -isAdmin -email");
+
+    const chats = await Chat.find({
+      chatName: { $regex: new RegExp(searchQuery, "i") },
+    });
+
+    const searchResult = { users, chats };
 
     res.status(200).send(searchResult);
+  } else {
+    res.status(200).send({});
   }
 });
 module.exports = {
