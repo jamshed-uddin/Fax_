@@ -3,6 +3,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const connectDB = require("./config/db");
 const userRoute = require("./routes/userRoute");
+const chatRoute = require("./routes/chatRoutes");
 const dotenv = require("dotenv");
 const { notFound, errorHandler } = require("./middlewares/errorMiddlewares");
 dotenv.config();
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/user", userRoute);
+app.use("/api/chat", chatRoute);
 
 app.use(notFound);
 app.use(errorHandler);

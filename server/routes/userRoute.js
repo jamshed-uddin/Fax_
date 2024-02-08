@@ -1,16 +1,19 @@
 const express = require("express");
+const { verifyJWT } = require("../middlewares/authMids");
 const {
   authUser,
   registerUser,
   searchUsers,
   logoutUser,
+  singleUser,
 } = require("../controllers/userControllers");
-const { verifyJWT } = require("../middlewares/authMids");
+
 const router = express.Router();
 
 router.post("/auth", authUser);
 router.post("/", registerUser);
 router.post("/logout", logoutUser);
 router.get("/", verifyJWT, searchUsers);
+router.get("/singleUser", singleUser);
 
 module.exports = router;

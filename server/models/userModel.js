@@ -8,9 +8,9 @@ const userSchema = mongoose.Schema(
     password: { type: "String", required: true },
     pic: {
       type: "String",
-      default:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+      default: "https://i.ibb.co/Twp960D/default-profile-400x400.png",
     },
+    bio: { type: String },
     isAdmin: {
       type: Boolean,
       required: true,

@@ -1,7 +1,5 @@
 const User = require("../models/userModel");
-
 const asyncHandler = require("express-async-handler");
-const router = require("../routes/userRoute");
 const generateToken = require("../utils/generateToken");
 
 //@desc auth user
@@ -21,6 +19,30 @@ const authUser = asyncHandler(async (req, res) => {
   } else {
     res.status(400);
     throw new Error("Invalid email or password");
+  }
+});
+
+// @desc single user
+// route POST api/user/singleUser
+// access private
+const singleUser = asyncHandler(async (req, res) => {
+  const userId = req.query.userId;
+  console.log(userId);
+  try {
+    const user = await User.findById({ _id: userId }).select(
+      "-password -email -isAdmin"
+    );
+    console.log(user);
+    if (user) {
+      res.status(200).send(user);
+    } else {
+      res.status(404);
+      throw new Error("User not found");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(404);
+    throw new Error(error.message);
   }
 });
 
@@ -80,18 +102,21 @@ const searchUsers = asyncHandler(async (req, res) => {
     throw new Error("Unauthorized action");
   }
 
-  console.log(searchQuery);
   if (searchQuery) {
     const searchResult = await User.find({
       $or: [
         { name: { $regex: new RegExp(searchQuery, "i") } },
         { email: { $regex: new RegExp(searchQuery, "i") } },
       ],
-    }).select("-password -token -isAdmin");
+    }).select("-password  -isAdmin");
 
     res.status(200).send(searchResult);
-  } else {
-    res.status(200).json([]);
   }
 });
-module.exports = { authUser, registerUser, searchUsers, logoutUser };
+module.exports = {
+  authUser,
+  registerUser,
+  searchUsers,
+  logoutUser,
+  singleUser,
+};
