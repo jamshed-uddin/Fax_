@@ -8,6 +8,7 @@ import useGetChat from "../hooks/useGetChat";
 import InboxSkeleton from "../components/InboxSkeleton";
 import WentWrong from "../components/WentWrong";
 import Settings from "../components/Settings";
+import SendMessage from "../components/SendMessage";
 
 const ChatInbox = () => {
   const { chatId } = useParams();
@@ -19,7 +20,12 @@ const ChatInbox = () => {
     refetch: singleChatRefetch,
   } = useGetChat(`/api/chat/${chatId}`);
 
-  console.log(singleChat);
+  const {
+    data: messages,
+    isLoading: messagesLoading,
+    error: messagesError,
+    refetch: messagesRefetch,
+  } = useGetChat(`/api/message/${chatId}`);
 
   useEffect(() => {
     setIsSideChatOpen(!chatId);
@@ -63,33 +69,16 @@ const ChatInbox = () => {
         ) : (
           <div className="h-max">
             <h1 className="text-center">messages</h1>
-            {[
-              1, 2, 3, 4, 5, 6, 7, 8, 34, 213, 245, 45, 234, 13, 32, 42, 66, 77,
-              88, 99, 33, 22, 11, 55, 232, 13241, 3424, 35235,
-            ].map((el) => (
-              <div key={el} className="mb-6">
-                {el}
+            {messages?.map((message) => (
+              <div key={message._id} className="mb-6">
+                {message.content}
               </div>
             ))}
           </div>
         )}
       </div>
       {/* send message input */}
-      <div className=" flex items-center  gap-2 lg:px-3 mb-2">
-        <span>
-          <PhotoIcon className="w-7 h-7 text-slate-600" />
-        </span>
-        <input
-          type="text"
-          placeholder="Send message"
-          className="input input-bordered focus:outline-0 input-sm w-full "
-          name="messageInput"
-        />
-
-        <span>
-          <PaperAirplaneIcon className="w-7 h-7 text-slate-600" />
-        </span>
-      </div>
+      <SendMessage chatId={chatId} messagesRefetch={messagesRefetch} />
     </div>
   );
 };
