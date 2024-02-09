@@ -7,7 +7,7 @@ const SideHeader = () => {
   const [dark, setDark] = useState(false);
 
   return (
-    <div className="flex items-center justify-between bg-white  pb-1 pr-2 lg:pr-0 mb-1">
+    <div className="flex items-center justify-between bg-white  pb-1  mb-1">
       <div>
         <h1 className="text-2xl font-bold">CHAT</h1>
       </div>

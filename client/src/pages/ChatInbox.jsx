@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import useChatProvider from "../hooks/useChatProvider";
@@ -9,10 +9,20 @@ import InboxSkeleton from "../components/InboxSkeleton";
 import WentWrong from "../components/WentWrong";
 import Settings from "../components/Settings";
 import SendMessage from "../components/SendMessage";
+import {
+  chatPhotoHandler,
+  isOwnMessage,
+  isUsersLastMessage,
+} from "../logics/messageLogics";
+import useAuthProvider from "../hooks/useAuthProvider";
 
 const ChatInbox = () => {
+  const { user } = useAuthProvider();
   const { chatId } = useParams();
   const { setIsSideChatOpen } = useChatProvider();
+  const messageRef = useRef();
+  const [scrollToEnd, setScrollToEnd] = useState(false);
+
   const {
     data: singleChat,
     isLoading: singleChatLoading,
@@ -31,6 +41,10 @@ const ChatInbox = () => {
     setIsSideChatOpen(!chatId);
   }, [chatId, setIsSideChatOpen]);
 
+  useEffect(() => {
+    messageRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [scrollToEnd]);
+
   if (singleChatError) {
     return <WentWrong refetch={singleChatRefetch} />;
   }
@@ -43,15 +57,21 @@ const ChatInbox = () => {
         <div className="flex items-center gap-2">
           {/* photo */}
           <div className="h-11 w-11 rounded-full overflow-hidden">
-            <img
-              className="w-full h-full object-cover rounded-full"
-              src={singleChat?.chatPhotoURL}
-              alt={`Profile photo of ${singleChat?.chatName}`}
-            />
+            {singleChatLoading ? (
+              <div className="h-full w-full rounded-full bg-slate-200"></div>
+            ) : (
+              <img
+                className="w-full h-full object-cover rounded-full"
+                src={chatPhotoHandler(singleChat, user)}
+                alt={`Profile photo of ${singleChat?.chatName}`}
+              />
+            )}
           </div>
           {/* name */}
           <h1 className="text-xl font-medium leading-4">
-            {singleChat?.chatName}
+            {singleChat?.users[0]._id === user?._id
+              ? singleChat?.users[1].name
+              : singleChat?.users[0].name}
           </h1>
         </div>
         <div className="flex-grow flex justify-end">
@@ -63,22 +83,57 @@ const ChatInbox = () => {
         </div>
       </div>
       {/* messages */}
-      <div className=" flex-grow overflow-y-auto px-3">
+      <div
+        ref={messageRef}
+        className=" flex-grow overflow-y-auto px-4 mb-2 flex items-end "
+      >
         {singleChatLoading ? (
           <InboxSkeleton />
         ) : (
-          <div className="h-max">
-            <h1 className="text-center">messages</h1>
-            {messages?.map((message) => (
-              <div key={message._id} className="mb-6">
-                {message.content}
+          <div className="h-max  py-2  w-full ">
+            {messages?.map((message, index, msgArr) => (
+              <div
+                key={message._id}
+                className={`chat flex items-end ${
+                  isOwnMessage(message.sender, user?._id)
+                    ? "justify-end chat-end "
+                    : "justify-start chat-start"
+                }`}
+              >
+                {/* user avatar */}
+                {!isOwnMessage(message.sender, user?._id) && (
+                  <div className="h-10 w-10 rounded-full overflow-hidden  ">
+                    {!isUsersLastMessage(msgArr, index, message) &&
+                      !isOwnMessage(message.sender, user?._id) && (
+                        <img
+                          className="w-full h-full object-cover rounded-full"
+                          src={message.sender.photoURL}
+                          alt={`Profile photo of ${singleChat?.chatName}`}
+                        />
+                      )}
+                  </div>
+                )}
+                {/* message text */}
+                <div
+                  className={`  bg-slate-200 text-black shadow-md ${
+                    isUsersLastMessage(msgArr, index, message)
+                      ? "p-2 px-3 rounded-lg"
+                      : "p-2 px-3  chat-bubble rounded-lg"
+                  }`}
+                >
+                  {message.content}
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
       {/* send message input */}
-      <SendMessage chatId={chatId} messagesRefetch={messagesRefetch} />
+      <SendMessage
+        setScrollToEnd={setScrollToEnd}
+        chatId={chatId}
+        messagesRefetch={messagesRefetch}
+      />
     </div>
   );
 };

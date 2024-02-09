@@ -5,7 +5,7 @@ import Users from "./Users";
 import Chats from "./Chats";
 import SideHeader from "./SideHeader";
 import CardSkeleton from "./CardSkeleton";
-import useChatProvider from "../hooks/useChatProvider";
+
 import useGetChat from "../hooks/useGetChat";
 
 const SideChats = () => {

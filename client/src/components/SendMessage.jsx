@@ -1,11 +1,9 @@
 import { PaperAirplaneIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
-const SendMessage = ({ chatId, messagesRefetch }) => {
+const SendMessage = ({ chatId, messagesRefetch, setScrollToEnd }) => {
   const [message, setMessage] = useState("");
-
-  console.log(message);
 
   const sendMessageHandler = async () => {
     try {
@@ -13,9 +11,11 @@ const SendMessage = ({ chatId, messagesRefetch }) => {
         content: message,
         chatId,
       });
+
       console.log(result);
-      messagesRefetch();
       setMessage("");
+      messagesRefetch();
+      setScrollToEnd((p) => !p);
     } catch (error) {
       if (
         error.response &&
