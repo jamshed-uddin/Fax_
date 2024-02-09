@@ -65,9 +65,14 @@ const getChats = asyncHandler(async (req, res) => {
     const allChat = await Chat.find({
       users: req.user._id,
     })
-
-      .populate("latestMessage")
-      .populate({ path: "latestMessage.sender", select: "name email pic" });
+      .populate("users")
+      .populate({
+        path: "latestMessage",
+        populate: {
+          path: "sender",
+          select: "name email",
+        },
+      });
 
     res.status(200).send(allChat);
   } catch (error) {

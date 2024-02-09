@@ -31,7 +31,7 @@ const createMessage = asyncHandler(async (req, res) => {
 
     await Chat.findByIdAndUpdate(
       { _id: chatId },
-      { lastMessage: createNewMessage._id }
+      { latestMessage: createNewMessage._id }
     );
 
     res.status(201).send(createdNewMessage);

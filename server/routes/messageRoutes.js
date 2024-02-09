@@ -1,4 +1,5 @@
 const express = require("express");
+const Message = require("../models/messageModel");
 const { verifyJWT } = require("../middlewares/authMids");
 const {
   createMessage,
