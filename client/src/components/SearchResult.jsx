@@ -4,7 +4,6 @@ import Chats from "./Chats";
 
 const SearchResult = ({ query, searchResult, searchLoading }) => {
   const { users, chats } = searchResult;
-  console.log(users, chats);
 
   if (query && searchLoading) {
     return <CardSkeleton cardAmount={3} />;

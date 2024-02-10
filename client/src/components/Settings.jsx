@@ -12,7 +12,7 @@ import { Link, useNavigate } from "react-router-dom";
 import useAuthProvider from "../hooks/useAuthProvider";
 import useCloseMenu from "../hooks/useCloseMenu";
 import Modal from "./Modal";
-const Settings = ({ placedIn, settingsFor, chatInfo }) => {
+const Settings = ({ placedIn, settingsFor, chatInfo, userRefetch }) => {
   const { userLogout } = useAuthProvider();
   const { user } = useAuthProvider();
   const navigate = useNavigate();
@@ -36,6 +36,7 @@ const Settings = ({ placedIn, settingsFor, chatInfo }) => {
           setIsModalOpen={setIsModalOpen}
           chatId={chatInfo?._id}
           userId={user?._id}
+          userRefetch={userRefetch}
         />
       </div>
       <div id="settings" className="relative select-none">

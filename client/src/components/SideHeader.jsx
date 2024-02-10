@@ -20,7 +20,7 @@ const SideHeader = () => {
           )}
         </div>
         <div className="h-9 w-9">
-          <Link to={`/profile/${user?._id}`} replace={true}>
+          <Link to={`/profile/${user?._id}`}>
             <span>
               <UserIcon className="w-full h-full  rounded-full p-1" />
             </span>

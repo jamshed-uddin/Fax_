@@ -21,11 +21,14 @@ import axios from "axios";
 const ChatInbox = () => {
   const { user } = useAuthProvider();
   const { chatId } = useParams();
-  const { setIsSideChatOpen, socket, typingStatus } = useChatProvider();
+  const { setIsSideChatOpen, socket, typingStatus, lastSeen, isUserActive } =
+    useChatProvider();
+
   const messageRef = useRef();
-  const [scrollToEnd, setScrollToEnd] = useState(false);
+
   const [allMessages, setAllMessages] = useState([]);
   const [sendMessage, setSendMessage] = useState(null);
+  const [newMessage, setNewMessage] = useState(false);
 
   const {
     data: singleChat,
@@ -33,6 +36,26 @@ const ChatInbox = () => {
     error: singleChatError,
     refetch: singleChatRefetch,
   } = useGetChat(`/api/chat/${chatId}`);
+
+  // scroll to the end when send new message and in initail render
+  useEffect(() => {
+    const messageInbox = document.getElementById("messages");
+
+    messageInbox?.scrollIntoView();
+    messageInbox?.scrollIntoView(false);
+    messageInbox?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+      inline: "nearest",
+    });
+  }, [newMessage]);
+
+  useEffect(() => {
+    // if (allMessages?.at(-1)?.sender._id === user?._id) return;
+    const messageInbox = document.getElementById("message-container");
+
+    messageInbox.scrollTop = messageInbox?.scrollHeight;
+  }, [allMessages]);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -71,11 +94,6 @@ const ChatInbox = () => {
     setIsSideChatOpen(!chatId);
   }, [chatId, setIsSideChatOpen]);
 
-  //to scroll to the last message
-  useEffect(() => {
-    messageRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [scrollToEnd]);
-
   if (singleChatError) {
     return <WentWrong refetch={singleChatRefetch} />;
   }
@@ -85,9 +103,9 @@ const ChatInbox = () => {
       {/* inbox header */}
       <div className="shadow-sm w-full flex items-center gap-2  pb-1 px-4 ">
         <NavigateBack />
-        <div className="flex items-center gap-2">
+        <div className="flex items-center  gap-2">
           {/* photo */}
-          <div className="h-11 w-11 rounded-full overflow-hidden">
+          <div className="h-11 w-11 rounded-full  relative">
             {singleChatLoading ? (
               <div className="h-full w-full rounded-full bg-slate-200"></div>
             ) : (
@@ -97,11 +115,21 @@ const ChatInbox = () => {
                 alt={`Profile photo of ${singleChat?.chatName}`}
               />
             )}
+
+            {!singleChat?.isGroupChat &&
+              isUserActive(user, singleChat?.users) && (
+                <div className="h-4 w-4 border-2 border-white bg-green-400 rounded-full absolute -bottom-[3px] -right-[3px] z-20"></div>
+              )}
           </div>
           {/* name */}
-          <h1 className="text-xl font-medium leading-4">
-            {chatNameHandler(singleChat, user)}
-          </h1>
+          <div>
+            <h1 className="text-xl font-medium ">
+              {chatNameHandler(singleChat, user)}
+            </h1>
+            <h1 className="text-sm  leading-3">
+              Last seen {lastSeen(new Date(), new Date())}
+            </h1>
+          </div>
         </div>
         <div className="flex-grow flex justify-end">
           <Settings
@@ -112,11 +140,15 @@ const ChatInbox = () => {
         </div>
       </div>
       {/* messages */}
-      <div className=" flex-grow overflow-y-auto lg:px-4 mb-2">
+      <div
+        ref={messageRef}
+        id="message-container"
+        className=" flex-grow overflow-y-auto lg:px-4 mb-2"
+      >
         {singleChatLoading ? (
           <InboxSkeleton />
         ) : (
-          <div ref={messageRef} className="h-max  py-2  w-full ">
+          <div id="messages" className="h-max  py-2  w-full ">
             {allMessages?.map((message, index, msgArr) => (
               <div
                 key={message._id}
@@ -180,10 +212,10 @@ const ChatInbox = () => {
       </div>
       {/* send message input */}
       <SendMessage
-        setScrollToEnd={setScrollToEnd}
         chat={singleChat}
         setSendMessage={setSendMessage}
         setAllMessages={setAllMessages}
+        setNewMessage={setNewMessage}
       />
     </div>
   );

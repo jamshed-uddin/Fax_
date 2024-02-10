@@ -1,11 +1,19 @@
 import React, { useState } from "react";
 import useAuthProvider from "../hooks/useAuthProvider";
+import axios from "axios";
 
-const Modal = ({ modalFor, isModalOpen, setIsModalOpen, chatId, userId }) => {
+const Modal = ({
+  modalFor,
+  isModalOpen,
+  setIsModalOpen,
+  chatId,
+  userId,
+  userRefetch,
+}) => {
   const { user } = useAuthProvider();
   const [name, setName] = useState(user?.name || "");
   const [bio, setBio] = useState(user?.bio || "");
-  console.log(modalFor);
+  const [loading, setLoading] = useState(false);
 
   const handleModalClose = () => {
     if (modalFor === "editProfile") {
@@ -15,37 +23,50 @@ const Modal = ({ modalFor, isModalOpen, setIsModalOpen, chatId, userId }) => {
     setIsModalOpen((p) => !p);
   };
 
+  const handleUserUpdate = async () => {
+    if (!name || !bio) return;
+
+    try {
+      setLoading(true);
+      const result = await axios.put("/api/user", { name, bio });
+      setLoading(false);
+      userRefetch();
+      handleModalClose();
+      console.log(result.data);
+    } catch (error) {
+      setLoading(false);
+      console.log(error.message);
+    }
+  };
+
   return (
     <div
-      className={`w-11/12 p-3 lg:w-2/5 min-h-36 mx-auto  bg-white shadow-2xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 rounded-xl ${
+      className={`w-11/12 p-3 lg:w-2/5 mx-auto h-fit bg-white shadow-2xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 rounded-xl ${
         !isModalOpen && "hidden"
-      }`}
+      } `}
     >
-      {modalFor === "deleteChat" ||
-        (modalFor === "leaveGroup" && (
-          <div className=" flex flex-col h-full">
-            <h1 className="flex-grow text-xl font-medium">
-              {modalFor === "deleteChat"
-                ? "Delete this conversation?"
-                : "Leave this group?"}
-            </h1>
+      {(modalFor === "deleteChat" || modalFor === "leaveGroup") && (
+        <div className=" flex flex-col h-full space-y-12">
+          <h1 className="flex-grow text-xl font-medium">
+            {modalFor === "deleteChat"
+              ? "Delete this conversation?"
+              : "Leave this group?"}
+          </h1>
 
-            <div className="text-end space-x-2 ">
-              {modalFor === "deleteChat" ? (
-                <button className="btn btn-sm btn-error text-white">
-                  Delete
-                </button>
-              ) : (
-                <button className="btn btn-sm btn-error text-white">
-                  Leave
-                </button>
-              )}
-              <button onClick={handleModalClose} className="btn btn-sm ">
-                Cancel
+          <div className="text-end space-x-2 ">
+            {modalFor === "deleteChat" ? (
+              <button className="btn btn-sm btn-error text-white">
+                Delete
               </button>
-            </div>
+            ) : (
+              <button className="btn btn-sm btn-error text-white">Leave</button>
+            )}
+            <button onClick={handleModalClose} className="btn btn-sm ">
+              Cancel
+            </button>
           </div>
-        ))}
+        </div>
+      )}
 
       {modalFor === "editProfile" && (
         <div className=" flex flex-col h-full">
@@ -73,7 +94,9 @@ const Modal = ({ modalFor, isModalOpen, setIsModalOpen, chatId, userId }) => {
             <button onClick={handleModalClose} className="btn btn-sm ">
               Cancel
             </button>
-            <button className="btn btn-sm ">Update</button>
+            <button onClick={handleUserUpdate} className="btn btn-sm ">
+              {loading ? "Updating..." : "Update"}
+            </button>
           </div>
         </div>
       )}

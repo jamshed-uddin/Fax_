@@ -1,13 +1,12 @@
 import { PaperAirplaneIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
-import React, { useRef, useState } from "react";
+import { useState } from "react";
 import useAuthProvider from "../hooks/useAuthProvider";
 import useChatProvider from "../hooks/useChatProvider";
 
 const SendMessage = ({
   chat,
-
-  setScrollToEnd,
+  setNewMessage,
   setSendMessage,
   setAllMessages,
 }) => {
@@ -37,12 +36,10 @@ const SendMessage = ({
     const reciever = chat?.users.find((u) => u._id !== user._id);
     // sending message to socket
     setSendMessage({
-      ...{
-        sender,
-        content: message,
-        chatId: chat?._id,
-      },
-      recieverId: reciever?._id,
+      sender,
+      content: message,
+      chatId: chat?._id,
+      users: chat?.users,
     });
 
     // sending to DB
@@ -50,10 +47,9 @@ const SendMessage = ({
       const result = await axios.post("/api/message/newMessage", messageToSend);
 
       setAllMessages((p) => [...p, result?.data]);
+      setNewMessage((p) => !p);
       console.log(result);
       setMessage("");
-
-      setScrollToEnd((p) => !p);
     } catch (error) {
       if (
         error.response &&

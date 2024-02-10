@@ -1,6 +1,4 @@
-import React from "react";
 import ChatCard from "./ChatCard";
-import CardSkeleton from "./CardSkeleton";
 import { Link } from "react-router-dom";
 
 const Chats = ({ chats }) => {
@@ -10,7 +8,7 @@ const Chats = ({ chats }) => {
       <div className="space-y-2">
         {chats?.map((chat, index) => (
           <div key={index}>
-            <Link to={`inbox/${chat?._id}`} replace={true}>
+            <Link to={`inbox/${chat?._id}`}>
               <ChatCard key={chat._id} chat={chat} />
             </Link>
           </div>

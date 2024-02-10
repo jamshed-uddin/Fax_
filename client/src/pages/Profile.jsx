@@ -59,7 +59,9 @@ const Profile = () => {
       <div className="flex justify-between items-center  py-2 px-4">
         <NavigateBack />
         <div className="w-fit">
-          {user?._id === userData?._id && <Settings placedIn={"profile"} />}
+          {user?._id === userData?._id && (
+            <Settings placedIn={"profile"} userRefetch={userDataRefetch} />
+          )}
         </div>
       </div>
       <div className="flex flex-col items-center">
@@ -72,7 +74,7 @@ const Profile = () => {
         </div>
         <div className="mt-4 text-center">
           <h1 className="text-3xl font-semibold">{userData?.name}</h1>
-          <h3 className="text-xl">{userData?.bio} ksadf sad flsadf</h3>
+          <h3 className="text-xl">{userData?.bio}</h3>
         </div>
       </div>
     </div>
