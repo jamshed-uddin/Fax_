@@ -57,7 +57,7 @@ const accessChat = asyncHandler(async (req, res) => {
 });
 
 //@desc get all chat for specific user
-//@route POST /api/chat
+//@route get /api/chat
 //@access private
 
 const getChats = asyncHandler(async (req, res) => {
@@ -65,12 +65,12 @@ const getChats = asyncHandler(async (req, res) => {
     const allChat = await Chat.find({
       users: req.user._id,
     })
-      .populate("users")
+      .populate("users", "name photoURL ")
       .populate({
         path: "latestMessage",
         populate: {
           path: "sender",
-          select: "name email",
+          select: "name photoURL",
         },
       });
 
@@ -88,8 +88,8 @@ const getSignleChat = asyncHandler(async (req, res) => {
   try {
     const allChat = await Chat.findOne({ _id: req.params.chatId })
       .populate("latestMessage")
-      .populate("users", "-password -email")
-      .populate({ path: "latestMessage.sender", select: "name email pic" });
+      .populate("users", "name photoURL")
+      .populate({ path: "latestMessage.sender", select: "name photoURL" });
 
     res.status(200).send(allChat);
   } catch (error) {
