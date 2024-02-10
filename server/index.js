@@ -43,30 +43,28 @@ io.on("connection", (socket) => {
   console.log(`${socket.id} is connected`);
 
   // user setup when login and send active users to client
-  socket.on("userSetup", (data) => {
-    console.log("active user", data);
-    if (!activeUsers.some((user) => user.userId === data._id)) {
-      activeUsers.push({ userId: data._id, socketId: socket.id });
+  socket.on("userSetup", (user) => {
+    socket.join(user._id);
+    console.log("active user", user);
+    if (!activeUsers.some((user) => user.userId === user._id)) {
+      activeUsers.push({ userId: user._id, socketId: socket.id });
     }
-
+    console.log("activearray", activeUsers);
     io.emit("activeUsers", activeUsers);
   });
 
   // send message
   socket.on("sendMessage", (data) => {
-    const { recieverId } = data;
-
-    const user = activeUsers.find((user) => user.userId === recieverId);
-    // console.log("sending to ", user);
-    // console.log("data: ", data);
-    if (user) {
-      io.to(user.socketId).emit("recieveMessage", data);
+    const { users } = data;
+    if (users.length) {
+      users.forEach((user) => {
+        socket.in(user._id).emit("recieveMessage", data);
+      });
     }
   });
 
   // typing status
   socket.on("typingStatus", (data) => {
-    console.log(data);
     io.emit("typing", data);
 
     setTimeout(() => {

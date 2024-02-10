@@ -115,10 +115,32 @@ const searchUsers = asyncHandler(async (req, res) => {
     res.status(200).send({});
   }
 });
+
+//@desc update user
+//route GET api/user
+//access private
+
+const updateUser = asyncHandler(async (req, res) => {
+  const bodyToUpdate = req.body;
+  console.log("updateuser", body);
+
+  try {
+    await User.findOneAndUpdate({ _id: req.user._id }, bodyToUpdate, {
+      new: true,
+    });
+
+    res.status(200).send({ message: "User updated successfully" });
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
 module.exports = {
   authUser,
   registerUser,
   searchUsers,
   logoutUser,
   singleUser,
+  updateUser,
 };
