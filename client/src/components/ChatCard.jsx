@@ -32,13 +32,13 @@ const ChatCard = ({ chat, clickFunc }) => {
           {chat?.isGroupChat ? chat?.chatName : chatNameHandler(chat, user)}
         </h1>
         <h2>
-          {chat?.latestMessage?.sender._id === user?._id
-            ? `You: ${chat?.latestMessage?.content.slice(0, 35)}...`
+          {chat?.latestMessage?.sender?._id === user?._id
+            ? `You: ${chat?.latestMessage?.content?.slice(0, 35)}...`
             : chat.isGroupChat
             ? `${
                 chat?.latestMessage?.sender.name
-              }: ${chat?.latestMessage?.content.slice(0, 35)}...`
-            : `${chat?.latestMessage?.content.slice(0, 35)}...`}
+              }: ${chat?.latestMessage?.content?.slice(0, 35)}...`
+            : `${chat?.latestMessage?.content?.slice(0, 35)}...`}
         </h2>
       </div>
     </div>

@@ -1,24 +1,31 @@
 import { useState } from "react";
 
 import Searchbar from "./Searchbar";
-import Users from "./Users";
-import Chats from "./Chats";
-import SideHeader from "./SideHeader";
-import CardSkeleton from "./CardSkeleton";
 
-import useGetChat from "../hooks/useGetChat";
+import SideHeader from "./SideHeader";
+
+import MyChats from "./MyChats";
+import SearchResult from "./SearchResult";
+import { useQuery } from "@tanstack/react-query";
+import useDebounce from "../hooks/useDebouce";
+import axios from "axios";
 
 const SideChats = () => {
-  const [searchResult, setSearchResult] = useState([]);
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
-
-  const {
-    data: myChats,
-    isLoading: myChatsLoading,
-    error: myChatsError,
-    refetch: myChatsRefetch,
-  } = useGetChat("/api/chat");
+  const [searchQuery, setSearchQuery] = useState("");
+  const bouncedQuery = useDebounce(searchQuery, 600);
+  const { data: searchResult, isLoading: searchLoading } = useQuery({
+    queryKey: [bouncedQuery],
+    queryFn: async () => {
+      try {
+        const result = await axios.get(`/api/user?query=${bouncedQuery}`);
+        console.log(result);
+        return result.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    enabled: !!bouncedQuery,
+  });
 
   return (
     <div className="h-full overflow-y-auto relative">
@@ -28,39 +35,19 @@ const SideChats = () => {
       <div className="h-max">
         <div className="py-1 mb-1">
           <Searchbar
-            setSearchResult={setSearchResult}
-            setSearchLoading={setSearchLoading}
-            setIsSearching={setIsSearching}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
           />
         </div>
         {/* search result */}
-        {searchLoading && isSearching ? (
-          <CardSkeleton cardAmount={3} />
-        ) : !searchResult?.users?.length &&
-          !searchResult?.users?.length &&
-          isSearching ? (
-          <div>
-            <h1 className="text-center">No user or chat found</h1>
-          </div>
-        ) : (
-          <div>
-            {!!searchResult?.users?.length && (
-              <Users users={searchResult?.users} />
-            )}
-            {!!searchResult?.chats?.length && (
-              <Chats chats={searchResult?.chats} />
-            )}
-          </div>
-        )}
+        <SearchResult
+          searchLoading={searchLoading}
+          searchResult={searchResult || {}}
+          query={bouncedQuery}
+        />
 
         {/* existing chats */}
-        <div>
-          {myChatsLoading ? (
-            <CardSkeleton cardAmount={5} />
-          ) : (
-            <Chats chats={myChats} />
-          )}
-        </div>
+        <MyChats />
       </div>
     </div>
   );

@@ -38,7 +38,7 @@ const Settings = ({ placedIn, settingsFor, chatInfo }) => {
           userId={user?._id}
         />
       </div>
-      <div id="settings" className="relative ">
+      <div id="settings" className="relative select-none">
         <div
           onClick={() => setIsMenuOpen((p) => !p)}
           className={`cursor-pointer transition-transform duration-500 active:scale-90 pl-3`}
@@ -56,15 +56,17 @@ const Settings = ({ placedIn, settingsFor, chatInfo }) => {
         >
           {placedIn === "profile" ? (
             <ul className="text-lg  space-y-1">
-              <Link to={"/profile"}>
-                <li
-                  onClick={() => setIsMenuOpen(false)}
-                  className="hover:bg-slate-100 px-3 py-1 rounded-xl flex items-center gap-1"
-                >
-                  <PencilSquareIcon className="w-5 h-5 " />
-                  <span>Edit profile</span>
-                </li>
-              </Link>
+              <li
+                onClick={() => {
+                  setModalFor("editProfile");
+                  setIsModalOpen(true);
+                  setIsMenuOpen(false);
+                }}
+                className="hover:bg-slate-100 px-3 py-1 rounded-xl flex items-center gap-1 cursor-pointer"
+              >
+                <PencilSquareIcon className="w-5 h-5 " />
+                <span>Edit profile</span>
+              </li>
 
               <li
                 onClick={userLogoutHandler}
