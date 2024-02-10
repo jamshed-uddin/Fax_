@@ -1,9 +1,9 @@
 const isOwnMessage = (sender, userId) => {
-  return sender._id === userId;
+  return sender?._id === userId;
 };
 
 const isUsersLastMessage = (messages, index, message) => {
-  return message?.sender._id === messages[index + 1]?.sender._id;
+  return message?.sender?._id === messages[index + 1]?.sender?._id;
 };
 
 const chatPhotoHandler = (singleChat, user) => {
@@ -12,4 +12,10 @@ const chatPhotoHandler = (singleChat, user) => {
     : singleChat?.users[0].photoURL;
 };
 
-export { isOwnMessage, isUsersLastMessage, chatPhotoHandler };
+const chatNameHandler = (singleChat, user) => {
+  return singleChat?.users[0]._id === user?._id
+    ? singleChat?.users[1].name
+    : singleChat?.users[0].name;
+};
+
+export { isOwnMessage, isUsersLastMessage, chatPhotoHandler, chatNameHandler };

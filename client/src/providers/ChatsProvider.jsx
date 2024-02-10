@@ -1,40 +1,60 @@
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import React, { createContext, useState } from "react";
+import io from "socket.io-client";
+import React, { createContext, useEffect, useState } from "react";
+import useAuthProvider from "../hooks/useAuthProvider";
 
 export const ChatsContext = createContext({});
 
 const ChatsProvider = ({ children }) => {
+  const { user } = useAuthProvider();
+  console.log(user);
   const [isSideChatOpen, setIsSideChatOpen] = useState(true);
 
-  const {
-    data: myChats,
-    isLoading: myChatsLoading,
-    error: myChatsError,
-  } = useQuery({
-    queryKey: ["myChats"],
-    queryFn: async () => {
-      try {
-        const result = await axios.get("/api/chat");
-        return result.data;
-      } catch (error) {
-        if (
-          error.response &&
-          (error.response.status === 400 || error.response.status === 401)
-        ) {
-          throw new Error(error.response.data.message);
-        } else {
-          throw new Error("Something went wrong");
-        }
-      }
-    },
-  });
+  const [socket, setSocket] = useState(null);
+  const [activeUsers, setActiveUsers] = useState([]);
+  const [typingStatus, setTypingStatus] = useState({});
+
+  useEffect(() => {
+    if (!user) return;
+
+    const newSocket = io("ws://localhost:2000");
+    newSocket.emit("userSetup", user);
+    setSocket(newSocket);
+
+    return () => newSocket.disconnect();
+  }, [user]);
+
+  useEffect(() => {
+    socket?.on("activeUsers", (data) => {
+      setActiveUsers(data);
+      console.log(data);
+    });
+  }, [socket]);
+
+  useEffect(() => {
+    socket?.on("typing", (data) => {
+      console.log(data);
+      setTypingStatus(data);
+    });
+  }, [socket]);
+
+  const isUserActive = (user, chatUsers) => {
+    const otherUser = chatUsers?.find((u) => u._id !== user?._id);
+
+    const activeUser = activeUsers.find(
+      (user) => user.userId === otherUser?._id
+    );
+
+    return !!activeUser;
+  };
+  console.log(typingStatus);
 
   const chatInfo = {
     isSideChatOpen,
     setIsSideChatOpen,
-    myChats,
-    myChatsLoading,
+    socket,
+    activeUsers,
+    isUserActive,
+    typingStatus,
   };
   return (
     <ChatsContext.Provider value={chatInfo}>{children}</ChatsContext.Provider>

@@ -1,28 +1,68 @@
 import { PaperAirplaneIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
 import React, { useRef, useState } from "react";
+import useAuthProvider from "../hooks/useAuthProvider";
+import useChatProvider from "../hooks/useChatProvider";
 
-const SendMessage = ({ chatId, messagesRefetch, setScrollToEnd }) => {
+const SendMessage = ({
+  chat,
+
+  setScrollToEnd,
+  setSendMessage,
+  setAllMessages,
+}) => {
+  const { socket } = useChatProvider();
+  const { user } = useAuthProvider();
   const [message, setMessage] = useState("");
 
-  const sendMessageHandler = async () => {
-    try {
-      const result = await axios.post("/api/message/newMessage", {
-        content: message,
-        chatId,
-      });
+  const handleInputChange = (e) => {
+    setMessage(e.target.value);
 
+    const typingUser = chat?.users.find((u) => u._id === user._id);
+
+    socket?.emit("typingStatus", {
+      user: typingUser,
+      isTyping: true,
+      chatId: chat._id,
+    });
+  };
+
+  const sendMessageHandler = async () => {
+    const messageToSend = {
+      content: message,
+      chatId: chat?._id,
+    };
+
+    const sender = chat?.users.find((u) => u._id === user._id);
+    const reciever = chat?.users.find((u) => u._id !== user._id);
+    // sending message to socket
+    setSendMessage({
+      ...{
+        sender,
+        content: message,
+        chatId: chat?._id,
+      },
+      recieverId: reciever?._id,
+    });
+
+    // sending to DB
+    try {
+      const result = await axios.post("/api/message/newMessage", messageToSend);
+
+      setAllMessages((p) => [...p, result?.data]);
       console.log(result);
       setMessage("");
-      messagesRefetch();
+
       setScrollToEnd((p) => !p);
     } catch (error) {
       if (
         error.response &&
         (error.response.status === 400 || error.response.status === 401)
       ) {
+        console.log(error.response.data.message);
         throw new Error(error.response.data.message);
       } else {
+        console.log(error);
         throw new Error("Something went wrong");
       }
     }
@@ -39,7 +79,7 @@ const SendMessage = ({ chatId, messagesRefetch, setScrollToEnd }) => {
         className="input input-bordered focus:outline-0 input-sm w-full "
         value={message}
         name="messageInput"
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={handleInputChange}
       />
 
       <button onClick={sendMessageHandler}>

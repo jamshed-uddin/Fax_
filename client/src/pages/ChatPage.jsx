@@ -31,7 +31,7 @@ const ChatPage = () => {
         </div>
 
         <div
-          className={`bg-white h-full flex-grow lg:shadow-md lg:rounded-md pt-2  `}
+          className={`bg-white w-full lg:w-[60%]  h-full  lg:shadow-md lg:rounded-md pt-2  `}
         >
           <Outlet />
         </div>
