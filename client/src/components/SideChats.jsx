@@ -1,31 +1,16 @@
 import { useState } from "react";
-
 import Searchbar from "./Searchbar";
-
 import SideHeader from "./SideHeader";
-
 import MyChats from "./MyChats";
 import SearchResult from "./SearchResult";
-import { useQuery } from "@tanstack/react-query";
 import useDebounce from "../hooks/useDebouce";
-import axios from "axios";
+import useGetSearchResult from "../hooks/useGetSearchResult";
 
 const SideChats = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const bouncedQuery = useDebounce(searchQuery, 600);
-  const { data: searchResult, isLoading: searchLoading } = useQuery({
-    queryKey: [bouncedQuery],
-    queryFn: async () => {
-      try {
-        const result = await axios.get(`/api/user?query=${bouncedQuery}`);
-        console.log(result);
-        return result.data;
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    enabled: !!bouncedQuery,
-  });
+  const { data: searchResult, isLoading: searchLoading } =
+    useGetSearchResult(bouncedQuery);
 
   return (
     <div className="h-full overflow-y-auto relative">

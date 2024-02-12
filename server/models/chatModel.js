@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const chatSchema = mongoose.Schema(
   {
     chatName: { type: String, trim: true },
+    chatDescription: { type: String, trim: true },
     chatPhotoURL: {
       type: String,
       default: function () {

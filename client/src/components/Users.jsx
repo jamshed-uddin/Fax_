@@ -1,16 +1,8 @@
-import React from "react";
 import UserCard from "./UserCard";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 const Users = ({ users }) => {
-  const navigate = useNavigate();
-
   const handleAccessChat = async (userId) => {
-    // await axios.post('/api/chat/accessChat', {userId: user?._id})
-
-    console.log(userId);
-
     try {
       const result = await axios.post(`/api/chat/accessChat`, {
         userId,

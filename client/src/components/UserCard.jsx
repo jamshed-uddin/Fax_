@@ -1,10 +1,10 @@
 import React from "react";
 
-const UserCard = ({ user, clickFunc }) => {
+const UserCard = ({ user, clickFunc = () => {} }) => {
   return (
     <div
       onClick={() => clickFunc(user?._id)}
-      className="h-14 w-full rounded-lg  cursor-pointer"
+      className="h-14 w-full rounded-lg  cursor-pointer select-none"
     >
       <div className="flex items-center gap-2 ">
         {/* image */}
@@ -12,7 +12,7 @@ const UserCard = ({ user, clickFunc }) => {
           <img
             className="w-full h-full object-cover  rounded-full"
             src={user?.photoURL}
-            alt={`Profile image of ${user?.name}`}
+            alt={user && `Profile image of ${user?.name}`}
           />
         </div>
         {/* other info */}
