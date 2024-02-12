@@ -1,9 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import React from "react";
+import useChatProvider from "./useChatProvider";
 
 const useGetChat = (endpoint) => {
-  const queryKey = [endpoint];
+  const { isSideChatOpen } = useChatProvider();
+  const queryKey = [endpoint, isSideChatOpen];
 
   const fetchData = async () => {
     try {

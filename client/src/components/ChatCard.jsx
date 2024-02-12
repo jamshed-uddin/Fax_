@@ -1,11 +1,17 @@
 import useAuthProvider from "../hooks/useAuthProvider";
-import { chatNameHandler, chatPhotoHandler } from "../logics/messageLogics";
+import {
+  chatDate,
+  chatNameHandler,
+  chatPhotoHandler,
+  isOwnMessage,
+} from "../logics/messageLogics";
 import useChatProvider from "../hooks/useChatProvider";
 
 const ChatCard = ({ chat, clickFunc }) => {
   const { user } = useAuthProvider();
   const { isUserActive } = useChatProvider();
 
+  console.log(chat);
   return (
     <div
       onClick={clickFunc}
@@ -27,11 +33,23 @@ const ChatCard = ({ chat, clickFunc }) => {
         )}
       </div>
       {/* other info */}
-      <div>
-        <h1 className="text-lg font-medium leading-4">
-          {chat?.isGroupChat ? chat?.chatName : chatNameHandler(chat, user)}
-        </h1>
-        <h2>
+      <div className="flex-grow">
+        <div className=" flex justify-between items-center">
+          <h1 className="text-lg font-medium leading-4">
+            {chat?.isGroupChat ? chat?.chatName : chatNameHandler(chat, user)}
+          </h1>
+          {/* last message date */}
+          <h4 className="text-sm font-semibold">
+            {chatDate(chat?.latestMessage.updatedAt)}
+          </h4>
+        </div>
+        <h2
+          className={`${
+            !chat?.latestMessage.readBy.includes(user?._id) &&
+            !isOwnMessage(chat?.latestMessage?.sender, user._id) &&
+            "font-bold"
+          }`}
+        >
           {chat?.latestMessage?.sender?._id === user?._id
             ? `You: ${chat?.latestMessage?.content?.slice(0, 35)}...`
             : chat.isGroupChat

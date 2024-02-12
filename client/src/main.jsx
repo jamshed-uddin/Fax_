@@ -11,6 +11,7 @@ import PrivateRoute from "./privateRoutes/PrivateRoute.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ChatInbox from "./pages/ChatInbox.jsx";
 import ChatsProvider from "./providers/ChatsProvider.jsx";
+import CreateGroup from "./pages/CreateGroup.jsx";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,22 @@ const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Profile />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "createGroup",
+        element: (
+          <PrivateRoute>
+            <CreateGroup />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "createGroup/:groupId",
+        element: (
+          <PrivateRoute>
+            <CreateGroup />
           </PrivateRoute>
         ),
       },

@@ -1,6 +1,6 @@
 const InboxSkeleton = () => {
   return (
-    <div className=" w-full">
+    <div className=" w-full mt-3">
       <div className=" w-full h-fit space-y-8 mb-5">
         <div className="space-y-2">
           <p className="skeleton bg-slate-200 h-9 w-1/2 rounded-lg"></p>

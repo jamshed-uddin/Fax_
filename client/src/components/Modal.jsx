@@ -34,6 +34,7 @@ const Modal = ({
       handleModalClose();
       console.log(result.data);
     } catch (error) {
+      console.log(error?.response?.data);
       setLoading(false);
       console.log(error.message);
     }

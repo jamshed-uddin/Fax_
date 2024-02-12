@@ -56,7 +56,7 @@ const Profile = () => {
 
   return (
     <div className="">
-      <div className="flex justify-between items-center  py-2 px-4">
+      <div className="flex justify-between items-center  py-2 px-2 lg:px-4">
         <NavigateBack />
         <div className="w-fit">
           {user?._id === userData?._id && (

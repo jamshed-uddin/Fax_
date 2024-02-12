@@ -14,22 +14,25 @@ import {
   chatPhotoHandler,
   isOwnMessage,
   isUsersLastMessage,
+  messageDate,
+  messageTime,
 } from "../logics/messageLogics";
 import useAuthProvider from "../hooks/useAuthProvider";
 import axios from "axios";
+import AllMessages from "../components/AllMessages";
 
 const ChatInbox = () => {
   const { user } = useAuthProvider();
   const { chatId } = useParams();
-  const { setIsSideChatOpen, socket, typingStatus, lastSeen, isUserActive } =
+  const { setIsSideChatOpen, socket, typingStatus, isUserActive } =
     useChatProvider();
 
-  const messageRef = useRef();
-
+  const lastMessageRef = useRef();
   const [allMessages, setAllMessages] = useState([]);
   const [sendMessage, setSendMessage] = useState(null);
   const [newMessage, setNewMessage] = useState(false);
-
+  const [messagesFetched, setMessagesFetched] = useState(false);
+  console.log(messagesFetched);
   const {
     data: singleChat,
     isLoading: singleChatLoading,
@@ -37,40 +40,38 @@ const ChatInbox = () => {
     refetch: singleChatRefetch,
   } = useGetChat(`/api/chat/${chatId}`);
 
-  // scroll to the end when send new message and in initail render
-  useEffect(() => {
-    const messageInbox = document.getElementById("messages");
-
-    messageInbox?.scrollIntoView();
-    messageInbox?.scrollIntoView(false);
-    messageInbox?.scrollIntoView({
-      behavior: "smooth",
-      block: "end",
-      inline: "nearest",
-    });
-  }, [newMessage]);
-
-  useEffect(() => {
-    // if (allMessages?.at(-1)?.sender._id === user?._id) return;
-    const messageInbox = document.getElementById("message-container");
-
-    messageInbox.scrollTop = messageInbox?.scrollHeight;
-  }, [allMessages]);
-
   useEffect(() => {
     const fetchMessages = async () => {
       try {
         const result = await axios.get(`/api/message/${chatId}`);
 
         setAllMessages(result?.data);
-        socket?.emit("joinRoom", chatId);
+        setMessagesFetched(!!result?.data);
       } catch (error) {
         console.log(error?.response?.message);
       }
     };
 
     fetchMessages();
-  }, [chatId, socket]);
+  }, [chatId]);
+
+  // updating message readBy
+  useEffect(() => {
+    const updateMessageReadBy = async () => {
+      try {
+        const result = await axios.patch(
+          `/api/message/${singleChat?.latestMessage?._id}`
+        );
+        console.log(result);
+      } catch (error) {
+        console.log(error?.response?.message);
+      }
+    };
+
+    if (singleChat && !singleChat?.latestMessage?.readBy.includes(user?._id)) {
+      updateMessageReadBy();
+    }
+  }, [singleChat, user]);
 
   // send message to socket
   useEffect(() => {
@@ -101,13 +102,13 @@ const ChatInbox = () => {
   return (
     <div className="h-full w-full flex flex-col  bg-white">
       {/* inbox header */}
-      <div className="shadow-sm w-full flex items-center gap-2  pb-1 px-4 ">
+      <div className="shadow-sm w-full flex items-center gap-2  pb-1 px-2 lg:px-4 ">
         <NavigateBack />
         <div className="flex items-center  gap-2">
           {/* photo */}
           <div className="h-11 w-11 rounded-full  relative">
             {singleChatLoading ? (
-              <div className="h-full w-full rounded-full bg-slate-200"></div>
+              <div className="h-full w-full rounded-full bg-slate-200 skeleton"></div>
             ) : (
               <img
                 className="w-full h-full object-cover rounded-full"
@@ -123,92 +124,69 @@ const ChatInbox = () => {
           </div>
           {/* name */}
           <div>
-            <h1 className="text-xl font-medium ">
-              {chatNameHandler(singleChat, user)}
-            </h1>
-            <h1 className="text-sm  leading-3">
-              Last seen {lastSeen(new Date(), new Date())}
-            </h1>
+            {singleChatLoading ? (
+              <div className="h-8 w-28 rounded-xl skeleton bg-slate-200"></div>
+            ) : (
+              <>
+                <h1 className="text-xl font-medium ">
+                  {chatNameHandler(singleChat, user)}
+                </h1>
+              </>
+            )}
           </div>
         </div>
         <div className="flex-grow flex justify-end">
-          <Settings
-            placedIn={"inbox"}
-            settingsFor={singleChat?.isGroupChat ? "group" : "otherUser"}
-            chatInfo={singleChat}
-          />
+          {singleChatLoading ? (
+            <div className="h-7 w-2 bg-slate-200 skeleton"></div>
+          ) : (
+            <Settings
+              placedIn={"inbox"}
+              settingsFor={singleChat?.isGroupChat ? "group" : "otherUser"}
+              chatInfo={singleChat}
+            />
+          )}
         </div>
       </div>
       {/* messages */}
-      <div
-        ref={messageRef}
-        id="message-container"
-        className=" flex-grow overflow-y-auto lg:px-4 mb-2"
-      >
+      <div className=" flex-grow overflow-y-auto lg:px-4 mb-2">
         {singleChatLoading ? (
           <InboxSkeleton />
         ) : (
-          <div id="messages" className="h-max  py-2  w-full ">
-            {allMessages?.map((message, index, msgArr) => (
-              <div
-                key={message._id}
-                className={`chat flex items-center ${
-                  isOwnMessage(message?.sender, user?._id)
-                    ? "justify-end chat-end "
-                    : "justify-start chat-start"
-                }`}
-              >
+          <AllMessages
+            allMessages={allMessages}
+            isGroupChat={singleChat?.isGroupChat}
+          />
+        )}
+
+        {/* user typing indicator */}
+
+        <div
+          className="border-2 border-red-400"
+          id="last-message"
+          ref={lastMessageRef}
+        >
+          {typingStatus?.isTyping &&
+            typingStatus?.user._id !== user?._id &&
+            typingStatus?.chatId === singleChat?._id && (
+              <div className="flex items-center gap-3">
                 {/* user avatar */}
-                {!isOwnMessage(message?.sender, user?._id) && (
-                  <div className=" h-10 w-10 rounded-full overflow-hidden  ">
-                    {!isUsersLastMessage(msgArr, index, message) &&
-                      !isOwnMessage(message?.sender, user?._id) && (
-                        <img
-                          className="w-full h-full object-cover rounded-full"
-                          src={message?.sender.photoURL}
-                          alt={`Profile photo of ${singleChat?.chatName}`}
-                        />
-                      )}
-                  </div>
-                )}
-                {/* message text */}
+                <div className=" h-10 w-10 rounded-full overflow-hidden  ">
+                  <img
+                    className="w-full h-full object-cover rounded-full"
+                    src={typingStatus?.user?.photoURL}
+                    alt={`Profile photo of ${typingStatus?.user?.name}`}
+                  />
+                </div>
+
                 <div
-                  className={` bg-slate-200 text-black text-sm md:text-base shadow-md max-w-[70%] ${
-                    isUsersLastMessage(msgArr, index, message)
-                      ? "p-2 rounded-lg"
-                      : "p-2 rounded-lg mb-2"
-                  }`}
+                  className={`bg-slate-200  shadow-md py-2 px-3 rounded-lg mb-2
+          `}
                 >
-                  {message.content}
+                  <span className="loading loading-dots loading-sm bg-slate-600"></span>
                 </div>
               </div>
-            ))}
-
-            {/* user typing indicator */}
-            {typingStatus?.isTyping &&
-              typingStatus.user._id !== user?._id &&
-              typingStatus?.chatId === singleChat._id && (
-                <div className="flex items-center gap-3">
-                  {/* user avatar */}
-                  <div className=" h-10 w-10 rounded-full overflow-hidden  ">
-                    <img
-                      className="w-full h-full object-cover rounded-full"
-                      src={typingStatus?.user?.photoURL}
-                      alt={`Profile photo of ${typingStatus?.user?.name}`}
-                    />
-                  </div>
-
-                  {/* message text */}
-                  <div
-                    className={`flex items-end bg-slate-200  shadow-md p-2 px-3 rounded-lg mb-2
-                    `}
-                  >
-                    <span className="loading loading-dots loading-sm bg-slate-800"></span>
-                  </div>
-                </div>
-              )}
-          </div>
-        )}
+            )}
+        </div>
       </div>
       {/* send message input */}
       <SendMessage

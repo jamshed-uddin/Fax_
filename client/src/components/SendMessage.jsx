@@ -72,13 +72,15 @@ const SendMessage = ({
       <input
         type="text"
         placeholder="Send message"
-        className="input input-bordered focus:outline-0 input-sm w-full "
+        className={`input input-bordered focus:outline-0 input-sm w-full ${
+          !chat && "input-disabled"
+        }`}
         value={message}
         name="messageInput"
         onChange={handleInputChange}
       />
 
-      <button onClick={sendMessageHandler}>
+      <button disabled={!chat} onClick={sendMessageHandler}>
         <PaperAirplaneIcon className="w-7 h-7 text-slate-600 active:scale-90 transition-transform duration-500" />
       </button>
     </div>

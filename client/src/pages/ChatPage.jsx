@@ -21,7 +21,7 @@ const ChatPage = () => {
     <div className="my-container h-screen  lg:py-4 relative">
       <div className="lg:flex h-full gap-2 ">
         <div
-          className={`bg-white w-full h-full lg:w-[40%] lg:shadow-md  lg:rounded-md pt-2 px-2 absolute lg:static z-20  ${
+          className={`bg-white w-full h-full lg:w-[40%] lg:shadow-md  lg:rounded-md pt-2 px-2 absolute lg:static z-50  ${
             isSideChatOpen
               ? "top-0  left-0 "
               : "top-0 -left-[50rem] transition-all duration-500"
