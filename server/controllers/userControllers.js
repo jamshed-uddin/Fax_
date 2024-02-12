@@ -122,7 +122,6 @@ const searchUsers = asyncHandler(async (req, res) => {
 
 const updateUser = asyncHandler(async (req, res) => {
   const bodyToUpdate = req.body;
-  console.log("updateuser", body);
 
   try {
     await User.findOneAndUpdate({ _id: req.user._id }, bodyToUpdate, {

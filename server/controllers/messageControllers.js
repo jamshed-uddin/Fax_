@@ -57,4 +57,25 @@ const getAllMessages = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { createMessage, getAllMessages };
+// @desc update message
+// @route PATCH /api/message/:messageId
+// @access private
+
+const updateMessageReadBy = asyncHandler(async (req, res) => {
+  const messageId = req.params.messageId;
+
+  try {
+    await Message.findByIdAndUpdate(
+      { _id: messageId },
+      { $push: { readBy: req.user._id } },
+      { new: true }
+    );
+
+    res.status(200).send({ message: `Message read by user ${req.user._id}` });
+  } catch (error) {
+    res.status(401);
+    throw new Error(error.message);
+  }
+});
+
+module.exports = { createMessage, getAllMessages, updateMessageReadBy };

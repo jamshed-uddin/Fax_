@@ -32,11 +32,9 @@ const accessChat = asyncHandler(async (req, res) => {
   if (chatExists.length) {
     res.status(200).send(chatExists[0]);
   } else {
-    const user = await User.findOne({ _id: userId });
-
     const chatData = {
-      chatName: user?.name,
-      chatPhotoURL: user?.photoURL,
+      chatName: "",
+      chatPhotoURL: "",
       users: [req.user._id, userId],
     };
 
@@ -98,4 +96,75 @@ const getSignleChat = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { accessChat, getChats, getSignleChat };
+//@desc create group
+//@route POST /api/chat/group
+//@access private
+
+const createGroup = asyncHandler(async (req, res) => {
+  const { chatName, users, chatPhtoURL } = req.body;
+
+  if (members.length < 2) {
+    return res
+      .send(400)
+      .send({ message: "At two members required to create a group. " });
+  }
+  const groupData = {
+    chatName: chatName,
+    chatPhotoURL: chatPhtoURL,
+    users: users,
+    groupAdmin: req.user._id,
+  };
+
+  try {
+    const newGroup = await Chat.create(groupData);
+
+    const newCreatedGroup = await Chat.findOne({ _id: newGroup._id }).populate({
+      path: "users",
+      select: " -password -email",
+    });
+    console.log("group", newCreatedGroup);
+    res.status(201).send(newCreatedGroup);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
+//@desc update group
+//@route PUT /api/chat/group/:groupId
+//@access private
+
+const updateGroup = asyncHandler(async (req, res) => {
+  const groupId = req.params.groupId;
+  const { chatName, users, chatPhotoURL, groupAdmin } = req.body;
+  if (req.user._id !== groupAdmin._id) {
+    return res.status(401).send({ message: "Unauthorized action" });
+  }
+
+  try {
+    const group = await Chat.findOne({ _id: groupId });
+    const groupInfoToUpdate = {
+      chatName: chatName || group.chatName,
+      users: users,
+      chatPhotoURL: chatPhotoURL || group.chatPhotoURL,
+    };
+
+    const updatedGroup = await Chat.findByIdAndUpdate(
+      { _id: groupId },
+      groupInfoToUpdate,
+      { new: true }
+    );
+    res.status(200).send(updatedGroup);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
+module.exports = {
+  accessChat,
+  getChats,
+  getSignleChat,
+  createGroup,
+  updateGroup,
+};

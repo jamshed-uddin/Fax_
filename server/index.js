@@ -45,11 +45,11 @@ io.on("connection", (socket) => {
   // user setup when login and send active users to client
   socket.on("userSetup", (user) => {
     socket.join(user._id);
-    console.log("active user", user);
+    // console.log("active user", user);
     if (!activeUsers.some((user) => user.userId === user._id)) {
       activeUsers.push({ userId: user._id, socketId: socket.id });
     }
-    console.log("activearray", activeUsers);
+    // console.log("activearray", activeUsers);
     io.emit("activeUsers", activeUsers);
   });
 
@@ -64,10 +64,11 @@ io.on("connection", (socket) => {
   });
 
   // typing status
+  let timer;
   socket.on("typingStatus", (data) => {
     io.emit("typing", data);
-
-    setTimeout(() => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
       io.emit("typing", { ...data, isTyping: false });
     }, 3000);
   });
