@@ -9,7 +9,10 @@ const SideHeader = () => {
   return (
     <div className="flex items-center justify-between bg-white  pb-1  mb-1">
       <div>
-        <h1 className="text-2xl font-bold">CHAT</h1>
+        <Link to={"/"}>
+          {" "}
+          <h1 className="text-3xl font-bold">Fax_</h1>
+        </Link>
       </div>
       <div className="relative flex items-center gap-2">
         <div className="cursor-pointer">

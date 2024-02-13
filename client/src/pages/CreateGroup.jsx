@@ -6,20 +6,29 @@ import useDebounce from "../hooks/useDebouce";
 import UserCard from "../components/UserCard";
 import CardSkeleton from "../components/CardSkeleton";
 import NavigateBack from "../components/NavigateBack";
-import { CheckIcon, MinusIcon } from "@heroicons/react/24/outline";
+import {
+  CheckIcon,
+  MinusIcon,
+  PencilSquareIcon,
+  PhotoIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
+import useCloseMenu from "../hooks/useCloseMenu";
+import uploadPhotoToCloud from "../myFunctions/uploadPhotoToCloud";
+import deletePhotoFromCloud from "../myFunctions/deletePhotoFromCloud";
 
 const CreateGroup = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const bouncedQuery = useDebounce(searchQuery, 600);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [photoUploading, setPhotoUploading] = useState("");
+  const [profilePhotoURL, setProfilePhotoURL] = useState("");
   const [groupData, setGroupData] = useState({
     chatName: "",
     chatDescription: "",
     chatPhotoURL: "",
     users: [],
   });
-
-  console.log(groupData);
 
   const { data: searchResult, isLoading: searchLoading } =
     useGetSearchResult(bouncedQuery);
@@ -47,6 +56,37 @@ const CreateGroup = () => {
     setGroupData((p) => ({ ...p, users: selectedUsers }));
   }, [selectedUsers]);
 
+  const { isMenuOpen: uploaderOpen, setIsMenuOpen: setUploaderOpen } =
+    useCloseMenu("photoUploader");
+
+  const removeProfilePhoto = async () => {
+    setProfilePhotoURL("");
+    setUploaderOpen((p) => !p);
+    const response = await deletePhotoFromCloud(profilePhotoURL);
+    console.log(response);
+  };
+
+  const handleProfilePhotoChange = async (e) => {
+    const file = e.target.files[0];
+    const previewURL = URL.createObjectURL(file);
+    setProfilePhotoURL(previewURL);
+
+    setUploaderOpen((p) => !p);
+    if (file) {
+      try {
+        setPhotoUploading(true);
+        await uploadPhotoToCloud(file).then((res) => {
+          console.log(res);
+          const cloudImageUrl = res.data.secure_url;
+          setPhotoUploading(false);
+          setProfilePhotoURL(cloudImageUrl);
+        });
+      } catch (error) {
+        setPhotoUploading(false);
+      }
+    }
+  };
+
   return (
     <div className="overflow-y-auto h-full w-full pt-3 lg:px-2 pb-10">
       <div className=" flex items-center justify-between">
@@ -60,7 +100,61 @@ const CreateGroup = () => {
       <div className="h-max space-y-2">
         {/* group photo */}
         <div className="flex justify-center ">
-          <div className="h-40 w-40 bg-slate-200 rounded-full"></div>
+          <div className="relative ">
+            <div className="  h-36 w-36 bg-slate-200 rounded-full">
+              <img
+                className=" w-full h-full object-cover rounded-full"
+                src={profilePhotoURL}
+                alt=""
+              />
+            </div>
+
+            {/*  image upload button */}
+
+            <div id="photoUploader" className=" absolute right-0 bottom-0 ">
+              <div className="relative">
+                <button
+                  onClick={() => setUploaderOpen((p) => !p)}
+                  className="w-fit rounded  cursor-pointer active:scale-95   "
+                >
+                  <PencilSquareIcon className="w-6 h-6" />
+                </button>
+
+                {/* image upload and delete option */}
+                {uploaderOpen && (
+                  <div
+                    className={` flex gap-2 md:gap-5 rounded-lg px-1 py-1 md:px-3 shadow-md absolute bottom-2 -right-28 `}
+                  >
+                    <div className=" p-1  rounded-lg text-lg cursor-pointer ">
+                      <label className="cursor-pointer" htmlFor="profilePhoto">
+                        <PhotoIcon className="w-5 h-5" />
+                      </label>
+                      <input
+                        onChange={handleProfilePhotoChange}
+                        type="file"
+                        name="profilePhoto"
+                        id="profilePhoto"
+                        className="hidden"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={removeProfilePhoto}
+                      className=" p-1  rounded-lg text-lg cursor-pointer active:bg-slate-50 active:scale-90"
+                    >
+                      <TrashIcon className="w-5 h-5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {photoUploading ? (
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                <span className="loading loading-spinner  w-12 text-slate-300"></span>
+              </div>
+            ) : null}
+          </div>
         </div>
         {/* name */}
         <div className="flex flex-col gap-3 items-center ">
@@ -80,6 +174,7 @@ const CreateGroup = () => {
             onChange={handleTextInput}
           ></textarea>
         </div>
+        {/* added members */}
         <div className="">
           <h1 className="text-2xl font-medium">Add members</h1>
           <div className="overflow-x-auto mt-2">

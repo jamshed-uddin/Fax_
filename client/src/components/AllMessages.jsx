@@ -32,9 +32,11 @@ const AllMessages = ({ allMessages = [], isGroupChat }) => {
   return (
     <div className="h-max  py-2  w-full ">
       {Object.keys(messageGroup).map((date) => (
-        <div key={date}>
-          <div className="text-center text-green-600">
-            {messageDate(messageGroup[date][0].updatedAt)}
+        <div key={date} className="relative ">
+          <div className=" flex justify-center  sticky top-1 left-1/2 ">
+            <h1 className="w-fit bg-slate-100  rounded-md px-3  shadow-md my-1 ">
+              {messageDate(messageGroup[date][0].updatedAt)}
+            </h1>
           </div>
           {messageGroup[date]?.map((message, index, msgArr) => (
             <div

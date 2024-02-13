@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import useAuthProvider from "../hooks/useAuthProvider";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -6,18 +6,15 @@ import axios from "axios";
 import WentWrong from "../components/WentWrong";
 import ProfileSkeleton from "../components/ProfileSkeleton";
 import NavigateBack from "../components/NavigateBack";
-import useChatProvider from "../hooks/useChatProvider";
 import Settings from "../components/Settings";
+import ProfilePhoto from "../components/ProfilePhoto";
 
 const Profile = () => {
   const { userId } = useParams();
   const { user } = useAuthProvider();
 
-  const { setIsSideChatOpen } = useChatProvider();
-
-  useEffect(() => {
-    setIsSideChatOpen(!userId);
-  }, [userId, setIsSideChatOpen]);
+  const [profilePhotoURL, setProfilePhotoURL] = useState("");
+  const [photoUploading, setPhotoUploading] = useState(false);
 
   const {
     data: userData,
@@ -65,11 +62,12 @@ const Profile = () => {
         </div>
       </div>
       <div className="flex flex-col items-center">
-        <div className="h-40 w-40">
-          <img
-            className="h-full w-full object-cover rounded-full"
-            src={userData?.photoURL}
-            alt={`Profile image of ${userData?.name}`}
+        <div className="">
+          <ProfilePhoto
+            placedIn={"userProfile"}
+            userId={userData?._id}
+            profilePhotoURL={profilePhotoURL}
+            photoUploading={photoUploading}
           />
         </div>
         <div className="mt-4 text-center">
