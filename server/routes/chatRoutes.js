@@ -12,6 +12,6 @@ const router = express.Router();
 router.post("/accessChat", verifyJWT, accessChat);
 router.get("/", verifyJWT, getChats);
 router.get("/:chatId", verifyJWT, getSignleChat);
-router.get("/group", verifyJWT, createGroup);
-router.get("/group/:groupId", verifyJWT, updateGroup);
+router.post("/group", verifyJWT, createGroup);
+router.put("/group/:groupId", verifyJWT, updateGroup);
 module.exports = router;

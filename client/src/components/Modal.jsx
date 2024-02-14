@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import useAuthProvider from "../hooks/useAuthProvider";
 import axios from "axios";
+import useTheme from "../hooks/useTheme";
 
 const Modal = ({
   modalFor,
@@ -10,6 +11,7 @@ const Modal = ({
   userId,
   userRefetch,
 }) => {
+  const { dark } = useTheme();
   const { user } = useAuthProvider();
   const [name, setName] = useState(user?.name || "");
   const [bio, setBio] = useState(user?.bio || "");
@@ -42,9 +44,11 @@ const Modal = ({
 
   return (
     <div
-      className={`w-11/12 p-3 lg:w-2/5 mx-auto h-fit bg-white shadow-2xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 rounded-xl ${
+      className={`w-11/12 p-3 lg:w-2/5 mx-auto h-fit   absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 rounded-xl ${
         !isModalOpen && "hidden"
-      } `}
+      }  ${
+        dark ? "bg-slate-800 shadow-lg shadow-slate-700" : "bg-white shadow-2xl"
+      }`}
     >
       {(modalFor === "deleteChat" || modalFor === "leaveGroup") && (
         <div className=" flex flex-col h-full space-y-12">

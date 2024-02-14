@@ -1,6 +1,8 @@
 import React from "react";
+import useAuthProvider from "../hooks/useAuthProvider";
 
 const UserCard = ({ user, clickFunc = () => {} }) => {
+  const { user: currentUser } = useAuthProvider();
   return (
     <div
       onClick={() => clickFunc(user?._id)}
@@ -17,7 +19,12 @@ const UserCard = ({ user, clickFunc = () => {} }) => {
         </div>
         {/* other info */}
         <div>
-          <h1 className="text-lg font-medium leading-4">{user?.name}</h1>
+          <h1 className="text-lg font-medium leading-4">
+            {user?.name}{" "}
+            {user._id === currentUser?._id && (
+              <span className="text-xs"> (You)</span>
+            )}
+          </h1>
         </div>
       </div>
     </div>

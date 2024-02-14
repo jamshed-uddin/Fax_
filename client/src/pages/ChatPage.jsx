@@ -1,13 +1,26 @@
 import useAuthProvider from "../hooks/useAuthProvider";
 import SideChats from "../components/SideChats";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 import useChatProvider from "../hooks/useChatProvider";
 import Hero from "../components/Hero";
+import { useEffect, useState } from "react";
+import useTheme from "../hooks/useTheme";
 
 const ChatPage = () => {
-  const { isSideChatOpen } = useChatProvider();
+  const { isSideChatOpen, setIsSideChatOpen } = useChatProvider();
   const { user, userLoading } = useAuthProvider();
+  const { pathname } = useLocation();
+  const { dark } = useTheme();
+  const [latestMessage, setLatestMessage] = useState("hello world");
+
+  useEffect(() => {
+    if (pathname === "/") {
+      setIsSideChatOpen(true);
+    } else {
+      setIsSideChatOpen(false);
+    }
+  }, [pathname, setIsSideChatOpen]);
 
   if (userLoading) {
     return <div className="h-screen bg-white"></div>;
@@ -21,7 +34,9 @@ const ChatPage = () => {
     <div className="my-container h-screen  lg:py-4 relative">
       <div className="lg:flex h-full gap-2 ">
         <div
-          className={`bg-white w-full h-full lg:w-[40%] lg:shadow-md  lg:rounded-md pt-2 px-2 absolute lg:static z-50  ${
+          className={`${
+            dark ? "bg-slate-900 text-white" : "bg-white text-gray-800"
+          } w-full h-full lg:w-[40%] lg:shadow-md  lg:rounded-md pt-2 px-2 absolute lg:static z-50  ${
             isSideChatOpen
               ? "top-0  left-0 "
               : "top-0 -left-[50rem] transition-all duration-500"
@@ -31,9 +46,11 @@ const ChatPage = () => {
         </div>
 
         <div
-          className={`bg-white w-full lg:w-[60%]  h-full  lg:shadow-md lg:rounded-md pt-2  `}
+          className={`${
+            dark ? "bg-slate-900 text-white" : "bg-white text-gray-800"
+          } w-full lg:w-[60%]  h-full  lg:shadow-md lg:rounded-md pt-2  `}
         >
-          <Outlet />
+          <Outlet context={setLatestMessage} />
         </div>
       </div>
     </div>

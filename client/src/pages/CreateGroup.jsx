@@ -16,19 +16,27 @@ import {
 import useCloseMenu from "../hooks/useCloseMenu";
 import uploadPhotoToCloud from "../myFunctions/uploadPhotoToCloud";
 import deletePhotoFromCloud from "../myFunctions/deletePhotoFromCloud";
+import axios from "axios";
+import useAuthProvider from "../hooks/useAuthProvider";
 
 const CreateGroup = () => {
+  const { user: currentUser } = useAuthProvider();
   const [searchQuery, setSearchQuery] = useState("");
   const bouncedQuery = useDebounce(searchQuery, 600);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [photoUploading, setPhotoUploading] = useState("");
   const [profilePhotoURL, setProfilePhotoURL] = useState("");
+  const [profilePhotoFile, setProfilePhotoFile] = useState();
+  const [groupCreateLoading, setGroupCreateLoading] = useState(false);
   const [groupData, setGroupData] = useState({
     chatName: "",
     chatDescription: "",
     chatPhotoURL: "",
     users: [],
   });
+
+  console.log(groupData);
+  console.log(profilePhotoFile);
 
   const { data: searchResult, isLoading: searchLoading } =
     useGetSearchResult(bouncedQuery);
@@ -47,14 +55,21 @@ const CreateGroup = () => {
       );
     }
 
-    if (selectedUsers.some((user) => user._id === selectedUser._id)) return;
+    if (
+      selectedUsers.some((user) => user._id === selectedUser._id) ||
+      currentUser._id === selectedUser._id
+    )
+      return;
 
     setSelectedUsers((users) => [...users, selectedUser]);
   };
 
   useEffect(() => {
-    setGroupData((p) => ({ ...p, users: selectedUsers }));
-  }, [selectedUsers]);
+    setGroupData((p) => ({
+      ...p,
+      users: [currentUser._id, ...selectedUsers.map((user) => user._id)],
+    }));
+  }, [selectedUsers, currentUser]);
 
   const { isMenuOpen: uploaderOpen, setIsMenuOpen: setUploaderOpen } =
     useCloseMenu("photoUploader");
@@ -70,20 +85,47 @@ const CreateGroup = () => {
     const file = e.target.files[0];
     const previewURL = URL.createObjectURL(file);
     setProfilePhotoURL(previewURL);
+    setProfilePhotoFile(file);
 
     setUploaderOpen((p) => !p);
-    if (file) {
+    // if (file) {
+    //   try {
+    //     setPhotoUploading(true);
+    //     await uploadPhotoToCloud(file).then((res) => {
+    //       console.log(res);
+    //       const cloudImageUrl = res.data.secure_url;
+    //       setPhotoUploading(false);
+    //       setProfilePhotoURL(cloudImageUrl);
+    //     });
+    //   } catch (error) {
+    //     setPhotoUploading(false);
+    //   }
+    // }
+  };
+
+  const handleCreateGroup = async () => {
+    setGroupCreateLoading(true);
+    if (profilePhotoFile) {
       try {
-        setPhotoUploading(true);
-        await uploadPhotoToCloud(file).then((res) => {
-          console.log(res);
+        await uploadPhotoToCloud(profilePhotoFile).then((res) => {
           const cloudImageUrl = res.data.secure_url;
           setPhotoUploading(false);
-          setProfilePhotoURL(cloudImageUrl);
+
+          setGroupData((p) => ({ ...p, chatPhotoURL: cloudImageUrl }));
         });
       } catch (error) {
-        setPhotoUploading(false);
+        setGroupData((p) => ({ ...p, chatPhotoURL: "" }));
       }
+    }
+
+    try {
+      const result = await axios.post(`/api/chat/group`, groupData);
+
+      console.log(result);
+      setGroupCreateLoading(false);
+    } catch (error) {
+      console.log(error.response);
+      setGroupCreateLoading(false);
     }
   };
 
@@ -92,8 +134,12 @@ const CreateGroup = () => {
       <div className=" flex items-center justify-between">
         <NavigateBack />
         <div>
-          <button className=" btn btn-sm no-animation bg-slate-300 text-xl">
-            Create
+          <button
+            disabled={groupCreateLoading}
+            onClick={handleCreateGroup}
+            className=" btn btn-sm no-animation bg-slate-300 text-xl"
+          >
+            {groupCreateLoading ? "Creating..." : "Create"}
           </button>
         </div>
       </div>
@@ -123,7 +169,7 @@ const CreateGroup = () => {
                 {/* image upload and delete option */}
                 {uploaderOpen && (
                   <div
-                    className={` flex gap-2 md:gap-5 rounded-lg px-1 py-1 md:px-3 shadow-md absolute bottom-2 -right-28 `}
+                    className={` flex gap-2 md:gap-5 rounded-lg px-1 py-1 md:px-3 shadow-md absolute bottom-2 lg:-right-28 -right-20 `}
                   >
                     <div className=" p-1  rounded-lg text-lg cursor-pointer ">
                       <label className="cursor-pointer" htmlFor="profilePhoto">
@@ -224,7 +270,7 @@ const CreateGroup = () => {
                     className={`shadow-md rounded-xl px-2 py-1 relative`}
                   >
                     <UserCard user={user} />
-                    <div className="absolute -top-1 -right-1 shadow-md rounded-full">
+                    <div className="absolute -top-1 lg:-right-1 right-0 shadow-md rounded-full">
                       {selectedUsers.some(
                         (selectedUser) => selectedUser._id === user._id
                       ) && (

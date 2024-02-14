@@ -26,7 +26,7 @@ const Profile = () => {
     queryFn: async () => {
       try {
         const result = await axios.get(`/api/user/singleUser?userId=${userId}`);
-
+        setProfilePhotoURL(result?.data.photoURL);
         return result.data;
       } catch (error) {
         if (
@@ -41,8 +41,8 @@ const Profile = () => {
     },
     enabled: !!userId,
   });
+  console.log(profilePhotoURL);
 
-  console.log(userData);
   if (userDataError) {
     return <WentWrong refetch={userDataRefetch} />;
   }

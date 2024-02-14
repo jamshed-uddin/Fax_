@@ -101,18 +101,18 @@ const getSignleChat = asyncHandler(async (req, res) => {
 //@access private
 
 const createGroup = asyncHandler(async (req, res) => {
-  const { chatName, users, chatPhtoURL } = req.body;
+  const { chatName, chatDescription, users, chatPhtoURL } = req.body;
 
-  if (members.length < 2) {
+  console.log(req.body);
+  if (users.length < 2) {
     return res
       .send(400)
       .send({ message: "At two members required to create a group. " });
   }
   const groupData = {
-    chatName: chatName,
-    chatPhotoURL: chatPhtoURL,
-    users: users,
+    ...req.body,
     groupAdmin: req.user._id,
+    isGroupChat: true,
   };
 
   try {

@@ -1,22 +1,27 @@
 import io from "socket.io-client";
 import { createContext, useEffect, useState } from "react";
 import useAuthProvider from "../hooks/useAuthProvider";
-import axios from "axios";
+import useGetChat from "../hooks/useGetChat";
 
 export const ChatsContext = createContext({});
 
 const ChatsProvider = ({ children }) => {
   const { user } = useAuthProvider();
-
   const [isSideChatOpen, setIsSideChatOpen] = useState(true);
-
   const [socket, setSocket] = useState(null);
   const [activeUsers, setActiveUsers] = useState([]);
   const [typingStatus, setTypingStatus] = useState({});
-  const [readBy, setReadBy] = useState([]);
+  const [latestMessage, setLatestMessage] = useState({});
+
+  const {
+    data: myChats,
+    isLoading: myChatsLoading,
+    error: myChatsError,
+    refetch: myChatsRefetch,
+  } = useGetChat("/api/chat");
 
   useEffect(() => {
-    if (!user) return;
+    if (!user && !myChats) return;
 
     const newSocket = io("ws://localhost:2000");
 
@@ -25,19 +30,19 @@ const ChatsProvider = ({ children }) => {
     return () => {
       newSocket.disconnect();
     };
-  }, [user]);
+  }, [user, myChats]);
 
+  // active users
   useEffect(() => {
     socket?.emit("userSetup", user);
     socket?.on("activeUsers", (data) => {
       setActiveUsers(data);
-      console.log(data);
     });
   }, [socket, user]);
 
+  // typing indicator
   useEffect(() => {
     socket?.on("typing", (data) => {
-      console.log(data);
       setTypingStatus(data);
     });
   }, [socket]);
@@ -97,13 +102,18 @@ const ChatsProvider = ({ children }) => {
   };
 
   const chatInfo = {
+    myChats,
+    myChatsLoading,
+    myChatsError,
+    myChatsRefetch,
     isSideChatOpen,
     setIsSideChatOpen,
     socket,
     activeUsers,
     isUserActive,
     typingStatus,
-    lastSeen,
+    latestMessage,
+    setLatestMessage,
   };
   return (
     <ChatsContext.Provider value={chatInfo}>{children}</ChatsContext.Provider>

@@ -5,6 +5,8 @@ import MyChats from "./MyChats";
 import SearchResult from "./SearchResult";
 import useDebounce from "../hooks/useDebouce";
 import useGetSearchResult from "../hooks/useGetSearchResult";
+import { Link } from "react-router-dom";
+import { UsersIcon } from "@heroicons/react/24/outline";
 
 const SideChats = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,7 +19,7 @@ const SideChats = () => {
       <div className="sticky top-0 left-0 right-0 z-20">
         <SideHeader />
       </div>
-      <div className="h-max">
+      <div className="h-max space-y-2">
         <div className="py-1 mb-1">
           <Searchbar
             searchQuery={searchQuery}
@@ -32,6 +34,18 @@ const SideChats = () => {
         />
 
         {/* existing chats */}
+        <div className="flex justify-between items-center mb-1">
+          <h1 className="text-2xl font-semibold mb-2">Chats</h1>
+          <Link to={"/createGroup"}>
+            <div
+              // onClick={() => setIsSideChatOpen(false)}
+              className={`flex items-center rounded-md  px-2 py-[0.20rem]  text-sm font-medium btn btn-sm `}
+            >
+              <UsersIcon className="w-5 h-5  " />
+              <span className="">Create group</span>
+            </div>
+          </Link>
+        </div>
         <MyChats />
       </div>
     </div>

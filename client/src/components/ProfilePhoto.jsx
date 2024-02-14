@@ -44,7 +44,7 @@ const ProfilePhoto = ({
             {/* image upload and delete option */}
             {uploaderOpen && (
               <div
-                className={` flex gap-2 md:gap-5 rounded-lg px-1 py-1 md:px-3 shadow-md absolute bottom-2 -right-28 `}
+                className={` flex gap-2 md:gap-5 rounded-lg px-1 py-1 md:px-3 shadow-md absolute bottom-2 lg:-right-28 -right-20 `}
               >
                 <div className=" p-1  rounded-lg text-lg cursor-pointer ">
                   <label className="cursor-pointer" htmlFor="profilePhoto">

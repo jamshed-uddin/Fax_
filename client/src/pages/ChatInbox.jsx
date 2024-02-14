@@ -9,22 +9,17 @@ import InboxSkeleton from "../components/InboxSkeleton";
 import WentWrong from "../components/WentWrong";
 import Settings from "../components/Settings";
 import SendMessage from "../components/SendMessage";
-import {
-  chatNameHandler,
-  chatPhotoHandler,
-  isOwnMessage,
-  isUsersLastMessage,
-  messageDate,
-  messageTime,
-} from "../logics/messageLogics";
+import { chatNameHandler, chatPhotoHandler } from "../logics/messageLogics";
 import useAuthProvider from "../hooks/useAuthProvider";
 import axios from "axios";
 import AllMessages from "../components/AllMessages";
+import useTheme from "../hooks/useTheme";
 
 const ChatInbox = () => {
+  const { dark } = useTheme();
   const { user } = useAuthProvider();
   const { chatId } = useParams();
-  const { setIsSideChatOpen, socket, typingStatus, isUserActive } =
+  const { socket, typingStatus, isUserActive, setLatestMessage } =
     useChatProvider();
 
   const lastMessageRef = useRef();
@@ -32,7 +27,7 @@ const ChatInbox = () => {
   const [sendMessage, setSendMessage] = useState(null);
   const [newMessage, setNewMessage] = useState(false);
   const [messagesFetched, setMessagesFetched] = useState(false);
-  console.log(messagesFetched);
+
   const {
     data: singleChat,
     isLoading: singleChatLoading,
@@ -40,6 +35,7 @@ const ChatInbox = () => {
     refetch: singleChatRefetch,
   } = useGetChat(`/api/chat/${chatId}`);
 
+  // fetching messages
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -83,24 +79,21 @@ const ChatInbox = () => {
   // recieve message from socket
   useEffect(() => {
     socket?.on("recieveMessage", (data) => {
-      console.log(data);
+      setLatestMessage(data);
       if (data !== null && data.chatId === chatId) {
         setAllMessages([...allMessages, data]);
       }
     });
-  }, [socket, chatId, allMessages]);
-
-  //  side chat close or open for mobile
-  useEffect(() => {
-    setIsSideChatOpen(!chatId);
-  }, [chatId, setIsSideChatOpen]);
+  }, [socket, chatId, allMessages, setLatestMessage]);
 
   if (singleChatError) {
     return <WentWrong refetch={singleChatRefetch} />;
   }
 
+  const themeWiseBg = `${dark ? "bg-slate-800" : "bg-slate-200"}`;
+
   return (
-    <div className="h-full w-full flex flex-col  bg-white">
+    <div className="h-full w-full flex flex-col  ">
       {/* inbox header */}
       <div className="shadow-sm w-full flex items-center gap-2  pb-1 px-2 lg:px-4 ">
         <NavigateBack />
@@ -108,7 +101,9 @@ const ChatInbox = () => {
           {/* photo */}
           <div className="h-11 w-11 rounded-full  relative">
             {singleChatLoading ? (
-              <div className="h-full w-full rounded-full bg-slate-200 skeleton"></div>
+              <div
+                className={`h-full w-full rounded-full  skeleton ${themeWiseBg}`}
+              ></div>
             ) : (
               <img
                 className="w-full h-full object-cover rounded-full"
@@ -125,7 +120,9 @@ const ChatInbox = () => {
           {/* name */}
           <div>
             {singleChatLoading ? (
-              <div className="h-8 w-28 rounded-xl skeleton bg-slate-200"></div>
+              <div
+                className={`h-8 w-28 rounded-xl skeleton ${themeWiseBg} `}
+              ></div>
             ) : (
               <>
                 <h1 className="text-xl font-medium ">
@@ -137,7 +134,7 @@ const ChatInbox = () => {
         </div>
         <div className="flex-grow flex justify-end">
           {singleChatLoading ? (
-            <div className="h-7 w-2 bg-slate-200 skeleton"></div>
+            <div className={`h-7 w-2  skeleton ${themeWiseBg}`}></div>
           ) : (
             <Settings
               placedIn={"inbox"}

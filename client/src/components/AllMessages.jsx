@@ -6,7 +6,9 @@ import {
   messageDate,
   messageTime,
 } from "../logics/messageLogics";
+import useTheme from "../hooks/useTheme";
 const AllMessages = ({ allMessages = [], isGroupChat }) => {
+  const { dark } = useTheme();
   const { user } = useAuthProvider();
   const [messageGroup, setMessageGroup] = useState({});
 
@@ -34,7 +36,11 @@ const AllMessages = ({ allMessages = [], isGroupChat }) => {
       {Object.keys(messageGroup).map((date) => (
         <div key={date} className="relative ">
           <div className=" flex justify-center  sticky top-1 left-1/2 ">
-            <h1 className="w-fit bg-slate-100  rounded-md px-3  shadow-md my-1 ">
+            <h1
+              className={`w-fit   rounded-md px-3  shadow-md my-1 ${
+                dark ? "bg-slate-600" : "bg-slate-100"
+              }`}
+            >
               {messageDate(messageGroup[date][0].updatedAt)}
             </h1>
           </div>
@@ -68,7 +74,9 @@ const AllMessages = ({ allMessages = [], isGroupChat }) => {
                     <div className="text-xs ml-1">{message?.sender?.name}</div>
                   )}
                 <div
-                  className={` bg-slate-200 w-full text-black text-sm md:text-base shadow-md px-3 py-2  rounded-lg flex items-end `}
+                  className={`  w-full  text-sm md:text-base shadow-md px-3 py-2  rounded-lg flex items-end ${
+                    dark ? "bg-slate-800" : "bg-slate-200"
+                  }`}
                 >
                   <div className="flex-grow">{message?.content}</div>
                   <div className="shrink-0 text-end  text-[0.60rem] ml-2 -mb-2 -mr-1 ">

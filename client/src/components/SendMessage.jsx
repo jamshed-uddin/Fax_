@@ -55,10 +55,10 @@ const SendMessage = ({
         error.response &&
         (error.response.status === 400 || error.response.status === 401)
       ) {
-        console.log(error.response.data.message);
+        // console.log(error.response.data.message);
         throw new Error(error.response.data.message);
       } else {
-        console.log(error);
+        // console.log(error);
         throw new Error("Something went wrong");
       }
     }

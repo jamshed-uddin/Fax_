@@ -6,12 +6,15 @@ import {
   isOwnMessage,
 } from "../logics/messageLogics";
 import useChatProvider from "../hooks/useChatProvider";
+import { useState } from "react";
 
 const ChatCard = ({ chat, clickFunc }) => {
   const { user } = useAuthProvider();
   const { isUserActive } = useChatProvider();
+  const [lastMessageRead, setLastMessageRead] = useState(
+    chat?.latestMessage?.readBy.includes(user?._id)
+  );
 
-  console.log(chat);
   return (
     <div
       onClick={clickFunc}
@@ -33,31 +36,37 @@ const ChatCard = ({ chat, clickFunc }) => {
         )}
       </div>
       {/* other info */}
-      <div className="flex-grow">
+      <div onClick={() => setLastMessageRead(true)} className="flex-grow">
         <div className=" flex justify-between items-center">
           <h1 className="text-lg font-medium leading-4">
             {chat?.isGroupChat ? chat?.chatName : chatNameHandler(chat, user)}
           </h1>
           {/* last message date */}
-          <h4 className="text-sm font-semibold">
-            {chatDate(chat?.latestMessage.updatedAt)}
-          </h4>
+          {chat?.latestMessage && (
+            <h4 className="text-sm font-semibold">
+              {chatDate(chat?.latestMessage?.updatedAt)}
+            </h4>
+          )}
         </div>
-        <h2
-          className={`${
-            !chat?.latestMessage.readBy.includes(user?._id) &&
-            !isOwnMessage(chat?.latestMessage?.sender, user._id) &&
-            "font-bold"
-          }`}
-        >
-          {chat?.latestMessage?.sender?._id === user?._id
-            ? `You: ${chat?.latestMessage?.content?.slice(0, 35)}...`
-            : chat.isGroupChat
-            ? `${
-                chat?.latestMessage?.sender.name
-              }: ${chat?.latestMessage?.content?.slice(0, 35)}...`
-            : `${chat?.latestMessage?.content?.slice(0, 35)}...`}
-        </h2>
+        {chat?.latestMessage ? (
+          <h2
+            className={`${
+              !lastMessageRead &&
+              !isOwnMessage(chat?.latestMessage?.sender, user._id) &&
+              "font-bold"
+            }`}
+          >
+            {chat?.latestMessage?.sender?._id === user?._id
+              ? `You: ${chat?.latestMessage?.content?.slice(0, 35)}...`
+              : chat.isGroupChat
+              ? `${
+                  chat?.latestMessage?.sender.name
+                }: ${chat?.latestMessage?.content?.slice(0, 35)}...`
+              : `${chat?.latestMessage?.content?.slice(0, 35)}...`}
+          </h2>
+        ) : (
+          <h2>{chat?.chatDescription?.slice(0, 35)}</h2>
+        )}
       </div>
     </div>
   );

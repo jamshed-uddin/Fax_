@@ -1,6 +1,9 @@
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import useTheme from "../hooks/useTheme";
 
 const Searchbar = ({ searchQuery, setSearchQuery }) => {
+  const { dark } = useTheme();
+
   return (
     <div className="form-control  ">
       <div className="flex w-full items-center relative overflow-hidden  rounded-lg  py-1 pr-1">
@@ -20,7 +23,9 @@ const Searchbar = ({ searchQuery, setSearchQuery }) => {
         {searchQuery && (
           <span
             onClick={() => setSearchQuery("")}
-            className=" absolute right-1 top-1/2 -translate-y-1/2 bg-white  rounded-lg  cursor-pointer"
+            className={`absolute right-2 top-1/2 -translate-y-1/2   rounded-lg  cursor-pointer ${
+              dark ? "bg-gray-900" : "bg-white"
+            }`}
           >
             <XMarkIcon className="w-6 h-6" />
           </span>

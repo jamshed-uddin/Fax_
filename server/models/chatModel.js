@@ -4,12 +4,7 @@ const chatSchema = mongoose.Schema(
   {
     chatName: { type: String, trim: true },
     chatDescription: { type: String, trim: true },
-    chatPhotoURL: {
-      type: String,
-      default: function () {
-        return this.isGroupChat ? "https://i.ibb.co/mz6J26q/usergroup.png" : "";
-      },
-    },
+    chatPhotoURL: { type: String },
     isGroupChat: { type: Boolean, default: false },
     users: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     latestMessage: {
@@ -20,5 +15,13 @@ const chatSchema = mongoose.Schema(
   },
   { timestamps: true }
 );
+
+chatSchema.pre("save", async function (next) {
+  if (!this.isGroupChat) {
+    next();
+  }
+
+  this.chatPhotoURL = "https://i.ibb.co/mz6J26q/usergroup.png";
+});
 
 module.exports = mongoose.model("Chat", chatSchema);
