@@ -10,9 +10,9 @@ const isUsersLastMessage = (messages, index, message, position = "last") => {
 };
 
 const chatPhotoHandler = (singleChat, user) => {
-  return singleChat?.users[0]._id === user?._id
-    ? singleChat?.users[1].photoURL
-    : singleChat?.users[0].photoURL;
+  return singleChat?.users[0]?._id === user?._id
+    ? singleChat?.users[1]?.photoURL
+    : singleChat?.users[0]?.photoURL;
 };
 
 const chatNameHandler = (singleChat, user) => {

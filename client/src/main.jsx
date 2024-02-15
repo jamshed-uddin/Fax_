@@ -14,6 +14,7 @@ import ChatsProvider from "./providers/ChatsProvider.jsx";
 import CreateGroup from "./pages/CreateGroup.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import ThemeProvider from "./providers/ThemeProvider.jsx";
+import SocketProvider from "./providers/SocketProvider.jsx";
 
 const queryClient = new QueryClient();
 
@@ -81,13 +82,15 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          <ChatsProvider>
-            <RouterProvider router={router} />
-          </ChatsProvider>
-        </AuthProvider>
-      </ThemeProvider>
+      <AuthProvider>
+        <SocketProvider>
+          <ThemeProvider>
+            <ChatsProvider>
+              <RouterProvider router={router} />
+            </ChatsProvider>
+          </ThemeProvider>
+        </SocketProvider>
+      </AuthProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );

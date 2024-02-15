@@ -24,12 +24,14 @@ const AllMessages = ({ allMessages = [], isGroupChat }) => {
       if (group[messageDate]) {
         group[messageDate].push(message);
       } else {
-        group[messageDate] = [];
+        group[messageDate] = [message];
       }
     });
 
     setMessageGroup(group);
   }, [allMessages]);
+
+  console.log(allMessages[allMessages.length - 1]);
 
   return (
     <div className="h-max  py-2  w-full ">
@@ -41,7 +43,9 @@ const AllMessages = ({ allMessages = [], isGroupChat }) => {
                 dark ? "bg-slate-600" : "bg-slate-100"
               }`}
             >
-              {messageDate(messageGroup[date][0].updatedAt)}
+              {messageDate(
+                messageGroup[date].length && messageGroup[date][0]?.updatedAt
+              )}
             </h1>
           </div>
           {messageGroup[date]?.map((message, index, msgArr) => (
@@ -51,7 +55,7 @@ const AllMessages = ({ allMessages = [], isGroupChat }) => {
                 isOwnMessage(message?.sender, user?._id)
                   ? "justify-end "
                   : "justify-start "
-              }`}
+              } ${message?.type === "event" ? "justify-center" : ""} `}
             >
               {/* user avatar */}
               {!isOwnMessage(message?.sender, user?._id) && (
@@ -60,25 +64,30 @@ const AllMessages = ({ allMessages = [], isGroupChat }) => {
                     !isOwnMessage(message?.sender, user?._id) && (
                       <img
                         className="w-full h-full object-cover rounded-full"
-                        src={message?.sender.photoURL}
+                        src={message?.sender?.photoURL}
                         alt={`Profile photo of `}
                       />
                     )}
                 </div>
               )}
               {/* message text */}
-              <div className=" ml-2 max-w-[75%]">
-                {!isGroupChat &&
-                  isUsersLastMessage(msgArr, index, message, "first") &&
-                  !isOwnMessage(message?.sender, user?._id) && (
-                    <div className="text-xs ml-1">{message?.sender?.name}</div>
-                  )}
+              <div className=" ml-2 max-w-[75%] ">
+                {isGroupChat && !isOwnMessage(message?.sender, user?._id) && (
+                  <div className="text-xs ml-1">{message?.sender?.name}</div>
+                )}
                 <div
                   className={`  w-full  text-sm md:text-base shadow-md px-3 py-2  rounded-lg flex items-end ${
                     dark ? "bg-slate-800" : "bg-slate-200"
+                  } ${
+                    message?.type === "event"
+                      ? "bg-transparent shadow-none items-center "
+                      : ""
                   }`}
                 >
-                  <div className="flex-grow">{message?.content}</div>
+                  <div className="flex-grow">
+                    {message?.type === "event" && message?.sender?.name}{" "}
+                    {message?.content}
+                  </div>
                   <div className="shrink-0 text-end  text-[0.60rem] ml-2 -mb-2 -mr-1 ">
                     {messageTime(message?.updatedAt)}
                   </div>

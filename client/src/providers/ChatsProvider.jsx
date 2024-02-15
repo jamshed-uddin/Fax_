@@ -6,58 +6,20 @@ import useGetChat from "../hooks/useGetChat";
 export const ChatsContext = createContext({});
 
 const ChatsProvider = ({ children }) => {
-  const { user } = useAuthProvider();
   const [isSideChatOpen, setIsSideChatOpen] = useState(true);
-  const [socket, setSocket] = useState(null);
-  const [activeUsers, setActiveUsers] = useState([]);
-  const [typingStatus, setTypingStatus] = useState({});
   const [latestMessage, setLatestMessage] = useState({});
-
-  const {
-    data: myChats,
-    isLoading: myChatsLoading,
-    error: myChatsError,
-    refetch: myChatsRefetch,
-  } = useGetChat("/api/chat");
-
-  useEffect(() => {
-    if (!user && !myChats) return;
-
-    const newSocket = io("ws://localhost:2000");
-
-    setSocket(newSocket);
-
-    return () => {
-      newSocket.disconnect();
-    };
-  }, [user, myChats]);
-
-  // active users
-  useEffect(() => {
-    socket?.emit("userSetup", user);
-    socket?.on("activeUsers", (data) => {
-      setActiveUsers(data);
-    });
-  }, [socket, user]);
-
-  // typing indicator
-  useEffect(() => {
-    socket?.on("typing", (data) => {
-      setTypingStatus(data);
-    });
-  }, [socket]);
 
   // update lastMessage readBy
 
-  const isUserActive = (user, chatUsers) => {
-    const otherUser = chatUsers?.find((u) => u._id !== user?._id);
+  // const isUserActive = (user, chatUsers) => {
+  //   const otherUser = chatUsers?.find((u) => u._id !== user?._id);
 
-    const activeUser = activeUsers.find(
-      (user) => user.userId === otherUser?._id
-    );
+  //   const activeUser = activeUsers.find(
+  //     (user) => user.userId === otherUser?._id
+  //   );
 
-    return !!activeUser;
-  };
+  //   return !!activeUser;
+  // };
 
   const lastSeen = (currentTime, previousTime) => {
     const msDifference = currentTime - previousTime;
@@ -102,16 +64,11 @@ const ChatsProvider = ({ children }) => {
   };
 
   const chatInfo = {
-    myChats,
-    myChatsLoading,
-    myChatsError,
-    myChatsRefetch,
     isSideChatOpen,
     setIsSideChatOpen,
-    socket,
-    activeUsers,
-    isUserActive,
-    typingStatus,
+
+    // isUserActive,
+
     latestMessage,
     setLatestMessage,
   };

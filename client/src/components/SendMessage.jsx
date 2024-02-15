@@ -35,17 +35,11 @@ const SendMessage = ({
     const sender = chat?.users.find((u) => u._id === user._id);
     const reciever = chat?.users.find((u) => u._id !== user._id);
     // sending message to socket
-    setSendMessage({
-      sender,
-      content: message,
-      chatId: chat?._id,
-      users: chat?.users,
-    });
 
     // sending to DB
     try {
       const result = await axios.post("/api/message/newMessage", messageToSend);
-
+      setSendMessage(result?.data);
       setAllMessages((p) => [...p, result?.data]);
       setNewMessage((p) => !p);
       console.log(result);

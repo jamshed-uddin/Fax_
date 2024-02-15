@@ -44,7 +44,7 @@ const ChatInbox = () => {
         setAllMessages(result?.data);
         setMessagesFetched(!!result?.data);
       } catch (error) {
-        console.log(error?.response?.message);
+        console.log(error);
       }
     };
 
@@ -55,16 +55,14 @@ const ChatInbox = () => {
   useEffect(() => {
     const updateMessageReadBy = async () => {
       try {
-        const result = await axios.patch(
-          `/api/message/${singleChat?.latestMessage?._id}`
-        );
-        console.log(result);
+        await axios.patch(`/api/message/${singleChat?.latestMessage?._id}`);
       } catch (error) {
         console.log(error?.response?.message);
       }
     };
 
     if (
+      singleChat?.users.length === singleChat?.latestMessage?.readBy.length &&
       singleChat &&
       singleChat?.latestMessage &&
       !singleChat?.latestMessage?.readBy.includes(user?._id)
@@ -72,6 +70,10 @@ const ChatInbox = () => {
       updateMessageReadBy();
     }
   }, [singleChat, user]);
+
+  useEffect(() => {
+    socket?.emit("joinChat", user);
+  }, [socket, user]);
 
   // send message to socket
   useEffect(() => {
@@ -82,13 +84,18 @@ const ChatInbox = () => {
 
   // recieve message from socket
   useEffect(() => {
+    console.log("recieve message running");
+    console.log(socket);
     socket?.on("recieveMessage", (data) => {
-      setLatestMessage(data);
-      if (data !== null && data.chatId === chatId) {
+      console.log(data);
+
+      if (data.chat._id === chatId) {
         setAllMessages([...allMessages, data]);
       }
     });
-  }, [socket, chatId, allMessages, setLatestMessage]);
+
+    return () => socket?.off("recieveMessage");
+  }, [socket, allMessages, chatId]);
 
   if (singleChatError) {
     return <WentWrong refetch={singleChatRefetch} />;
@@ -167,11 +174,7 @@ const ChatInbox = () => {
 
         {/* user typing indicator */}
 
-        <div
-          className="border-2 border-red-400"
-          id="last-message"
-          ref={lastMessageRef}
-        >
+        <div id="last-message" ref={lastMessageRef}>
           {typingStatus?.isTyping &&
             typingStatus?.user._id !== user?._id &&
             typingStatus?.chatId === singleChat?._id && (

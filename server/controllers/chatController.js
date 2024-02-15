@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 
 const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
+const Message = require("../models/messageModel");
 
 //@desc access or create chat
 // route POST /api/chat/accessChat
@@ -112,7 +113,7 @@ const createGroup = asyncHandler(async (req, res) => {
   }
   const groupData = {
     ...req.body,
-    groupAdmin: req.user._id,
+    groupAdmin: [req.user._id],
     isGroupChat: true,
   };
 
@@ -123,6 +124,14 @@ const createGroup = asyncHandler(async (req, res) => {
       path: "users",
       select: " -password -email",
     });
+
+    const newEventMessage = {
+      sender: req.user._id,
+      content: "created this group",
+      type: "event",
+      chat: newCreatedGroup._id,
+    };
+    await Message.create(newEventMessage);
     console.log("group", newCreatedGroup);
     res.status(201).send(newCreatedGroup);
   } catch (error) {

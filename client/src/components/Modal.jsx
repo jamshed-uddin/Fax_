@@ -7,7 +7,7 @@ const Modal = ({
   modalFor,
   isModalOpen,
   setIsModalOpen,
-  chatId,
+  chat,
   userId,
   userRefetch,
 }) => {
@@ -54,7 +54,7 @@ const Modal = ({
         <div className=" flex flex-col h-full space-y-12">
           <h1 className="flex-grow text-xl font-medium">
             {modalFor === "deleteChat"
-              ? "Delete this conversation?"
+              ? `Delete this ${chat?.isGroupChat ? "group" : "conversation"}?`
               : "Leave this group?"}
           </h1>
 

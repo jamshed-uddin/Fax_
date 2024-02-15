@@ -40,25 +40,33 @@ app.use("/api/message", messageRoute);
 let activeUsers = [];
 
 io.on("connection", (socket) => {
-  console.log(`${socket.id} is connected`);
+  const userId = socket.handshake.query.userId;
+  console.log(userId);
+  console.log(`${userId} is connected`);
 
-  // user setup when login and send active users to client
-  socket.on("userSetup", (user) => {
+  if (userId) {
+    activeUsers.push({ userId: userId, socketId: socket.id });
+  }
+  console.log(activeUsers);
+
+  // emiting active users
+  io.emit("activeUsers", activeUsers);
+
+  console.log(activeUsers);
+
+  socket.on("joinChat", (user) => {
     socket.join(user._id);
-    // console.log("active user", user);
-    if (!activeUsers.some((user) => user.userId === user._id)) {
-      activeUsers.push({ userId: user._id, socketId: socket.id });
-    }
-    // console.log("activearray", activeUsers);
-    io.emit("activeUsers", activeUsers);
+    console.log(`${user?.name} joined the chat`);
   });
-
   // send message
   socket.on("sendMessage", (data) => {
-    const { users } = data;
-    if (users.length) {
-      users.forEach((user) => {
+    const { chat } = data;
+    console.log(data);
+    if (chat.users.length) {
+      chat.users.forEach((user) => {
+        if (user._id === data.sender._id) return;
         socket.in(user._id).emit("recieveMessage", data);
+        console.log("message sent");
       });
     }
   });
@@ -75,10 +83,11 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     activeUsers = activeUsers.filter((user) => user.socketId !== socket.id);
-    console.log(`${socket.id} is disconnected`);
+    console.log(`${userId} is disconnected`);
+    io.emit("activeUsers", activeUsers);
   });
 });
-
+console.log(activeUsers);
 app.use(notFound);
 app.use(errorHandler);
 
