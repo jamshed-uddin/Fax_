@@ -87,7 +87,8 @@ const getSignleChat = asyncHandler(async (req, res) => {
     const allChat = await Chat.findOne({ _id: req.params.chatId })
       .populate("latestMessage")
       .populate("users", "name photoURL")
-      .populate({ path: "latestMessage.sender", select: "name photoURL" });
+      .populate({ path: "latestMessage.sender", select: "name photoURL" })
+      .populate("groupAdmin");
 
     res.status(200).send(allChat);
   } catch (error) {
@@ -137,7 +138,8 @@ const createGroup = asyncHandler(async (req, res) => {
 const updateGroup = asyncHandler(async (req, res) => {
   const groupId = req.params.groupId;
   const { chatName, users, chatPhotoURL, groupAdmin } = req.body;
-  if (req.user._id !== groupAdmin._id) {
+  console.log(groupAdmin._id, req.user?._id.toString());
+  if (req.user._id.toString() !== groupAdmin._id) {
     return res.status(401).send({ message: "Unauthorized action" });
   }
 

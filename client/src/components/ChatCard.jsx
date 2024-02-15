@@ -12,13 +12,13 @@ const ChatCard = ({ chat, clickFunc }) => {
   const { user } = useAuthProvider();
   const { isUserActive } = useChatProvider();
   const [lastMessageRead, setLastMessageRead] = useState(
-    chat?.latestMessage?.readBy.includes(user?._id)
+    chat?.latestMessage?.readBy?.includes(user?._id)
   );
 
   return (
     <div
       onClick={clickFunc}
-      className="h-14 w-full rounded-lg  flex items-center gap-2"
+      className="h-fit py-1 w-full rounded-lg  flex items-center gap-2"
     >
       {/* image */}
       <div className="h-11 w-11 rounded-full relative">

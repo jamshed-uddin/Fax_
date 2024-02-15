@@ -35,7 +35,7 @@ const SideChats = () => {
 
         {/* existing chats */}
         <div className="flex justify-between items-center mb-1">
-          <h1 className="text-2xl font-semibold mb-2">Chats</h1>
+          <h1 className="text-xl font-semibold mb-2">Chats</h1>
           <Link to={"/createGroup"}>
             <div
               // onClick={() => setIsSideChatOpen(false)}

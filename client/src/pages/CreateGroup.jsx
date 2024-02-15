@@ -18,16 +18,25 @@ import uploadPhotoToCloud from "../myFunctions/uploadPhotoToCloud";
 import deletePhotoFromCloud from "../myFunctions/deletePhotoFromCloud";
 import axios from "axios";
 import useAuthProvider from "../hooks/useAuthProvider";
+import { useNavigate, useParams } from "react-router-dom";
+import useGetChat from "../hooks/useGetChat";
+import ProfileSkeleton from "../components/ProfileSkeleton";
+import WentWrong from "../components/WentWrong";
+import useTheme from "../hooks/useTheme";
 
 const CreateGroup = () => {
+  const { dark } = useTheme();
+  const navigate = useNavigate();
+  const { groupId } = useParams();
+  const [editMode, setEditMode] = useState(false);
   const { user: currentUser } = useAuthProvider();
   const [searchQuery, setSearchQuery] = useState("");
   const bouncedQuery = useDebounce(searchQuery, 600);
-  const [selectedUsers, setSelectedUsers] = useState([]);
   const [photoUploading, setPhotoUploading] = useState("");
   const [profilePhotoURL, setProfilePhotoURL] = useState("");
   const [profilePhotoFile, setProfilePhotoFile] = useState();
   const [groupCreateLoading, setGroupCreateLoading] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState([currentUser]);
   const [groupData, setGroupData] = useState({
     chatName: "",
     chatDescription: "",
@@ -35,8 +44,31 @@ const CreateGroup = () => {
     users: [],
   });
 
-  console.log(groupData);
-  console.log(profilePhotoFile);
+  // editing group section starts ----------
+
+  const {
+    data: singleChat,
+    isLoading: singleChatLoading,
+    error: singleChatError,
+    refetch: singleChatRefetch,
+  } = useGetChat(`/api/chat/${groupId}`, !!groupId);
+
+  useEffect(() => {
+    if (!singleChat) return;
+    setEditMode(true);
+
+    const { chatName, chatDescription, chatPhotoURL, users } = singleChat;
+
+    setProfilePhotoURL(singleChat?.chatPhotoURL);
+    setSelectedUsers(users);
+    setGroupData({
+      chatName,
+      chatDescription,
+      chatPhotoURL,
+    });
+  }, [singleChat, currentUser]);
+
+  // editing group section ends ----------
 
   const { data: searchResult, isLoading: searchLoading } =
     useGetSearchResult(bouncedQuery);
@@ -63,11 +95,11 @@ const CreateGroup = () => {
 
     setSelectedUsers((users) => [...users, selectedUser]);
   };
-
+  console.log(groupData);
   useEffect(() => {
     setGroupData((p) => ({
       ...p,
-      users: [currentUser._id, ...selectedUsers.map((user) => user._id)],
+      users: selectedUsers.map((user) => user._id),
     }));
   }, [selectedUsers, currentUser]);
 
@@ -119,9 +151,15 @@ const CreateGroup = () => {
     }
 
     try {
-      const result = await axios.post(`/api/chat/group`, groupData);
+      const result = editMode
+        ? await axios.put(`/api/chat/group/${singleChat?._id}`, {
+            ...groupData,
+            groupAdmin: singleChat?.groupAdmin,
+          })
+        : await axios.post(`/api/chat/group`, groupData);
 
-      console.log(result);
+      navigate(`/inbox/${result?.data._id}`, { replace: true });
+
       setGroupCreateLoading(false);
     } catch (error) {
       console.log(error.response);
@@ -129,17 +167,34 @@ const CreateGroup = () => {
     }
   };
 
+  if (singleChatLoading) {
+    return <ProfileSkeleton />;
+  }
+
+  if (singleChatError) {
+    return <WentWrong refetch={singleChatRefetch} />;
+  }
+
   return (
     <div className="overflow-y-auto h-full w-full pt-3 lg:px-2 pb-10">
       <div className=" flex items-center justify-between">
         <NavigateBack />
         <div>
           <button
-            disabled={groupCreateLoading}
             onClick={handleCreateGroup}
-            className=" btn btn-sm no-animation bg-slate-300 text-xl"
+            className={`text-lg  rounded-lg cursor-pointer px-3 pb-1  ${
+              dark
+                ? "bg-slate-100 text-gray-800"
+                : "bg-slate-900 text-slate-100"
+            }`}
           >
-            {groupCreateLoading ? "Creating..." : "Create"}
+            {groupCreateLoading
+              ? editMode
+                ? "Updating..."
+                : "Creating..."
+              : editMode
+              ? "Update"
+              : "Create"}
           </button>
         </div>
       </div>
@@ -225,20 +280,23 @@ const CreateGroup = () => {
           <h1 className="text-2xl font-medium">Add members</h1>
           <div className="overflow-x-auto mt-2">
             <div className="py-1 mt-2 flex items-center gap-3 flex-nowrap w-max">
-              {selectedUsers.map((user) => (
-                <div
-                  key={user._id}
-                  className="shadow-md rounded-xl px-2 py-1 w-fit relative"
-                >
-                  <UserCard user={user} />
-                  <div
-                    onClick={() => selectOrRemoveUser(user, "remove")}
-                    className="rounded-full bg-red-400 w-fit  absolute -top-2 -right-2 cursor-pointer "
-                  >
-                    <MinusIcon className="text-white w-5 h-5 " />
-                  </div>
-                </div>
-              ))}
+              {selectedUsers.map(
+                (user) =>
+                  user._id !== currentUser?._id && (
+                    <div
+                      key={user._id}
+                      className="shadow-md rounded-xl px-2 py-1 w-fit relative"
+                    >
+                      <UserCard user={user} />
+                      <div
+                        onClick={() => selectOrRemoveUser(user, "remove")}
+                        className="rounded-full bg-red-400 w-fit  absolute -top-2 -right-2 cursor-pointer "
+                      >
+                        <MinusIcon className="text-white w-5 h-5 " />
+                      </div>
+                    </div>
+                  )
+              )}
             </div>
           </div>
         </div>
@@ -263,22 +321,25 @@ const CreateGroup = () => {
                   <h1 className="text-center">No user found</h1>
                 </div>
               ) : (
-                searchResult?.users.map((user) => (
-                  <div
-                    onClick={() => selectOrRemoveUser(user)}
-                    key={user?._id}
-                    className={`shadow-md rounded-xl px-2 py-1 relative`}
-                  >
-                    <UserCard user={user} />
-                    <div className="absolute -top-1 lg:-right-1 right-0 shadow-md rounded-full">
-                      {selectedUsers.some(
-                        (selectedUser) => selectedUser._id === user._id
-                      ) && (
-                        <CheckIcon className="w-5 h-5 rounded-full bg-green-400 p-1 text-white" />
-                      )}
-                    </div>
-                  </div>
-                ))
+                searchResult?.users.map(
+                  (user) =>
+                    user._id !== currentUser?._id && (
+                      <div
+                        onClick={() => selectOrRemoveUser(user)}
+                        key={user?._id}
+                        className={`shadow-md rounded-xl px-2 py-1 relative`}
+                      >
+                        <UserCard user={user} />
+                        <div className="absolute -top-1 lg:-right-1 right-0 shadow-md rounded-full">
+                          {selectedUsers.some(
+                            (selectedUser) => selectedUser._id === user._id
+                          ) && (
+                            <CheckIcon className="w-5 h-5 rounded-full bg-green-400 p-1 text-white" />
+                          )}
+                        </div>
+                      </div>
+                    )
+                )
               )}
             </div>
           </div>

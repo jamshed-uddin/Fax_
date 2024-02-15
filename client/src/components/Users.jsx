@@ -1,7 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import UserCard from "./UserCard";
 import axios from "axios";
 
-const Users = ({ users }) => {
+const Users = ({ users, title = true }) => {
+  const navigate = useNavigate();
   const handleAccessChat = async (userId) => {
     try {
       const result = await axios.post(`/api/chat/accessChat`, {
@@ -10,7 +12,7 @@ const Users = ({ users }) => {
       console.log(result);
       if (result) {
         console.log(result.data);
-        // navigate(`inbox/${result.data._id}`);
+        navigate(`inbox/${result.data._id}`);
       }
     } catch (error) {
       console.log(error);
@@ -27,7 +29,7 @@ const Users = ({ users }) => {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-2">Users</h1>
+      {title && <h1 className="text-xl font-semibold mb-2">Users</h1>}
       <div className="space-y-2">
         {users?.map((user) => (
           <UserCard key={user._id} user={user} clickFunc={handleAccessChat} />

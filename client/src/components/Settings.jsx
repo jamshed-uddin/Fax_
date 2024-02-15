@@ -57,6 +57,7 @@ const Settings = ({ placedIn, settingsFor, chatInfo, userRefetch }) => {
             isMenuOpen ? " block h-max " : " hidden "
           } ${dark ? "bg-slate-800 shadow-slate-700" : "bg-white"}`}
         >
+          {/* settings for profile */}
           {placedIn === "profile" ? (
             <ul className="text-lg  space-y-1">
               <li
@@ -75,7 +76,7 @@ const Settings = ({ placedIn, settingsFor, chatInfo, userRefetch }) => {
                 onClick={userLogoutHandler}
                 className=" px-3 py-1 rounded-xl flex items-center gap-1 cursor-pointer"
               >
-                <ArrowLeftStartOnRectangleIcon className="w-5 h-5 inline" />{" "}
+                <ArrowLeftStartOnRectangleIcon className="w-5 h-5 inline" />
                 Logout
               </li>
             </ul>
@@ -110,14 +111,19 @@ const Settings = ({ placedIn, settingsFor, chatInfo, userRefetch }) => {
             </ul>
           ) : (
             <ul className="text-lg  space-y-1">
-              <Link to={"/profile"}>
-                <li
-                  onClick={() => setIsMenuOpen(false)}
-                  className=" px-3 py-1 rounded-xl flex items-center gap-1"
-                >
-                  <UserGroupIcon className="w-5 h-5 " />
-                  <span>Group</span>
-                </li>
+              <Link
+                to={`/profile/${chatInfo?._id}`}
+                state={{ profileOf: "group" }}
+              >
+                {
+                  <li
+                    onClick={() => setIsMenuOpen(false)}
+                    className=" px-3 py-1 rounded-xl flex items-center gap-1"
+                  >
+                    <UserGroupIcon className="w-5 h-5 " />
+                    <span>Group info</span>
+                  </li>
+                }
               </Link>
 
               <li
@@ -128,7 +134,7 @@ const Settings = ({ placedIn, settingsFor, chatInfo, userRefetch }) => {
                 }}
                 className=" px-3 py-1 rounded-xl flex items-center gap-1 cursor-pointer"
               >
-                <ArrowLeftStartOnRectangleIcon className="w-5 h-5 inline" />{" "}
+                <ArrowLeftStartOnRectangleIcon className="w-5 h-5 inline" />
                 Leave group
               </li>
             </ul>

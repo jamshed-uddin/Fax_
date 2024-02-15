@@ -64,7 +64,11 @@ const ChatInbox = () => {
       }
     };
 
-    if (singleChat && !singleChat?.latestMessage?.readBy.includes(user?._id)) {
+    if (
+      singleChat &&
+      singleChat?.latestMessage &&
+      !singleChat?.latestMessage?.readBy.includes(user?._id)
+    ) {
       updateMessageReadBy();
     }
   }, [singleChat, user]);
@@ -107,7 +111,11 @@ const ChatInbox = () => {
             ) : (
               <img
                 className="w-full h-full object-cover rounded-full"
-                src={chatPhotoHandler(singleChat, user)}
+                src={
+                  singleChat?.isGroupChat
+                    ? singleChat?.chatPhotoURL
+                    : chatPhotoHandler(singleChat, user)
+                }
                 alt={`Profile photo of ${singleChat?.chatName}`}
               />
             )}
@@ -126,7 +134,9 @@ const ChatInbox = () => {
             ) : (
               <>
                 <h1 className="text-xl font-medium ">
-                  {chatNameHandler(singleChat, user)}
+                  {singleChat?.isGroupChat
+                    ? singleChat?.chatName
+                    : chatNameHandler(singleChat, user)}
                 </h1>
               </>
             )}

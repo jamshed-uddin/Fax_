@@ -6,7 +6,7 @@ const UserCard = ({ user, clickFunc = () => {} }) => {
   return (
     <div
       onClick={() => clickFunc(user?._id)}
-      className="h-14 w-full rounded-lg  cursor-pointer select-none"
+      className="h-fit py-1 w-full rounded-lg  cursor-pointer select-none"
     >
       <div className="flex items-center gap-2 ">
         {/* image */}
