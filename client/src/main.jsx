@@ -80,7 +80,7 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
+  <>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ChatsProvider>
@@ -92,5 +92,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         </ChatsProvider>
       </AuthProvider>
     </QueryClientProvider>
-  </React.StrictMode>
+  </>
 );

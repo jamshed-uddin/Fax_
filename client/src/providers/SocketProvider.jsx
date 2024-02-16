@@ -17,7 +17,7 @@ const SocketProvider = ({ children }) => {
   useEffect(() => {
     if (!user && !myChats) return;
 
-    const newSocket = io("ws://localhost:2000", {
+    const newSocket = io("http://localhost:2000", {
       query: { userId: user?._id },
     });
 
@@ -31,8 +31,13 @@ const SocketProvider = ({ children }) => {
   // send message to socket
   useEffect(() => {
     if (!user || sendMessage === null) return;
+    console.log(sendMessage);
+    console.log("send message running");
 
     socket?.emit("sendMessage", sendMessage);
+    console.log("message emited");
+    setSendMessage(null);
+    console.log(sendMessage);
   }, [sendMessage, socket, user]);
 
   // active users

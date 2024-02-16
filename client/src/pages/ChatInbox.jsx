@@ -75,13 +75,10 @@ const ChatInbox = () => {
   useEffect(() => {
     console.log(socket);
     socket?.on("recieveMessage", (data) => {
-      console.log(data);
       if (data.chat._id === chatId) {
         setMessages([...messages, data]);
       }
     });
-
-    return () => socket?.off("recieveMessage");
   }, [chatId, messages, socket]);
 
   if (singleChatError) {
