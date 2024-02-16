@@ -8,7 +8,12 @@ export const ChatsContext = createContext({});
 const ChatsProvider = ({ children }) => {
   const [isSideChatOpen, setIsSideChatOpen] = useState(true);
   const [latestMessage, setLatestMessage] = useState({});
-
+  const {
+    data: myChats,
+    isLoading: myChatsLoading,
+    error: myChatsError,
+    refetch: myChatsRefetch,
+  } = useGetChat("/api/chat");
   // update lastMessage readBy
 
   // const isUserActive = (user, chatUsers) => {
@@ -66,7 +71,10 @@ const ChatsProvider = ({ children }) => {
   const chatInfo = {
     isSideChatOpen,
     setIsSideChatOpen,
-
+    myChats,
+    myChatsLoading,
+    myChatsError,
+    myChatsRefetch,
     // isUserActive,
 
     latestMessage,

@@ -147,10 +147,10 @@ const createGroup = asyncHandler(async (req, res) => {
 const updateGroup = asyncHandler(async (req, res) => {
   const groupId = req.params.groupId;
   const { chatName, users, chatPhotoURL, groupAdmin } = req.body;
-  console.log(groupAdmin._id, req.user?._id.toString());
-  if (req.user._id.toString() !== groupAdmin._id) {
-    return res.status(401).send({ message: "Unauthorized action" });
-  }
+
+  // if (!groupAdmin.map((admin) => admin._id).includes(req.user._id.toString())) {
+  //   return res.status(401).send({ message: "Unauthorized action" });
+  // }
 
   try {
     const group = await Chat.findOne({ _id: groupId });

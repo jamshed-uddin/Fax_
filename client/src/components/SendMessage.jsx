@@ -2,27 +2,23 @@ import { PaperAirplaneIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
 import { useState } from "react";
 import useAuthProvider from "../hooks/useAuthProvider";
-import useChatProvider from "../hooks/useChatProvider";
 
-const SendMessage = ({
-  chat,
-  setNewMessage,
-  setSendMessage,
-  setAllMessages,
-}) => {
-  const { socket } = useChatProvider();
+import useSocketProvider from "../hooks/useSocketProvider";
+
+const SendMessage = ({ chat, messages, setMessages }) => {
   const { user } = useAuthProvider();
   const [message, setMessage] = useState("");
 
+  const { socket, setSendMessage } = useSocketProvider();
   const handleInputChange = (e) => {
     setMessage(e.target.value);
 
-    const typingUser = chat?.users.find((u) => u._id === user._id);
+    const typingUser = chat?.users.find((u) => u._id === user?._id);
 
     socket?.emit("typingStatus", {
       user: typingUser,
       isTyping: true,
-      chatId: chat._id,
+      chatId: chat?._id,
     });
   };
 
@@ -32,17 +28,13 @@ const SendMessage = ({
       chatId: chat?._id,
     };
 
-    const sender = chat?.users.find((u) => u._id === user._id);
-    const reciever = chat?.users.find((u) => u._id !== user._id);
-    // sending message to socket
-
     // sending to DB
     try {
       const result = await axios.post("/api/message/newMessage", messageToSend);
+      console.log(result.data);
+      // sending message to socket
       setSendMessage(result?.data);
-      setAllMessages((p) => [...p, result?.data]);
-      setNewMessage((p) => !p);
-      console.log(result);
+      // setMessages([...messages, result.data]);
       setMessage("");
     } catch (error) {
       if (

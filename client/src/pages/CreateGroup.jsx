@@ -23,10 +23,13 @@ import useGetChat from "../hooks/useGetChat";
 import ProfileSkeleton from "../components/ProfileSkeleton";
 import WentWrong from "../components/WentWrong";
 import useTheme from "../hooks/useTheme";
+import useChatProvider from "../hooks/useChatProvider";
+import ChatCard from "../components/ChatCard";
 
 const CreateGroup = () => {
   const { dark } = useTheme();
   const navigate = useNavigate();
+  const { myChats, myChatsLoading } = useChatProvider();
   const { groupId } = useParams();
   const [editMode, setEditMode] = useState(false);
   const { user: currentUser } = useAuthProvider();
@@ -67,7 +70,7 @@ const CreateGroup = () => {
       chatPhotoURL,
     });
   }, [singleChat, currentUser]);
-
+  console.log(singleChat);
   // editing group section ends ----------
 
   const { data: searchResult, isLoading: searchLoading } =
@@ -81,6 +84,7 @@ const CreateGroup = () => {
   };
 
   const selectOrRemoveUser = (selectedUser, action) => {
+    console.log(selectedUser);
     if (action === "remove") {
       return setSelectedUsers((users) =>
         users.filter((user) => user._id !== selectedUser._id)
@@ -95,7 +99,7 @@ const CreateGroup = () => {
 
     setSelectedUsers((users) => [...users, selectedUser]);
   };
-  console.log(groupData);
+
   useEffect(() => {
     setGroupData((p) => ({
       ...p,
@@ -343,6 +347,42 @@ const CreateGroup = () => {
               )}
             </div>
           </div>
+        </div>
+        {/* existing chat */}
+        <div className="space-y-3">
+          <h1 className="text-xl font-semibold mb-2">Chats</h1>
+          {myChatsLoading ? (
+            <CardSkeleton cardAmount={2} />
+          ) : (
+            myChats?.map(
+              (chat) =>
+                !chat.isGroupChat && (
+                  <div
+                    className={`shadow-md rounded-xl px-2 py-1 relative cursor-pointer`}
+                    onClick={() =>
+                      selectOrRemoveUser(
+                        chat.users.find((u) => u._id !== currentUser?._id)
+                      )
+                    }
+                    key={chat._id}
+                  >
+                    <ChatCard chat={chat} />
+
+                    <div className="absolute -top-1 lg:-right-1 right-0 shadow-md rounded-full">
+                      {selectedUsers.some(
+                        (selectedUser) =>
+                          selectedUser._id ===
+                          chat.users.find(
+                            (user) => user._id !== currentUser?._id
+                          )._id
+                      ) && (
+                        <CheckIcon className="w-5 h-5 rounded-full bg-green-400 p-1 text-white" />
+                      )}
+                    </div>
+                  </div>
+                )
+            )
+          )}
         </div>
       </div>
     </div>

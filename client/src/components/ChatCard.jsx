@@ -1,16 +1,17 @@
 import useAuthProvider from "../hooks/useAuthProvider";
+import useSocketProvider from "../hooks/useSocketProvider";
 import {
   chatDate,
   chatNameHandler,
   chatPhotoHandler,
   isOwnMessage,
 } from "../logics/messageLogics";
-import useChatProvider from "../hooks/useChatProvider";
+
 import { useState } from "react";
 
 const ChatCard = ({ chat, clickFunc }) => {
   const { user } = useAuthProvider();
-  const { isUserActive } = useChatProvider();
+  const { isUserActive } = useSocketProvider();
   const [lastMessageRead, setLastMessageRead] = useState(
     chat?.latestMessage?.readBy?.includes(user?._id)
   );

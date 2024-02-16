@@ -1,32 +1,33 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-
-import useChatProvider from "../hooks/useChatProvider";
-
 import NavigateBack from "../components/NavigateBack";
 import useGetChat from "../hooks/useGetChat";
 import InboxSkeleton from "../components/InboxSkeleton";
 import WentWrong from "../components/WentWrong";
 import Settings from "../components/Settings";
 import SendMessage from "../components/SendMessage";
-import { chatNameHandler, chatPhotoHandler } from "../logics/messageLogics";
+import {
+  chatNameHandler,
+  chatPhotoHandler,
+  isOwnMessage,
+  isUsersLastMessage,
+  messageTime,
+} from "../logics/messageLogics";
 import useAuthProvider from "../hooks/useAuthProvider";
 import axios from "axios";
-import AllMessages from "../components/AllMessages";
 import useTheme from "../hooks/useTheme";
+
+import useSocketProvider from "../hooks/useSocketProvider";
 
 const ChatInbox = () => {
   const { dark } = useTheme();
   const { user } = useAuthProvider();
   const { chatId } = useParams();
-  const { socket, typingStatus, isUserActive, setLatestMessage } =
-    useChatProvider();
+  const { socket, typingStatus, isUserActive } = useSocketProvider();
+
+  const [messages, setMessages] = useState([]);
 
   const lastMessageRef = useRef();
-  const [allMessages, setAllMessages] = useState([]);
-  const [sendMessage, setSendMessage] = useState(null);
-  const [newMessage, setNewMessage] = useState(false);
-  const [messagesFetched, setMessagesFetched] = useState(false);
 
   const {
     data: singleChat,
@@ -41,8 +42,7 @@ const ChatInbox = () => {
       try {
         const result = await axios.get(`/api/message/${chatId}`);
 
-        setAllMessages(result?.data);
-        setMessagesFetched(!!result?.data);
+        setMessages(result?.data);
       } catch (error) {
         console.log(error);
       }
@@ -62,7 +62,7 @@ const ChatInbox = () => {
     };
 
     if (
-      singleChat?.users.length === singleChat?.latestMessage?.readBy.length &&
+      singleChat?.users.length !== singleChat?.latestMessage?.readBy.length &&
       singleChat &&
       singleChat?.latestMessage &&
       !singleChat?.latestMessage?.readBy.includes(user?._id)
@@ -71,31 +71,18 @@ const ChatInbox = () => {
     }
   }, [singleChat, user]);
 
-  useEffect(() => {
-    socket?.emit("joinChat", user);
-  }, [socket, user]);
-
-  // send message to socket
-  useEffect(() => {
-    if (!user || sendMessage === null) return;
-
-    socket?.emit("sendMessage", sendMessage);
-  }, [sendMessage, socket, user]);
-
   // recieve message from socket
   useEffect(() => {
-    console.log("recieve message running");
     console.log(socket);
     socket?.on("recieveMessage", (data) => {
       console.log(data);
-
       if (data.chat._id === chatId) {
-        setAllMessages([...allMessages, data]);
+        setMessages([...messages, data]);
       }
     });
 
     return () => socket?.off("recieveMessage");
-  }, [socket, allMessages, chatId]);
+  }, [chatId, messages, socket]);
 
   if (singleChatError) {
     return <WentWrong refetch={singleChatRefetch} />;
@@ -118,11 +105,7 @@ const ChatInbox = () => {
             ) : (
               <img
                 className="w-full h-full object-cover rounded-full"
-                src={
-                  singleChat?.isGroupChat
-                    ? singleChat?.chatPhotoURL
-                    : chatPhotoHandler(singleChat, user)
-                }
+                src={chatPhotoHandler(singleChat, user)}
                 alt={`Profile photo of ${singleChat?.chatName}`}
               />
             )}
@@ -141,9 +124,7 @@ const ChatInbox = () => {
             ) : (
               <>
                 <h1 className="text-xl font-medium ">
-                  {singleChat?.isGroupChat
-                    ? singleChat?.chatName
-                    : chatNameHandler(singleChat, user)}
+                  {chatNameHandler(singleChat, user)}
                 </h1>
               </>
             )}
@@ -166,10 +147,58 @@ const ChatInbox = () => {
         {singleChatLoading ? (
           <InboxSkeleton />
         ) : (
-          <AllMessages
-            allMessages={allMessages}
-            isGroupChat={singleChat?.isGroupChat}
-          />
+          <div className="h-max  py-2  w-full ">
+            {messages?.map((message, index, msgArr) => (
+              <div
+                key={message._id}
+                className={`flex items-end mb-2 ${
+                  isOwnMessage(message?.sender, user?._id)
+                    ? "justify-end "
+                    : "justify-start "
+                } ${message?.type === "event" ? "justify-center" : ""} `}
+              >
+                {/* user avatar */}
+                {!isOwnMessage(message?.sender, user?._id) && (
+                  <div className=" h-9 w-9 rounded-full overflow-hidden  ">
+                    {isUsersLastMessage(msgArr, index, message) && (
+                      <img
+                        className="w-full h-full object-cover rounded-full"
+                        src={message?.sender?.photoURL}
+                        alt={`Profile photo of `}
+                      />
+                    )}
+                  </div>
+                )}
+                {/* message text */}
+                <div className=" ml-2 max-w-[75%] ">
+                  {!isOwnMessage(message?.sender, user?._id) &&
+                    isUsersLastMessage(msgArr, index, message, "first") &&
+                    singleChat?.isGroupChat && (
+                      <div className="text-xs ml-1">
+                        {message?.sender?.name}
+                      </div>
+                    )}
+                  <div
+                    className={`  w-full  text-sm md:text-base shadow-md px-3 py-[0.35rem]  rounded-lg flex items-end ${
+                      dark ? "bg-slate-800" : "bg-slate-200"
+                    } ${
+                      message?.type === "event"
+                        ? "bg-transparent shadow-none items-center "
+                        : ""
+                    }`}
+                  >
+                    <div className="flex-grow">
+                      {message?.type === "event" && message?.sender?.name}{" "}
+                      {message?.content}
+                    </div>
+                    <div className="shrink-0 text-end  text-[0.60rem] ml-2 -mb-2 -mr-1 ">
+                      {messageTime(message?.updatedAt)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
 
         {/* user typing indicator */}
@@ -178,7 +207,7 @@ const ChatInbox = () => {
           {typingStatus?.isTyping &&
             typingStatus?.user._id !== user?._id &&
             typingStatus?.chatId === singleChat?._id && (
-              <div className="flex items-center gap-3">
+              <div className="flex items-end gap-3">
                 {/* user avatar */}
                 <div className=" h-10 w-10 rounded-full overflow-hidden  ">
                   <img
@@ -189,7 +218,7 @@ const ChatInbox = () => {
                 </div>
 
                 <div
-                  className={`bg-slate-200  shadow-md py-2 px-3 rounded-lg mb-2
+                  className={`bg-slate-200  shadow-md py-[0.30rem] px-3 rounded-lg mb-2 flex items-center
           `}
                 >
                   <span className="loading loading-dots loading-sm bg-slate-600"></span>
@@ -201,9 +230,8 @@ const ChatInbox = () => {
       {/* send message input */}
       <SendMessage
         chat={singleChat}
-        setSendMessage={setSendMessage}
-        setAllMessages={setAllMessages}
-        setNewMessage={setNewMessage}
+        messages={messages}
+        setMessages={setMessages}
       />
     </div>
   );

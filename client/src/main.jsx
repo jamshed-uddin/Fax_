@@ -83,13 +83,13 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <SocketProvider>
-          <ThemeProvider>
-            <ChatsProvider>
+        <ChatsProvider>
+          <SocketProvider>
+            <ThemeProvider>
               <RouterProvider router={router} />
-            </ChatsProvider>
-          </ThemeProvider>
-        </SocketProvider>
+            </ThemeProvider>
+          </SocketProvider>
+        </ChatsProvider>
       </AuthProvider>
     </QueryClientProvider>
   </React.StrictMode>

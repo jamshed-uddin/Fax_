@@ -2,14 +2,11 @@ import useGetChat from "../hooks/useGetChat";
 import CardSkeleton from "./CardSkeleton";
 import WentWrong from "./WentWrong";
 import Chats from "./Chats";
+import useChatProvider from "../hooks/useChatProvider";
 
 const MyChats = () => {
-  const {
-    data: myChats,
-    isLoading: myChatsLoading,
-    error: myChatsError,
-    refetch: myChatsRefetch,
-  } = useGetChat("/api/chat");
+  const { myChats, myChatsLoading, myChatsError, myChatsRefetch } =
+    useChatProvider();
 
   if (myChatsLoading) {
     return <CardSkeleton cardAmount={5} />;

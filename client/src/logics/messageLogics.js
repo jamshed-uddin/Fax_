@@ -10,12 +10,16 @@ const isUsersLastMessage = (messages, index, message, position = "last") => {
 };
 
 const chatPhotoHandler = (singleChat, user) => {
+  if (singleChat?.isGroupChat) return singleChat?.chatPhotoURL;
+
   return singleChat?.users[0]?._id === user?._id
     ? singleChat?.users[1]?.photoURL
     : singleChat?.users[0]?.photoURL;
 };
 
 const chatNameHandler = (singleChat, user) => {
+  if (singleChat?.isGroupChat) return singleChat?.chatName;
+
   return singleChat?.users[0]._id === user?._id
     ? singleChat?.users[1].name
     : singleChat?.users[0].name;
@@ -68,7 +72,7 @@ const messageDate = (date) => {
 
   const days = Math.floor(msDifference / dayInMs);
 
-  if (days < 1) return "";
+  if (days < 1) return "Today";
 
   return chatDate(date);
 };

@@ -37,36 +37,31 @@ app.use("/api/user", userRoute);
 app.use("/api/chat", chatRoute);
 app.use("/api/message", messageRoute);
 
-let activeUsers = [];
+let activeUsers = {};
 
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
-  console.log(userId);
   console.log(`${userId} is connected`);
 
   if (userId) {
-    activeUsers.push({ userId: userId, socketId: socket.id });
+    activeUsers[userId] = socket.id;
   }
-  console.log(activeUsers);
 
   // emiting active users
   io.emit("activeUsers", activeUsers);
 
-  console.log(activeUsers);
-
-  socket.on("joinChat", (user) => {
-    socket.join(user._id);
-    console.log(`${user?.name} joined the chat`);
-  });
   // send message
   socket.on("sendMessage", (data) => {
     const { chat } = data;
+    console.log("chat users", chat.users);
+
     console.log(data);
+
     if (chat.users.length) {
-      chat.users.forEach((user) => {
-        if (user._id === data.sender._id) return;
-        socket.in(user._id).emit("recieveMessage", data);
-        console.log("message sent");
+      chat.users.forEach((userId) => {
+        // if (userId === data.sender._id) return;
+        io.to(activeUsers[userId]).emit("recieveMessage", data);
+        console.log("message sent to", activeUsers[userId]);
       });
     }
   });
@@ -78,16 +73,16 @@ io.on("connection", (socket) => {
     clearTimeout(timer);
     timer = setTimeout(() => {
       io.emit("typing", { ...data, isTyping: false });
-    }, 3000);
+    }, 2500);
   });
 
   socket.on("disconnect", () => {
-    activeUsers = activeUsers.filter((user) => user.socketId !== socket.id);
+    delete activeUsers[userId];
     console.log(`${userId} is disconnected`);
     io.emit("activeUsers", activeUsers);
   });
 });
-console.log(activeUsers);
+
 app.use(notFound);
 app.use(errorHandler);
 

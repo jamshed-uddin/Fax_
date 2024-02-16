@@ -1,19 +1,21 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import useAuthProvider from "../hooks/useAuthProvider";
+import useChatProvider from "../hooks/useChatProvider";
 
 export const SocketContext = createContext(null);
+
 const SocketProvider = ({ children }) => {
   const { user } = useAuthProvider();
-
+  const { myChats } = useChatProvider();
   const [socket, setSocket] = useState(null);
   const [activeUsers, setActiveUsers] = useState([]);
   const [typingStatus, setTypingStatus] = useState({});
   const [latestMessage, setLatestMessage] = useState({});
-  const [sendMessage, setSendMessage] = useState();
+  const [sendMessage, setSendMessage] = useState(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user && !myChats) return;
 
     const newSocket = io("ws://localhost:2000", {
       query: { userId: user?._id },
@@ -24,7 +26,14 @@ const SocketProvider = ({ children }) => {
     return () => {
       newSocket.disconnect();
     };
-  }, [user]);
+  }, [user, myChats]);
+
+  // send message to socket
+  useEffect(() => {
+    if (!user || sendMessage === null) return;
+
+    socket?.emit("sendMessage", sendMessage);
+  }, [sendMessage, socket, user]);
 
   // active users
   useEffect(() => {
@@ -45,11 +54,11 @@ const SocketProvider = ({ children }) => {
   const isUserActive = (user, chatUsers) => {
     const otherUser = chatUsers?.find((u) => u._id !== user?._id);
 
-    const activeUser = activeUsers.find(
-      (user) => user.userId === otherUser?._id
+    const userOnline = Object.keys(activeUsers).find(
+      (userId) => userId === otherUser?._id
     );
 
-    return !!activeUser;
+    return !!userOnline;
   };
 
   const value = {
@@ -59,6 +68,7 @@ const SocketProvider = ({ children }) => {
     latestMessage,
     setLatestMessage,
     isUserActive,
+    setSendMessage,
   };
 
   return (
