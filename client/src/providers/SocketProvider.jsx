@@ -12,7 +12,7 @@ const SocketProvider = ({ children }) => {
   const [activeUsers, setActiveUsers] = useState([]);
   const [typingStatus, setTypingStatus] = useState({});
   const [latestMessage, setLatestMessage] = useState({});
-  const [sendMessage, setSendMessage] = useState(null);
+  // const [sendMessage, setSendMessage] = useState(null);
 
   useEffect(() => {
     if (!user && !myChats) return;
@@ -29,16 +29,16 @@ const SocketProvider = ({ children }) => {
   }, [user, myChats]);
 
   // send message to socket
-  useEffect(() => {
-    if (!user || sendMessage === null) return;
-    console.log(sendMessage);
-    console.log("send message running");
+  // useEffect(() => {
+  //   if (!user || sendMessage === null) return;
+  //   console.log(sendMessage);
+  //   console.log("send message running");
 
-    socket?.emit("sendMessage", sendMessage);
-    console.log("message emited");
-    setSendMessage(null);
-    console.log(sendMessage);
-  }, [sendMessage, socket, user]);
+  //   socket?.emit("sendMessage", sendMessage);
+  //   console.log("message emited");
+  //   setSendMessage(null);
+  //   console.log(sendMessage);
+  // }, [sendMessage, socket, user]);
 
   // active users
   useEffect(() => {
@@ -73,7 +73,7 @@ const SocketProvider = ({ children }) => {
     latestMessage,
     setLatestMessage,
     isUserActive,
-    setSendMessage,
+    // setSendMessage,
   };
 
   return (

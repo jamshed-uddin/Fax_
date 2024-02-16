@@ -37,10 +37,26 @@ const messageTime = (messageDate) => {
   return clockTime.startsWith("0") ? clockTime.slice(1) : clockTime;
 };
 
+const isSameDay = (currentDate, messageDate) => {
+  return (
+    currentDate.getFullYear() === messageDate.getFullYear() &&
+    currentDate.getMonth() === messageDate.getMonth() &&
+    currentDate.getDate() === messageDate.getDate()
+  );
+};
+const isYesterday = (currentDate, messageDate) => {
+  return (
+    currentDate.getFullYear() === messageDate.getFullYear() &&
+    currentDate.getMonth() === messageDate.getMonth() &&
+    currentDate.getDate() === messageDate.getDate() + 1
+  );
+};
+
 const chatDate = (messageDateRaw) => {
   const messageDate = new Date(messageDateRaw);
+  const currentDate = new Date();
 
-  const msDifference = new Date() - new Date(messageDate);
+  const msDifference = currentDate - new Date(messageDate);
 
   const day = 60 * 60 * 24 * 1000;
   const days = Math.floor(msDifference / day);
@@ -50,12 +66,10 @@ const chatDate = (messageDateRaw) => {
     minute: "2-digit",
     hour12: true,
   });
-  if (days < 1) {
+  if (isSameDay(currentDate, messageDate)) {
     return clockTime.startsWith("0") ? clockTime.slice(1) : clockTime;
-  } else if (days === 1) {
+  } else if (isYesterday(currentDate, messageDate)) {
     return "YesterDay";
-  } else if (days >= 2 && days <= 4) {
-    return messageDate.toLocaleDateString("en-IN", { weekday: "long" });
   } else {
     return messageDate.toLocaleDateString("en-IN", {
       day: "numeric",

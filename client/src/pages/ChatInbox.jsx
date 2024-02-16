@@ -7,6 +7,7 @@ import WentWrong from "../components/WentWrong";
 import Settings from "../components/Settings";
 import SendMessage from "../components/SendMessage";
 import {
+  chatDate,
   chatNameHandler,
   chatPhotoHandler,
   isOwnMessage,
@@ -24,9 +25,8 @@ const ChatInbox = () => {
   const { user } = useAuthProvider();
   const { chatId } = useParams();
   const { socket, typingStatus, isUserActive } = useSocketProvider();
-
   const [messages, setMessages] = useState([]);
-
+  const [messageFetched, setMessageFetched] = useState(false);
   const lastMessageRef = useRef();
 
   const {
@@ -43,6 +43,7 @@ const ChatInbox = () => {
         const result = await axios.get(`/api/message/${chatId}`);
 
         setMessages(result?.data);
+        setMessageFetched(!!result?.data);
       } catch (error) {
         console.log(error);
       }
@@ -80,6 +81,21 @@ const ChatInbox = () => {
       }
     });
   }, [chatId, messages, socket]);
+
+  // last message into view
+  useEffect(() => {
+    if (lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView();
+    }
+  }, [messageFetched]);
+
+  // scrolling into last sent message for sender only
+  useEffect(() => {
+    if (messages.at(-1)?.sender._id !== user?._id) return;
+    if (lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView();
+    }
+  }, [messages, user]);
 
   if (singleChatError) {
     return <WentWrong refetch={singleChatRefetch} />;
@@ -189,7 +205,7 @@ const ChatInbox = () => {
                       {message?.content}
                     </div>
                     <div className="shrink-0 text-end  text-[0.60rem] ml-2 -mb-2 -mr-1 ">
-                      {messageTime(message?.updatedAt)}
+                      {chatDate(message?.updatedAt)}
                     </div>
                   </div>
                 </div>
@@ -200,7 +216,11 @@ const ChatInbox = () => {
 
         {/* user typing indicator */}
 
-        <div id="last-message" ref={lastMessageRef}>
+        <div
+          ref={lastMessageRef}
+          className="border-2 border-green-500"
+          id="last-message"
+        >
           {typingStatus?.isTyping &&
             typingStatus?.user._id !== user?._id &&
             typingStatus?.chatId === singleChat?._id && (
@@ -225,11 +245,7 @@ const ChatInbox = () => {
         </div>
       </div>
       {/* send message input */}
-      <SendMessage
-        chat={singleChat}
-        messages={messages}
-        setMessages={setMessages}
-      />
+      <SendMessage chat={singleChat} messages={messages} />
     </div>
   );
 };
