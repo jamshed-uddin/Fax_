@@ -31,6 +31,7 @@ const ChatCard = ({ chat, clickFunc }) => {
               : chatPhotoHandler(chat, user)
           }
           alt=""
+          draggable="false"
         />
         {!chat?.isGroupChat && isUserActive(user, chat?.users) && (
           <div className="h-4 w-4 border-2 border-white bg-green-400 rounded-full absolute -bottom-[3px] -right-[3px] z-20"></div>

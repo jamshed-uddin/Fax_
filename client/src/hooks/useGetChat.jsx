@@ -2,8 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 import useChatProvider from "./useChatProvider";
+import useAuthProvider from "./useAuthProvider";
 
 const useGetChat = (endpoint, enabled = true) => {
+  const { user } = useAuthProvider();
+
   const { isSideChatOpen } = useChatProvider();
   const queryKey = [endpoint, isSideChatOpen];
 
@@ -23,7 +26,7 @@ const useGetChat = (endpoint, enabled = true) => {
     }
   };
 
-  return useQuery({ queryKey, queryFn: fetchData, enabled: enabled });
+  return useQuery({ queryKey, queryFn: fetchData, enabled: enabled && !!user });
 };
 
 export default useGetChat;

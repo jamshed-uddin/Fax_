@@ -15,6 +15,8 @@ import CreateGroup from "./pages/CreateGroup.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import ThemeProvider from "./providers/ThemeProvider.jsx";
 import SocketProvider from "./providers/SocketProvider.jsx";
+import ChatPageHome from "./pages/ChatPageHome.jsx";
+import OnlineStatusProvider from "./providers/OnlineStatusProvider.jsx";
 
 const queryClient = new QueryClient();
 
@@ -26,13 +28,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: (
-          <div className="h-full w-full grid place-items-center">
-            <div>
-              <h1 className="text-2xl">Select chat and start messaging</h1>
-            </div>
-          </div>
-        ),
+        element: <ChatPageHome />,
         errorElement: <NotFound />,
       },
       {
@@ -82,15 +78,17 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <>
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ChatsProvider>
-          <SocketProvider>
-            <ThemeProvider>
-              <RouterProvider router={router} />
-            </ThemeProvider>
-          </SocketProvider>
-        </ChatsProvider>
-      </AuthProvider>
+      <OnlineStatusProvider>
+        <AuthProvider>
+          <ChatsProvider>
+            <SocketProvider>
+              <ThemeProvider>
+                <RouterProvider router={router} />
+              </ThemeProvider>
+            </SocketProvider>
+          </ChatsProvider>
+        </AuthProvider>
+      </OnlineStatusProvider>
     </QueryClientProvider>
   </>
 );

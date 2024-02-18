@@ -216,11 +216,7 @@ const ChatInbox = () => {
 
         {/* user typing indicator */}
 
-        <div
-          ref={lastMessageRef}
-          className="border-2 border-green-500"
-          id="last-message"
-        >
+        <div ref={lastMessageRef} id="last-message">
           {typingStatus?.isTyping &&
             typingStatus?.user._id !== user?._id &&
             typingStatus?.chatId === singleChat?._id && (

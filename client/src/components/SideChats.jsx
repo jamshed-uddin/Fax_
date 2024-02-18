@@ -15,7 +15,7 @@ const SideChats = () => {
     useGetSearchResult(bouncedQuery);
 
   return (
-    <div className="h-full overflow-y-auto relative">
+    <div className="h-full overflow-y-auto relative select-none">
       <div className="sticky top-0 left-0 right-0 z-20">
         <SideHeader />
       </div>

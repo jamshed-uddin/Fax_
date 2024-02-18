@@ -4,9 +4,11 @@ import { useState } from "react";
 import useAuthProvider from "../hooks/useAuthProvider";
 
 import useSocketProvider from "../hooks/useSocketProvider";
+import useOnlineStatus from "../hooks/useOnlineStatus";
 
 const SendMessage = ({ chat }) => {
   const { user } = useAuthProvider();
+  const { online } = useOnlineStatus();
   const [message, setMessage] = useState("");
 
   const { socket } = useSocketProvider();
@@ -25,6 +27,7 @@ const SendMessage = ({ chat }) => {
   };
 
   const sendMessageHandler = async () => {
+    if (!online || !message) return;
     const messageToSend = {
       content: message,
       chatId: chat?._id,

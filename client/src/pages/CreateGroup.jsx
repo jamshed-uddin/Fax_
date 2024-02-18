@@ -25,9 +25,11 @@ import WentWrong from "../components/WentWrong";
 import useTheme from "../hooks/useTheme";
 import useChatProvider from "../hooks/useChatProvider";
 import ChatCard from "../components/ChatCard";
+import useOnlineStatus from "../hooks/useOnlineStatus";
 
 const CreateGroup = () => {
   const { dark } = useTheme();
+  const { online } = useOnlineStatus();
   const navigate = useNavigate();
   const { myChats, myChatsLoading } = useChatProvider();
   const { groupId } = useParams();
@@ -47,8 +49,10 @@ const CreateGroup = () => {
     users: [],
   });
 
-  // editing group section starts ----------
+  const [error, setError] = useState("");
 
+  // editing group section starts ----------
+  console.log(online);
   const {
     data: singleChat,
     isLoading: singleChatLoading,
@@ -70,7 +74,7 @@ const CreateGroup = () => {
       chatPhotoURL,
     });
   }, [singleChat, currentUser]);
-  console.log(singleChat);
+  // console.log(singleChat);
   // editing group section ends ----------
 
   const { data: searchResult, isLoading: searchLoading } =
@@ -140,6 +144,8 @@ const CreateGroup = () => {
   };
 
   const handleCreateGroup = async () => {
+    if (!online) return;
+
     setGroupCreateLoading(true);
     if (profilePhotoFile) {
       try {
@@ -180,7 +186,7 @@ const CreateGroup = () => {
   }
 
   return (
-    <div className="overflow-y-auto h-full w-full pt-3 lg:px-2 pb-10">
+    <div className="overflow-y-auto h-full w-full pt-3 px-2 lg:px-4 pb-10">
       <div className=" flex items-center justify-between">
         <NavigateBack />
         <div>
@@ -266,15 +272,17 @@ const CreateGroup = () => {
           <input
             type="text"
             placeholder="Group name"
-            className="input text-lg border-0 border-b-[1px] border-black rounded-none focus:outline-0 focus:border-b-[1.5px] focus:border-0 w-3/4 lg:w-1/2 focus:border-slate-600"
+            className="input text-lg border-0 border-b-[1px] border-slate-500 rounded-none focus:outline-0 focus:border-b-[1.3px] focus:border-0 w-full lg:w-1/2 focus:border-slate-900"
             name="chatName"
             value={groupData.chatName}
             onChange={handleTextInput}
+            required
           />
+          {/* description */}
           <textarea
             name="chatDescription"
             placeholder="Description"
-            className="textarea text-lg border-0 border-b-[1px] border-slate-500 rounded-none focus:outline-0 focus:border-b-[1.5px] focus:border-slate-600  w-3/4 lg:w-1/2"
+            className="textarea text-lg border-0 border-b-[1px] border-slate-500 rounded-none focus:outline-0 focus:border-b-[1.3px] focus:border-slate-900  w-full lg:w-1/2"
             value={groupData.chatDescription}
             onChange={handleTextInput}
           ></textarea>
@@ -282,8 +290,8 @@ const CreateGroup = () => {
         {/* added members */}
         <div className="">
           <h1 className="text-2xl font-medium">Add members</h1>
-          <div className="overflow-x-auto mt-2">
-            <div className="py-1 mt-2 flex items-center gap-3 flex-nowrap w-max">
+          <div className="overflow-x-auto mt-2 ">
+            <div className=" border-red-100 pt-2 pb-1  flex items-center gap-3 flex-nowrap w-max">
               {selectedUsers.map(
                 (user) =>
                   user._id !== currentUser?._id && (
@@ -314,7 +322,7 @@ const CreateGroup = () => {
             />
           </div>
           {/* search result */}
-          <div className="mt-4 flex justify-center ">
+          <div className="mt-3 flex justify-center ">
             <div className="w-full lg:w-1/2 space-y-3">
               {searchLoading && bouncedQuery ? (
                 <CardSkeleton cardAmount={2} />
@@ -349,41 +357,43 @@ const CreateGroup = () => {
           </div>
         </div>
         {/* existing chat */}
-        <div className="space-y-3">
-          <h1 className="text-xl font-semibold mb-2">Chats</h1>
-          {myChatsLoading ? (
-            <CardSkeleton cardAmount={2} />
-          ) : (
-            myChats?.map(
-              (chat) =>
-                !chat.isGroupChat && (
-                  <div
-                    className={`shadow-md rounded-xl px-2 py-1 relative cursor-pointer`}
-                    onClick={() =>
-                      selectOrRemoveUser(
-                        chat.users.find((u) => u._id !== currentUser?._id)
-                      )
-                    }
-                    key={chat._id}
-                  >
-                    <ChatCard chat={chat} />
+        {!!myChats?.length && (
+          <div className="space-y-3">
+            <h1 className="text-xl font-semibold mb-2">Chats</h1>
+            {myChatsLoading ? (
+              <CardSkeleton cardAmount={2} />
+            ) : (
+              myChats?.map(
+                (chat) =>
+                  !chat.isGroupChat && (
+                    <div
+                      className={`shadow-md rounded-xl px-2 py-1 relative cursor-pointer`}
+                      onClick={() =>
+                        selectOrRemoveUser(
+                          chat.users.find((u) => u._id !== currentUser?._id)
+                        )
+                      }
+                      key={chat._id}
+                    >
+                      <ChatCard chat={chat} />
 
-                    <div className="absolute -top-1 lg:-right-1 right-0 shadow-md rounded-full">
-                      {selectedUsers.some(
-                        (selectedUser) =>
-                          selectedUser._id ===
-                          chat.users.find(
-                            (user) => user._id !== currentUser?._id
-                          )._id
-                      ) && (
-                        <CheckIcon className="w-5 h-5 rounded-full bg-green-400 p-1 text-white" />
-                      )}
+                      <div className="absolute -top-1 lg:-right-1 right-0 shadow-md rounded-full">
+                        {selectedUsers.some(
+                          (selectedUser) =>
+                            selectedUser._id ===
+                            chat.users.find(
+                              (user) => user._id !== currentUser?._id
+                            )._id
+                        ) && (
+                          <CheckIcon className="w-5 h-5 rounded-full bg-green-400 p-1 text-white" />
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )
-            )
-          )}
-        </div>
+                  )
+              )
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

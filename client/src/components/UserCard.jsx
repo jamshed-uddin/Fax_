@@ -1,4 +1,3 @@
-import React from "react";
 import useAuthProvider from "../hooks/useAuthProvider";
 
 const UserCard = ({ user, clickFunc = () => {} }) => {
@@ -15,6 +14,7 @@ const UserCard = ({ user, clickFunc = () => {} }) => {
             className="w-full h-full object-cover  rounded-full"
             src={user?.photoURL}
             alt={user && `Profile image of ${user?.name}`}
+            draggable="false"
           />
         </div>
         {/* other info */}

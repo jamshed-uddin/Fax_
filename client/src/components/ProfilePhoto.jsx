@@ -21,7 +21,7 @@ const ProfilePhoto = ({
 
   return (
     <div className="relative ">
-      <div className="  h-36 w-36 bg-slate-200 rounded-full">
+      <div className="  h-36 w-36 rounded-full">
         <img
           className=" w-full h-full object-cover rounded-full"
           src={profilePhotoURL}

@@ -3,6 +3,7 @@ import CardSkeleton from "./CardSkeleton";
 import WentWrong from "./WentWrong";
 import Chats from "./Chats";
 import useChatProvider from "../hooks/useChatProvider";
+import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 
 const MyChats = () => {
   const { myChats, myChatsLoading, myChatsError, myChatsRefetch } =
@@ -21,8 +22,9 @@ const MyChats = () => {
       {myChats?.length ? (
         <Chats chats={myChats} />
       ) : (
-        <div className="text-center text-lg">
-          <div>
+        <div className="text-center text-lg  mt-20">
+          <div className="flex flex-col items-center">
+            <ChatBubbleLeftRightIcon className="w-8 h-8" />
             <h1>Search user and start chat</h1>
           </div>
         </div>
