@@ -1,6 +1,4 @@
-import io from "socket.io-client";
-import { createContext, useEffect, useState } from "react";
-import useAuthProvider from "../hooks/useAuthProvider";
+import { createContext, useState } from "react";
 import useGetChat from "../hooks/useGetChat";
 
 export const ChatsContext = createContext({});

@@ -87,7 +87,7 @@ const ChatInbox = () => {
     if (lastMessageRef.current) {
       lastMessageRef.current.scrollIntoView();
     }
-  }, [messageFetched]);
+  }, [messages]);
 
   // scrolling into last sent message for sender only
   useEffect(() => {
@@ -216,7 +216,7 @@ const ChatInbox = () => {
 
         {/* user typing indicator */}
 
-        <div ref={lastMessageRef} id="last-message">
+        <div id="last-message">
           {typingStatus?.isTyping &&
             typingStatus?.user._id !== user?._id &&
             typingStatus?.chatId === singleChat?._id && (
@@ -239,6 +239,7 @@ const ChatInbox = () => {
               </div>
             )}
         </div>
+        <div ref={lastMessageRef}></div>
       </div>
       {/* send message input */}
       <SendMessage chat={singleChat} messages={messages} />

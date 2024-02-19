@@ -50,7 +50,7 @@ const ChatPage = () => {
         </div>
 
         <div
-          className={`${
+          className={`overflow-y-auto ${
             dark ? "bg-slate-900 text-white" : "bg-white text-gray-800"
           } w-full lg:w-[60%]  h-full  lg:shadow-md lg:rounded-md pt-2  `}
         >

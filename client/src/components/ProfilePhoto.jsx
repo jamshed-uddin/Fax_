@@ -73,7 +73,7 @@ const ProfilePhoto = ({
 
       {photoUploading ? (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <span className="loading loading-spinner  w-12 text-slate-300"></span>
+          <span className="loading loading-spinner  w-12 text-white"></span>
         </div>
       ) : null}
     </div>

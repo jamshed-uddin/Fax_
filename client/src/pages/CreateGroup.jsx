@@ -289,7 +289,7 @@ const CreateGroup = () => {
         </div>
         {/* added members */}
         <div className="">
-          <h1 className="text-2xl font-medium">Add members</h1>
+          <h1 className="text-2xl font-medium">Members</h1>
           <div className="overflow-x-auto mt-2 ">
             <div className=" border-red-100 pt-2 pb-1  flex items-center gap-3 flex-nowrap w-max">
               {selectedUsers.map(

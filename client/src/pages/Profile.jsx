@@ -16,6 +16,8 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import Modal from "../components/Modal";
+import uploadPhotoToCloud from "../myFunctions/uploadPhotoToCloud";
+import deletePhotoFromCloud from "../myFunctions/deletePhotoFromCloud";
 
 const Profile = () => {
   const { userId } = useParams();
@@ -62,6 +64,45 @@ const Profile = () => {
   } = useGetChat(`/api/chat/${userId}`, !!state?.profileOf);
   //userId here is chatId.which comes with params when user navigate here in profile by clicking on group chat.
   console.log(singleChat);
+
+  const removeProfilePhoto = async () => {
+    const response = await deletePhotoFromCloud(profilePhotoURL);
+    await axios.put("/api/user", {
+      photoURL: "https://i.ibb.co/Twp960D/default-profile-400x400.png",
+    });
+    setProfilePhotoURL("");
+    // setUploaderOpen((p) => !p);
+
+    console.log(response);
+  };
+
+  console.log(profilePhotoURL);
+
+  const handleProfilePhotoChange = async (e) => {
+    const file = e.target.files[0];
+    const previewURL = URL.createObjectURL(file);
+    setProfilePhotoURL(previewURL);
+
+    // setUploaderOpen((p) => !p);
+    if (file) {
+      try {
+        setPhotoUploading(true);
+        await uploadPhotoToCloud(file).then(async (res) => {
+          console.log(res);
+          const cloudImageUrl = res.data.secure_url;
+          setPhotoUploading(false);
+          setProfilePhotoURL(cloudImageUrl);
+
+          await axios.put("/api/user", { photoURL: cloudImageUrl });
+        });
+      } catch (error) {
+        setPhotoUploading(false);
+      }
+    }
+  };
+
+  console.log(singleChat);
+
   if (userDataError || singleChatError) {
     return (
       <WentWrong
@@ -75,7 +116,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="">
+    <div className="h-max relative pb-5">
       <Modal
         isModalOpen={modalOpen}
         modalFor={modalAction}
@@ -83,7 +124,7 @@ const Profile = () => {
         chat={singleChat}
       />
 
-      <div className="flex justify-between items-center  py-2 px-2 lg:px-4">
+      <div className="flex justify-between items-center  py-2 px-2 lg:px-4 sticky top-0 left-0 right-0">
         <NavigateBack />
         {state && (
           <div>
@@ -103,6 +144,7 @@ const Profile = () => {
           </div>
         )}
       </div>
+
       <div className="flex flex-col items-center">
         <div className="">
           <ProfilePhoto
@@ -110,6 +152,7 @@ const Profile = () => {
             userId={userData?._id}
             profilePhotoURL={profilePhotoURL || singleChat?.chatPhotoURL}
             photoUploading={photoUploading}
+            handleProfilePhotoChange={handleProfilePhotoChange}
           />
         </div>
         <div className="mt-4 text-center">
@@ -129,10 +172,12 @@ const Profile = () => {
         <div className="px-2 lg:px-4 mt-4">
           <h1 className="text-xl font-semibold mb-2">Members</h1>
           <div>
-            {singleChat?.users.map((user) => (
-              <div key={user?._id} className="flex gap-3 w-fit ">
-                <UserCard user={user} />
-                {singleChat?.groupAdmin?._id === user?._id && (
+            {singleChat?.users.map((member) => (
+              <div key={member?._id} className="flex gap-3 w-fit ">
+                <UserCard user={member} />
+                {singleChat?.groupAdmin
+                  .map((a) => a._id)
+                  .includes(member?._id) && (
                   <div className="text-sm text-green-500">Admin</div>
                 )}
               </div>
