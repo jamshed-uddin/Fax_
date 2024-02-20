@@ -116,7 +116,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="h-max relative pb-5">
+    <div className="h-max  pb-5">
       <Modal
         isModalOpen={modalOpen}
         modalFor={modalAction}

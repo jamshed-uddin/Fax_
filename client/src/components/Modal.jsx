@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import useAuthProvider from "../hooks/useAuthProvider";
 import axios from "axios";
 import useTheme from "../hooks/useTheme";
+import { useNavigate } from "react-router-dom";
 
 const Modal = ({
   modalFor,
@@ -16,7 +17,7 @@ const Modal = ({
   const [name, setName] = useState(user?.name || "");
   const [bio, setBio] = useState(user?.bio || "");
   const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
   const handleModalClose = () => {
     if (modalFor === "editProfile") {
       setName(user?.name);
@@ -42,6 +43,30 @@ const Modal = ({
     }
   };
 
+  const leaveGroupHandler = async () => {
+    const userLeft = chat?.users.filter((member) => member._id !== user._id);
+    setLoading(true);
+    try {
+      await axios
+        .put(`/api/chat/group/${chat?._id}`, {
+          ...{ users: userLeft },
+          groupAdmin: chat?.groupAdmin,
+        })
+        .then(async () => {
+          setLoading(false);
+          navigate("/");
+          const newEventMessage = {
+            content: "left the group",
+            type: "event",
+            chat: chat._id,
+          };
+          await axios.post("/api/message/newMessage", newEventMessage);
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div
       className={`w-11/12 p-3 lg:w-2/5 mx-auto h-fit   absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 rounded-xl ${
@@ -58,17 +83,39 @@ const Modal = ({
               : "Leave this group?"}
           </h1>
 
-          <div className="text-end space-x-2 ">
-            {modalFor === "deleteChat" ? (
-              <button className="btn btn-sm btn-error text-white">
-                Delete
+          <div className="gap-2 flex justify-end items-center">
+            <div className="">
+              {loading && (
+                <span
+                  className={`loading loading-spinner  w-6 ${
+                    dark ? "text-white" : "text-black"
+                  }`}
+                ></span>
+              )}
+            </div>
+            <div>
+              {modalFor === "deleteChat" ? (
+                <button
+                  disabled={loading}
+                  className="btn btn-sm btn-error text-white"
+                >
+                  Delete
+                </button>
+              ) : (
+                <button
+                  disabled={loading}
+                  onClick={leaveGroupHandler}
+                  className="btn btn-sm btn-error text-white"
+                >
+                  Leave
+                </button>
+              )}
+            </div>
+            <div>
+              <button onClick={handleModalClose} className="btn btn-sm ">
+                Cancel
               </button>
-            ) : (
-              <button className="btn btn-sm btn-error text-white">Leave</button>
-            )}
-            <button onClick={handleModalClose} className="btn btn-sm ">
-              Cancel
-            </button>
+            </div>
           </div>
         </div>
       )}

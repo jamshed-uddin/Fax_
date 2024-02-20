@@ -61,17 +61,81 @@ const accessChat = asyncHandler(async (req, res) => {
 
 const getChats = asyncHandler(async (req, res) => {
   try {
-    const allChat = await Chat.find({
-      users: req.user._id,
-    })
-      .populate("users", "name photoURL ")
-      .populate({
-        path: "latestMessage",
-        populate: {
-          path: "sender",
-          select: "name photoURL",
+    // const allChat = await Chat.find({
+    //   users: req.user._id,
+    // })
+    //   .populate("users", "name photoURL ")
+    //   .populate({
+    //     path: "latestMessage",
+    //     populate: {
+    //       path: "sender",
+    //       select: "name photoURL",
+    //     },
+    //   })
+    //   .exec();
+
+    const allChat = await Chat.aggregate([
+      {
+        $match: {
+          users: req.user._id,
         },
-      });
+      },
+      {
+        $lookup: {
+          from: "messages",
+          localField: "latestMessage",
+          foreignField: "_id",
+          as: "latestMessage",
+        },
+      },
+      {
+        $addFields: {
+          latestMessage: {
+            $arrayElemAt: ["$latestMessage", 0],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "users",
+          foreignField: "_id",
+          as: "users",
+        },
+      },
+      {
+        $unset: ["users.email", "users.password", "users.isAdmin", "users.bio"],
+      },
+
+      {
+        $lookup: {
+          from: "users",
+          localField: "latestMessage.sender",
+          foreignField: "_id",
+          as: "latestMessage.sender",
+        },
+      },
+      {
+        $addFields: {
+          "latestMessage.sender": {
+            $arrayElemAt: ["$latestMessage.sender", 0],
+          },
+        },
+      },
+      {
+        $unset: [
+          "latestMessage.sender.email",
+          "latestMessage.sender.password",
+          "latestMessage.sender.isAdmin",
+          "latestMessage.sender.bio",
+        ],
+      },
+      {
+        $sort: {
+          "latestMessage.createdAt": -1,
+        },
+      },
+    ]);
 
     res.status(200).send(allChat);
   } catch (error) {
@@ -126,7 +190,6 @@ const createGroup = asyncHandler(async (req, res) => {
     });
 
     const newEventMessage = {
-      sender: req.user._id,
       content: "created this group",
       type: "event",
       chat: newCreatedGroup._id,

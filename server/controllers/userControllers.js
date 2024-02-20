@@ -117,7 +117,7 @@ const searchUsers = asyncHandler(async (req, res) => {
 });
 
 //@desc update user
-//route GET api/user
+//route PUT api/user
 //access private
 
 const updateUser = asyncHandler(async (req, res) => {

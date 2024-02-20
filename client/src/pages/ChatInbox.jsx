@@ -87,7 +87,7 @@ const ChatInbox = () => {
     if (lastMessageRef.current) {
       lastMessageRef.current.scrollIntoView();
     }
-  }, [messages]);
+  }, [messageFetched]);
 
   // scrolling into last sent message for sender only
   useEffect(() => {
