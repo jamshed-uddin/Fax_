@@ -160,7 +160,7 @@ const ChatInbox = () => {
         {singleChatLoading ? (
           <InboxSkeleton />
         ) : (
-          <div className="h-max  py-2  w-full ">
+          <div className="h-max  my-2  w-full ">
             {messages?.map((message, index, msgArr) => (
               <div
                 key={message._id}
@@ -170,45 +170,55 @@ const ChatInbox = () => {
                     : "justify-start "
                 } ${message?.type === "event" ? "justify-center" : ""} `}
               >
-                {/* user avatar */}
-                {!isOwnMessage(message?.sender, user?._id) && (
-                  <div className=" h-9 w-9 rounded-full overflow-hidden  ">
-                    {isUsersLastMessage(msgArr, index, message) && (
-                      <img
-                        className="w-full h-full object-cover rounded-full"
-                        src={message?.sender?.photoURL}
-                        alt={`Profile photo of `}
-                      />
-                    )}
-                  </div>
-                )}
-                {/* message text */}
-                <div className=" ml-2 max-w-[75%] ">
-                  {!isOwnMessage(message?.sender, user?._id) &&
-                    isUsersLastMessage(msgArr, index, message, "first") &&
-                    singleChat?.isGroupChat && (
-                      <div className="text-xs ml-1">
-                        {message?.sender?.name}
+                {message.type === "event" ? (
+                  <h3 className="text-sm">{`${
+                    message?.sender._id === user?._id
+                      ? "You"
+                      : message?.sender?.name
+                  } ${message?.content}`}</h3>
+                ) : (
+                  <>
+                    {/* user avatar */}
+                    {!isOwnMessage(message?.sender, user?._id) && (
+                      <div className=" h-9 w-9 rounded-full overflow-hidden  ">
+                        {isUsersLastMessage(msgArr, index, message) && (
+                          <img
+                            className="w-full h-full object-cover rounded-full"
+                            src={message?.sender?.photoURL}
+                            alt={`Profile photo of `}
+                          />
+                        )}
                       </div>
                     )}
-                  <div
-                    className={`  w-full  text-sm md:text-base shadow-md px-3 py-[0.35rem]  rounded-lg flex items-end ${
-                      dark ? "bg-slate-800" : "bg-slate-200"
-                    } ${
-                      message?.type === "event"
-                        ? "bg-transparent shadow-none items-center "
-                        : ""
-                    }`}
-                  >
-                    <div className="flex-grow">
-                      {message?.type === "event" && message?.sender?.name}{" "}
-                      {message?.content}
+                    {/* message text */}
+                    <div className=" ml-2 max-w-[75%] ">
+                      {!isOwnMessage(message?.sender, user?._id) &&
+                        isUsersLastMessage(msgArr, index, message, "first") &&
+                        singleChat?.isGroupChat && (
+                          <div className="text-xs ml-1">
+                            {message?.sender?.name}
+                          </div>
+                        )}
+                      <div
+                        className={`  w-full  text-sm md:text-base shadow-md px-3 py-[0.35rem]  rounded-lg flex items-end ${
+                          dark ? "bg-slate-800" : "bg-slate-200"
+                        } ${
+                          message?.type === "event"
+                            ? "bg-transparent shadow-none items-center "
+                            : ""
+                        }`}
+                      >
+                        <div className="flex-grow">
+                          {message?.type === "event" && message?.sender?.name}{" "}
+                          {message?.content}
+                        </div>
+                        <div className="shrink-0 text-end  text-[0.60rem] ml-2 -mb-2 -mr-1 ">
+                          {chatDate(message?.updatedAt)}
+                        </div>
+                      </div>
                     </div>
-                    <div className="shrink-0 text-end  text-[0.60rem] ml-2 -mb-2 -mr-1 ">
-                      {chatDate(message?.updatedAt)}
-                    </div>
-                  </div>
-                </div>
+                  </>
+                )}
               </div>
             ))}
           </div>
@@ -220,7 +230,7 @@ const ChatInbox = () => {
           {typingStatus?.isTyping &&
             typingStatus?.user._id !== user?._id &&
             typingStatus?.chatId === singleChat?._id && (
-              <div className="flex items-end gap-3">
+              <div className="flex items-end gap-2 mb-2">
                 {/* user avatar */}
                 <div className=" h-10 w-10 rounded-full overflow-hidden  ">
                   <img
@@ -231,10 +241,16 @@ const ChatInbox = () => {
                 </div>
 
                 <div
-                  className={`bg-slate-200  shadow-md py-[0.30rem] px-3 rounded-lg mb-2 flex items-center
+                  className={`${
+                    dark ? "bg-slate-800" : "bg-slate-200"
+                  } shadow-md py-[0.30rem] px-3 rounded-lg flex items-center
           `}
                 >
-                  <span className="loading loading-dots loading-sm bg-slate-600"></span>
+                  <span
+                    className={`loading loading-dots loading-sm ${
+                      dark ? "bg-slate-200" : "bg-slate-800"
+                    }`}
+                  ></span>
                 </div>
               </div>
             )}

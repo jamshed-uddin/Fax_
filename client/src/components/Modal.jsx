@@ -52,17 +52,19 @@ const Modal = ({
           ...{ users: userLeft },
           groupAdmin: chat?.groupAdmin,
         })
-        .then(async () => {
+        .then(async (res) => {
+          console.log(res);
           setLoading(false);
           navigate("/");
           const newEventMessage = {
             content: "left the group",
             type: "event",
-            chat: chat._id,
+            chatId: chat._id,
           };
           await axios.post("/api/message/newMessage", newEventMessage);
         });
     } catch (error) {
+      setLoading(false);
       console.log(error);
     }
   };
@@ -121,7 +123,7 @@ const Modal = ({
       )}
 
       {modalFor === "editProfile" && (
-        <div className=" flex flex-col h-full">
+        <div className=" flex flex-col ">
           <h1 className="flex-grow text-xl font-medium">Edit profile</h1>
           <div className="my-5 space-y-3">
             <input

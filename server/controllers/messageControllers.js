@@ -8,16 +8,17 @@ const User = require("../models/userModel");
 // @access private
 
 const createMessage = asyncHandler(async (req, res) => {
-  const { content, chatId } = req.body;
+  const { content, chatId, type } = req.body;
 
   if (!content || !chatId) {
-    return res.status(404).send({ message: "Content not found" });
+    return res.status(404).send({ message: "Content or chatId not found" });
   }
 
   const newMessage = {
     sender: req.user._id,
     content,
     chat: chatId,
+    type: type || "",
   };
 
   try {

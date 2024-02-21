@@ -16,6 +16,8 @@ const ChatCard = ({ chat, clickFunc }) => {
     chat?.latestMessage?.readBy?.includes(user?._id)
   );
 
+  console.log(chat);
+
   return (
     <div
       onClick={clickFunc}
@@ -62,7 +64,7 @@ const ChatCard = ({ chat, clickFunc }) => {
               ? `You: ${chat?.latestMessage?.content?.slice(0, 35)}...`
               : chat.isGroupChat
               ? `${
-                  chat?.latestMessage?.sender.name
+                  chat?.latestMessage?.sender?.name
                 }: ${chat?.latestMessage?.content?.slice(0, 35)}...`
               : `${chat?.latestMessage?.content?.slice(0, 35)}...`}
           </h2>

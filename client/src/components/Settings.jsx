@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ArrowLeftStartOnRectangleIcon,
   Cog6ToothIcon,
@@ -28,7 +28,7 @@ const Settings = ({ placedIn, settingsFor, chatInfo, userRefetch }) => {
 
   const { isMenuOpen: isModalOpen, setIsMenuOpen: setIsModalOpen } =
     useCloseMenu("modal");
-
+  console.log(chatInfo);
   return (
     <>
       <div id="modal">
@@ -36,7 +36,7 @@ const Settings = ({ placedIn, settingsFor, chatInfo, userRefetch }) => {
           modalFor={modalFor}
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
-          chatId={chatInfo?._id}
+          chat={chatInfo}
           userId={user?._id}
           userRefetch={userRefetch}
         />

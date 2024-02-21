@@ -3,6 +3,11 @@ const isOwnMessage = (sender, userId) => {
 };
 
 const isUsersLastMessage = (messages, index, message, position = "last") => {
+  if (position === "first" && messages.at(index - 1)?.type === "event")
+    return true;
+
+  if (messages.at(index + 1)?.type === "event") return true;
+
   return (
     message?.sender?._id !==
     messages?.at(position === "last" ? index + 1 : index - 1)?.sender?._id
