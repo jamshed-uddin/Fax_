@@ -42,14 +42,18 @@ const messageTime = (messageDate) => {
   return clockTime.startsWith("0") ? clockTime.slice(1) : clockTime;
 };
 
-const isSameDay = (currentDate, messageDate) => {
+const isSameDay = (messageDate) => {
+  const currentDate = new Date();
+
   return (
     currentDate.getFullYear() === messageDate.getFullYear() &&
     currentDate.getMonth() === messageDate.getMonth() &&
     currentDate.getDate() === messageDate.getDate()
   );
 };
-const isYesterday = (currentDate, messageDate) => {
+const isYesterday = (messageDate) => {
+  const currentDate = new Date();
+
   return (
     currentDate.getFullYear() === messageDate.getFullYear() &&
     currentDate.getMonth() === messageDate.getMonth() &&
@@ -59,21 +63,15 @@ const isYesterday = (currentDate, messageDate) => {
 
 const chatDate = (messageDateRaw) => {
   const messageDate = new Date(messageDateRaw);
-  const currentDate = new Date();
-
-  const msDifference = currentDate - new Date(messageDate);
-
-  const day = 60 * 60 * 24 * 1000;
-  const days = Math.floor(msDifference / day);
 
   const clockTime = messageDate.toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,
   });
-  if (isSameDay(currentDate, messageDate)) {
+  if (isSameDay(messageDate)) {
     return clockTime.startsWith("0") ? clockTime.slice(1) : clockTime;
-  } else if (isYesterday(currentDate, messageDate)) {
+  } else if (isYesterday(messageDate)) {
     return "YesterDay";
   } else {
     return messageDate.toLocaleDateString("en-IN", {
@@ -84,14 +82,11 @@ const chatDate = (messageDateRaw) => {
   }
 };
 
-const messageDate = (date) => {
-  const dayInMs = 60 * 60 * 24 * 1000;
+const messageDate = (rawDate) => {
+  const date = new Date(rawDate);
 
-  const msDifference = new Date() - new Date(date);
-
-  const days = Math.floor(msDifference / dayInMs);
-
-  if (days < 1) return "Today";
+  if (isSameDay(date)) return "Today";
+  if (isYesterday(date)) return "Yesterday";
 
   return chatDate(date);
 };
