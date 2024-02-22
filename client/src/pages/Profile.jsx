@@ -25,8 +25,6 @@ const Profile = () => {
   const { state } = useLocation();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState("");
-  console.log(state?.profileOf);
-
   const [profilePhotoURL, setProfilePhotoURL] = useState("");
   const [photoUploading, setPhotoUploading] = useState(false);
 
@@ -124,7 +122,8 @@ const Profile = () => {
         chat={singleChat}
       />
 
-      <div className="flex justify-between items-center  py-2 px-2 lg:px-4 sticky top-0 left-0 right-0">
+      {/* header */}
+      <div className="flex justify-between items-center  py-2 px-2 lg:px-4  ">
         <NavigateBack />
         {state && (
           <div>

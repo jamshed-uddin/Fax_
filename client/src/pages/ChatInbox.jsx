@@ -6,14 +6,7 @@ import InboxSkeleton from "../components/InboxSkeleton";
 import WentWrong from "../components/WentWrong";
 import Settings from "../components/Settings";
 import SendMessage from "../components/SendMessage";
-import {
-  chatDate,
-  chatNameHandler,
-  chatPhotoHandler,
-  isOwnMessage,
-  isUsersLastMessage,
-  messageTime,
-} from "../logics/messageLogics";
+import { chatNameHandler, chatPhotoHandler } from "../logics/messageLogics";
 import useAuthProvider from "../hooks/useAuthProvider";
 import axios from "axios";
 import useTheme from "../hooks/useTheme";

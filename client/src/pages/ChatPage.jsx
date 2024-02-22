@@ -4,19 +4,16 @@ import { Outlet, useLocation } from "react-router-dom";
 
 import useChatProvider from "../hooks/useChatProvider";
 import Hero from "../components/Hero";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useTheme from "../hooks/useTheme";
 import OnlineStatus from "../components/OnlineStatus";
-import useOnlineStatus from "../hooks/useOnlineStatus";
 
 const ChatPage = () => {
-  const { online } = useOnlineStatus();
   const { isSideChatOpen, setIsSideChatOpen } = useChatProvider();
   const { user, userLoading } = useAuthProvider();
   const { pathname } = useLocation();
   const { dark } = useTheme();
-  const [latestMessage, setLatestMessage] = useState("hello world");
-  console.log(online);
+
   useEffect(() => {
     if (pathname === "/") {
       setIsSideChatOpen(true);
@@ -54,7 +51,7 @@ const ChatPage = () => {
             dark ? "bg-slate-900 text-white" : "bg-white text-gray-800"
           } w-full lg:w-[60%]  h-full  lg:shadow-md lg:rounded-md pt-2  `}
         >
-          <Outlet context={setLatestMessage} />
+          <Outlet />
         </div>
       </div>
     </div>

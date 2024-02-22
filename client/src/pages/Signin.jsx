@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuthProvider from "../hooks/useAuthProvider";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 
 const Signin = () => {
   const [email, setEmail] = useState("");
@@ -8,6 +9,7 @@ const Signin = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { user, userSignIn } = useAuthProvider();
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -63,20 +65,32 @@ const Signin = () => {
                 }}
               />
             </div>
-            <div className="form-control">
+            <div className="form-control ">
               <label className="label">
                 <span className="label-text">Password *</span>
               </label>
-              <input
-                type="password"
-                placeholder="password"
-                className="input input-bordered"
-                value={password}
-                onChange={(e) => {
-                  setError("");
-                  setPassword(e.target.value);
-                }}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="password"
+                  className="input input-bordered w-full"
+                  value={password}
+                  onChange={(e) => {
+                    setError("");
+                    setPassword(e.target.value);
+                  }}
+                />
+                <div
+                  onClick={() => setShowPassword((p) => !p)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
+                >
+                  {showPassword ? (
+                    <EyeIcon className="w-5 h-5" />
+                  ) : (
+                    <EyeSlashIcon className="w-5 h-5" />
+                  )}
+                </div>
+              </div>
             </div>
             {error && <span className="text-red-500 font-light">{error}</span>}
             <div className="form-control mt-6">

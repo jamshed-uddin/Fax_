@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  chatDate,
   isOwnMessage,
   isUsersLastMessage,
   messageDate,
@@ -34,8 +33,6 @@ const Messages = ({ messages, singleChat }) => {
 
     setMessageGroup(group);
   }, [messages]);
-
-  console.log(messageGroup);
 
   return (
     <div className="h-max  my-2  w-full ">
