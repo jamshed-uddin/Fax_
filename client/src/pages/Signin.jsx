@@ -59,7 +59,7 @@ const Signin = () => {
       }`}
     >
       <div className=" h-[calc(100vh-7rem)] grid place-items-center">
-        <div className=" w-full lg:w-[40%] mx-auto lg:shadow-md  p-8 rounded-2xl">
+        <div className="w-full lg:w-[40%] mx-auto lg:shadow-md  p-8 rounded-2xl">
           <h1 className="text-center text-3xl font-bold mb-4">Log in</h1>
           <form onSubmit={handleLogin} className="">
             <div className="form-control">
@@ -69,7 +69,9 @@ const Signin = () => {
               <input
                 type="email"
                 placeholder="email"
-                className="input input-bordered"
+                className={`input input-bordered focus:outline-0 focus:border-[1.3px] ${
+                  dark ? "focus:border-white" : "focus:border-black"
+                }  input-md w-full`}
                 value={email}
                 onChange={(e) => {
                   setError("");
@@ -85,7 +87,9 @@ const Signin = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="password"
-                  className="input input-bordered w-full"
+                  className={`input input-bordered focus:outline-0 focus:border-[1.3px] ${
+                    dark ? "focus:border-white" : "focus:border-black"
+                  }  input-md w-full`}
                   value={password}
                   onChange={(e) => {
                     setError("");
@@ -104,7 +108,12 @@ const Signin = () => {
                 </div>
               </div>
             </div>
-            {error && <span className="text-red-500 font-light">{error}</span>}
+            <div className="flex items-center justify-between">
+              <div className="text-red-500 text-sm ml-1">{error}</div>
+              <div className="text-blue-500 hover:underline ">
+                <Link to={"/forgotPassword"}>Forgot password?</Link>
+              </div>
+            </div>
             <div className="form-control mt-6">
               <button disabled={loading} type="submit" className={btnStyle}>
                 {loading ? "Logging in..." : "Login"}

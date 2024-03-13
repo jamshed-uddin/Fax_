@@ -154,6 +154,19 @@ const Modal = ({
           </div>
         </div>
       )}
+
+      {modalFor === "emailLinkSendModal" && (
+        <div>
+          <div className=" text-lg my-3">
+            Check your email inbox.Follow the instruction to sign in.
+          </div>
+          <div className="flex justify-end">
+            <button onClick={handleModalClose} className="btn btn-sm ">
+              Ok
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

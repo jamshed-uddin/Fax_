@@ -143,7 +143,9 @@ const Signup = () => {
                 </div>
               </div>
             </div>
-            {error && <span className="text-red-500 font-light">{error}</span>}
+            {error && (
+              <span className="text-red-500 text-sm ml-1">{error}</span>
+            )}
             <div className="form-control mt-6">
               <button disabled={loading} className={btnStyle}>
                 {loading ? "Signing up..." : "Sign up"}

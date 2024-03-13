@@ -145,8 +145,9 @@ const forgotPassword = asyncHandler(async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      res.status(400);
-      throw new Error("Couldn't send email.");
+      return res.status(401).send({
+        message: "Couldn't send sign in link.Wait before trying again.",
+      });
     }
 
     const resetToken = await user.getResetPasswordToken();
@@ -175,8 +176,9 @@ Reset your Fax password by clicking the link below.If you did not request for pa
       user.resetPasswordToken = undefined;
       user.resetPasswordTokenExpire = undefined;
       user.save();
-      res.status(400);
-      throw new Error("Couldn't send email.");
+      return res.status(401).send({
+        message: "Couldn't send sign in link.Wait before trying again.",
+      });
     }
   } catch (error) {
     console.log(error);
@@ -200,8 +202,9 @@ const resetPassword = asyncHandler(async (req, res) => {
     });
 
     if (!user) {
-      res.status(400);
-      throw new Error("Invalid reset token.Try again.");
+      return res.status(401).send({
+        message: "Invalid reset token.Wait before trying again.",
+      });
     }
 
     user.password = newPassword;

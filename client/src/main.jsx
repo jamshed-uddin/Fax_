@@ -16,6 +16,8 @@ import ThemeProvider from "./providers/ThemeProvider.jsx";
 import SocketProvider from "./providers/SocketProvider.jsx";
 import ChatPageHome from "./pages/ChatPageHome.jsx";
 import OnlineStatusProvider from "./providers/OnlineStatusProvider.jsx";
+import ForgotPassword from "./pages/ForgotPassword.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +73,14 @@ const router = createBrowserRouter([
   {
     path: "signup",
     element: <Signup />,
+  },
+  {
+    path: "forgotPassword",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "resetPassword/:resetToken",
+    element: <ResetPassword />,
   },
 ]);
 
