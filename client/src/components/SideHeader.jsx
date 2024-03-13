@@ -20,9 +20,9 @@ const SideHeader = () => {
       <div className="relative flex items-center gap-3">
         <div className="cursor-pointer">
           {dark ? (
-            <SunIcon onClick={toggleTheme} className="w-5 h-5" />
-          ) : (
             <MoonIcon onClick={toggleTheme} className="h-5 w-5" />
+          ) : (
+            <SunIcon onClick={toggleTheme} className="w-5 h-5" />
           )}
         </div>
         <div className="h-10 w-10">

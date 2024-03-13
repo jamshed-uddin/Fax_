@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuthProvider from "../hooks/useAuthProvider";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import useTheme from "../hooks/useTheme";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -10,7 +11,7 @@ const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const { dark } = useTheme();
   const { user, registerUser } = useAuthProvider();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -37,21 +38,25 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      const result = await registerUser(body);
+      await registerUser(body);
       setLoading(false);
       navigate("/");
-      console.log(result);
     } catch (error) {
       setLoading(false);
       setError(error?.message);
-      console.log(error.message);
     }
   };
+
+  const btnStyle = `btn btn-neutral btn-sm px-8 ${
+    dark
+      ? "bg-white text-gray-800 hover:bg-white hover:text-gray-800"
+      : "text-white "
+  }`;
 
   return (
     <div className=" my-container">
       <div className=" h-[calc(100vh-7rem)] grid place-items-center">
-        <div className=" w-full lg:w-[40%] mx-auto shadow-md  p-8 rounded-2xl">
+        <div className=" w-full lg:w-[40%] mx-auto lg:shadow-md  p-8 rounded-2xl">
           <h1 className="text-center text-3xl font-bold">Sign up</h1>
           <form onSubmit={handleRegister} className="">
             <div className="form-control">
@@ -140,14 +145,14 @@ const Signup = () => {
             </div>
             {error && <span className="text-red-500 font-light">{error}</span>}
             <div className="form-control mt-6">
-              <button disabled={loading} className={`btn btn-primary `}>
+              <button disabled={loading} className={btnStyle}>
                 {loading ? "Signing up..." : "Sign up"}
               </button>
             </div>
             <div className="mt-2">
               <h1>
                 Already have an account?{" "}
-                <Link to={"/"}>
+                <Link to={"/signin"}>
                   <span className="text-blue-500 hover:underline">Sign in</span>
                 </Link>
               </h1>

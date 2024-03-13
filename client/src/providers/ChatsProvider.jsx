@@ -12,17 +12,6 @@ const ChatsProvider = ({ children }) => {
     error: myChatsError,
     refetch: myChatsRefetch,
   } = useGetChat("/api/chat");
-  // update lastMessage readBy
-
-  // const isUserActive = (user, chatUsers) => {
-  //   const otherUser = chatUsers?.find((u) => u._id !== user?._id);
-
-  //   const activeUser = activeUsers.find(
-  //     (user) => user.userId === otherUser?._id
-  //   );
-
-  //   return !!activeUser;
-  // };
 
   const lastSeen = (currentTime, previousTime) => {
     const msDifference = currentTime - previousTime;
@@ -73,8 +62,6 @@ const ChatsProvider = ({ children }) => {
     myChatsLoading,
     myChatsError,
     myChatsRefetch,
-    // isUserActive,
-
     latestMessage,
     setLatestMessage,
   };

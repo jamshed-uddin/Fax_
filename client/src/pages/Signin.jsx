@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuthProvider from "../hooks/useAuthProvider";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import useTheme from "../hooks/useTheme";
 
 const Signin = () => {
   const [email, setEmail] = useState("");
@@ -12,6 +13,7 @@ const Signin = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
+  const { dark } = useTheme();
 
   useEffect(() => {
     if (user) {
@@ -28,7 +30,7 @@ const Signin = () => {
     }
 
     const body = { email, password };
-    console.log(body);
+
     setLoading(true);
 
     try {
@@ -44,10 +46,20 @@ const Signin = () => {
     }
   };
 
+  const btnStyle = `btn btn-neutral btn-sm px-8 ${
+    dark
+      ? "bg-white text-gray-800 hover:bg-white hover:text-gray-800"
+      : "text-white "
+  }`;
+
   return (
-    <div className="">
+    <div
+      className={`h-screen ${
+        dark ? "bg-slate-900 text-white" : "bg-white text-gray-800 "
+      }`}
+    >
       <div className=" h-[calc(100vh-7rem)] grid place-items-center">
-        <div className=" w-full lg:w-[40%] mx-auto shadow-md  p-8 rounded-2xl">
+        <div className=" w-full lg:w-[40%] mx-auto lg:shadow-md  p-8 rounded-2xl">
           <h1 className="text-center text-3xl font-bold mb-4">Log in</h1>
           <form onSubmit={handleLogin} className="">
             <div className="form-control">
@@ -94,17 +106,13 @@ const Signin = () => {
             </div>
             {error && <span className="text-red-500 font-light">{error}</span>}
             <div className="form-control mt-6">
-              <button
-                disabled={loading}
-                type="submit"
-                className="btn btn-primary"
-              >
+              <button disabled={loading} type="submit" className={btnStyle}>
                 {loading ? "Logging in..." : "Login"}
               </button>
             </div>
             <div className="mt-2">
               <h1>
-                New to chat?{" "}
+                New to Fax_?{" "}
                 <Link to={"/signup"}>
                   <span className="text-blue-500 hover:underline">Sign up</span>
                 </Link>

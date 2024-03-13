@@ -7,6 +7,8 @@ const {
   logoutUser,
   singleUser,
   updateUser,
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/userControllers");
 
 const router = express.Router();
@@ -17,5 +19,7 @@ router.post("/logout", verifyJWT, logoutUser);
 router.get("/", verifyJWT, searchUsers);
 router.get("/singleUser", singleUser);
 router.put("/", verifyJWT, updateUser);
+router.post("/forgotPassword", forgotPassword);
+router.put("/resetPassword", resetPassword);
 
 module.exports = router;
