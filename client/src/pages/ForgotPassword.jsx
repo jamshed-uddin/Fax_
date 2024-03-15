@@ -49,7 +49,7 @@ const ForgotPassword = () => {
         setIsModalOpen={setModalOpen}
         modalFor={"emailLinkSendModal"}
       ></Modal>
-      <div className="w-[85%] lg:w-2/5a mx-auto ">
+      <div className="w-[85%] lg:w-2/5 mx-auto ">
         <h1 className="text-2xl font-semibold text-center mb-6">
           Having problem siging in?
         </h1>

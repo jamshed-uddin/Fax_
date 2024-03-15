@@ -203,7 +203,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 
     if (!user) {
       return res.status(401).send({
-        message: "Invalid reset token.Wait before trying again.",
+        message: "Link expired or invalid reset link.",
       });
     }
 

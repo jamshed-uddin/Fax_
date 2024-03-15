@@ -28,10 +28,18 @@ const Signup = () => {
 
     if (!name || !email || !password || !confirmPassword) {
       return setError("Fill up the required fields");
-    }
-
-    if (password !== confirmPassword) {
-      return setError("Password does not match");
+    } else if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    } else if (password.length < 6) {
+      setError("Minimum password length is 6.");
+      return;
+    } else if (
+      password === "123456" ||
+      password.toLocaleLowerCase() === "password"
+    ) {
+      setError("Choose more secure password.");
+      return;
     }
 
     const body = { name, email, password };

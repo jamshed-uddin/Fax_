@@ -18,6 +18,12 @@ const Modal = ({
   const [bio, setBio] = useState(user?.bio || "");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const btnStyle = `btn btn-neutral btn-sm px-8 ${
+    dark
+      ? "bg-white text-gray-800 hover:bg-white hover:text-gray-800"
+      : "text-white "
+  }`;
+
   const handleModalClose = () => {
     if (modalFor === "editProfile") {
       setName(user?.name);
@@ -148,7 +154,7 @@ const Modal = ({
             <button onClick={handleModalClose} className="btn btn-sm ">
               Cancel
             </button>
-            <button onClick={handleUserUpdate} className="btn btn-sm ">
+            <button onClick={handleUserUpdate} className={btnStyle}>
               {loading ? "Updating..." : "Update"}
             </button>
           </div>
@@ -158,10 +164,11 @@ const Modal = ({
       {modalFor === "emailLinkSendModal" && (
         <div>
           <div className=" text-lg my-3">
-            Check your email inbox.Follow the instruction to sign in.
+            An email sent to you with the sign in link.Follow the instruction to
+            sign in.
           </div>
           <div className="flex justify-end">
-            <button onClick={handleModalClose} className="btn btn-sm ">
+            <button onClick={handleModalClose} className={btnStyle}>
               Ok
             </button>
           </div>
