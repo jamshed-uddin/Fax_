@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import NavigateBack from "../components/NavigateBack";
-import useGetChat from "../hooks/useGetChat";
+import useGetData from "../hooks/useGetData";
 import InboxSkeleton from "../components/InboxSkeleton";
 import WentWrong from "../components/WentWrong";
 import Settings from "../components/Settings";
@@ -28,7 +28,7 @@ const ChatInbox = () => {
     isLoading: singleChatLoading,
     error: singleChatError,
     refetch: singleChatRefetch,
-  } = useGetChat(`/api/chat/${chatId}`);
+  } = useGetData(`/api/chat/${chatId}`);
 
   // fetching messages
   useEffect(() => {
@@ -57,7 +57,6 @@ const ChatInbox = () => {
     };
 
     if (
-      singleChat?.users.length !== singleChat?.latestMessage?.readBy.length &&
       singleChat &&
       singleChat?.latestMessage &&
       !singleChat?.latestMessage?.readBy.includes(user?._id)
@@ -76,20 +75,6 @@ const ChatInbox = () => {
     });
   }, [chatId, messages, socket]);
 
-  // last message into view
-  useEffect(() => {
-    if (lastMessageRef.current) {
-      lastMessageRef.current.scrollIntoView();
-    }
-  }, [messageFetched]);
-
-  // scrolling into last sent message for sender only
-  useEffect(() => {
-    if (messages.at(-1)?.sender._id !== user?._id) return;
-    if (lastMessageRef.current) {
-      lastMessageRef.current.scrollIntoView();
-    }
-  }, [messages, user]);
   console.log(messages);
 
   if (singleChatError) {
@@ -97,6 +82,8 @@ const ChatInbox = () => {
   }
 
   const themeWiseBg = `${dark ? "bg-slate-800" : "bg-slate-200"}`;
+
+  console.log(messages);
 
   return (
     <div className="h-full w-full flex flex-col  ">

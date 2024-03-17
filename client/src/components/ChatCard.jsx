@@ -16,8 +16,6 @@ const ChatCard = ({ chat, clickFunc }) => {
     chat?.latestMessage?.readBy?.includes(user?._id)
   );
 
-  console.log(chat);
-
   return (
     <div
       onClick={clickFunc}
@@ -48,7 +46,7 @@ const ChatCard = ({ chat, clickFunc }) => {
           {/* last message date */}
           {chat?.latestMessage && (
             <h4 className="text-sm font-semibold">
-              {chatDate(chat?.latestMessage?.updatedAt)}
+              {chatDate(chat?.latestMessage?.createdAt)}
             </h4>
           )}
         </div>

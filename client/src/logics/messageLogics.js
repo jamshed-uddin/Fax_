@@ -54,11 +54,13 @@ const isSameDay = (messageDate) => {
 const isYesterday = (messageDate) => {
   const currentDate = new Date();
 
-  return (
+  const yesterday =
     currentDate.getFullYear() === messageDate.getFullYear() &&
     currentDate.getMonth() === messageDate.getMonth() &&
-    currentDate.getDate() === messageDate.getDate() + 1
-  );
+    currentDate.getDate() - 1 === messageDate.getDate();
+  console.log(yesterday);
+
+  return yesterday;
 };
 
 const chatDate = (messageDateRaw) => {

@@ -12,7 +12,7 @@ const Messages = ({ messages, singleChat }) => {
   const { user } = useAuthProvider();
   const { dark } = useTheme();
   const [messageGroup, setMessageGroup] = useState([]);
-
+  console.log(messages);
   useEffect(() => {
     const messageDate = (messageDate) =>
       new Date(messageDate).toLocaleDateString("en-IN", {
@@ -22,10 +22,10 @@ const Messages = ({ messages, singleChat }) => {
       });
 
     const group = messages?.reduce((acc, message) => {
-      if (acc[messageDate(message.updatedAt)]) {
-        acc[messageDate(message.updatedAt)]?.push(message);
+      if (acc[messageDate(message.createdAt)]) {
+        acc[messageDate(message.createdAt)]?.push(message);
       } else {
-        acc[messageDate(message.updatedAt)] = [message];
+        acc[messageDate(message.createdAt)] = [message];
       }
 
       return acc;
@@ -59,7 +59,7 @@ const Messages = ({ messages, singleChat }) => {
             >
               {message.type === "event" ? (
                 <h3 className="text-sm">{`${
-                  message?.sender._id === user?._id
+                  message?.sender?._id === user?._id
                     ? "You"
                     : message?.sender?.name
                 } ${message?.content}`}</h3>
@@ -100,7 +100,7 @@ const Messages = ({ messages, singleChat }) => {
                         {message?.content}
                       </div>
                       <div className="shrink-0 text-end  text-[0.60rem] ml-2 -mb-2 -mr-1 ">
-                        {messageTime(message?.updatedAt)}
+                        {messageTime(message?.createdAt)}
                       </div>
                     </div>
                   </div>

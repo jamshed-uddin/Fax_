@@ -7,12 +7,20 @@ import useDebounce from "../hooks/useDebouce";
 import useGetSearchResult from "../hooks/useGetSearchResult";
 import { Link } from "react-router-dom";
 import { UsersIcon } from "@heroicons/react/24/outline";
+import useTheme from "../hooks/useTheme";
 
 const SideChats = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const bouncedQuery = useDebounce(searchQuery, 600);
   const { data: searchResult, isLoading: searchLoading } =
     useGetSearchResult(bouncedQuery);
+  const { dark } = useTheme();
+
+  const btnStyle = `btn btn-neutral btn-sm px-3 ${
+    dark
+      ? "bg-white text-gray-800 hover:bg-white hover:text-gray-800"
+      : "text-white "
+  }`;
 
   return (
     <div className="h-full overflow-y-auto relative select-none">
@@ -39,10 +47,11 @@ const SideChats = () => {
           <Link to={"/createGroup"}>
             <div
               // onClick={() => setIsSideChatOpen(false)}
-              className={`flex items-center rounded-md  px-2 py-[0.20rem]  text-sm font-medium btn btn-sm `}
+              className={`flex items-center rounded-md   py-[0.10rem]  `}
             >
-              <UsersIcon className="w-5 h-5  " />
-              <span className="">Create group</span>
+              <button className={btnStyle}>
+                <UsersIcon className="w-5 h-5  " /> Create group
+              </button>
             </div>
           </Link>
         </div>

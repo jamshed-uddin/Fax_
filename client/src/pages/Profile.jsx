@@ -8,7 +8,7 @@ import ProfileSkeleton from "../components/ProfileSkeleton";
 import NavigateBack from "../components/NavigateBack";
 import Settings from "../components/Settings";
 import ProfilePhoto from "../components/ProfilePhoto";
-import useGetChat from "../hooks/useGetChat";
+import useGetData from "../hooks/useGetData";
 import UserCard from "../components/UserCard";
 import {
   ArrowLeftStartOnRectangleIcon,
@@ -59,7 +59,7 @@ const Profile = () => {
     isLoading: singleChatLoading,
     error: singleChatError,
     refetch: singleChatRefetch,
-  } = useGetChat(`/api/chat/${userId}`, !!state?.profileOf);
+  } = useGetData(`/api/chat/${userId}`, !!state?.profileOf);
   //userId here is chatId.which comes with params when user navigate here in profile by clicking on group chat.
   console.log(singleChat);
 

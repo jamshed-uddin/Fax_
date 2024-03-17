@@ -19,13 +19,14 @@ import deletePhotoFromCloud from "../myFunctions/deletePhotoFromCloud";
 import axios from "axios";
 import useAuthProvider from "../hooks/useAuthProvider";
 import { useNavigate, useParams } from "react-router-dom";
-import useGetChat from "../hooks/useGetChat";
+
 import ProfileSkeleton from "../components/ProfileSkeleton";
 import WentWrong from "../components/WentWrong";
 import useTheme from "../hooks/useTheme";
 import useChatProvider from "../hooks/useChatProvider";
 import ChatCard from "../components/ChatCard";
 import useOnlineStatus from "../hooks/useOnlineStatus";
+import useGetData from "../hooks/useGetData";
 
 const CreateGroup = () => {
   const { dark } = useTheme();
@@ -52,13 +53,13 @@ const CreateGroup = () => {
   const [error, setError] = useState("");
 
   // editing group section starts ----------
-  console.log(online);
+
   const {
     data: singleChat,
     isLoading: singleChatLoading,
     error: singleChatError,
     refetch: singleChatRefetch,
-  } = useGetChat(`/api/chat/${groupId}`, !!groupId);
+  } = useGetData(`/api/chat/${groupId}`, !!groupId);
 
   useEffect(() => {
     if (!singleChat) return;
@@ -81,6 +82,7 @@ const CreateGroup = () => {
     useGetSearchResult(bouncedQuery);
 
   const handleTextInput = (e) => {
+    setError("");
     setGroupData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -143,7 +145,14 @@ const CreateGroup = () => {
     // }
   };
 
+  // create or  update group handler
   const handleCreateGroup = async () => {
+    if (!groupData.chatName) {
+      return setError("Group must have a name.");
+    }
+    if (groupData.users.length < 2) {
+      return setError("At least 2 members required (including you)");
+    }
     if (!online) return;
 
     setGroupCreateLoading(true);
@@ -177,6 +186,12 @@ const CreateGroup = () => {
     }
   };
 
+  const btnStyle = `btn btn-neutral btn-sm px-8 ${
+    dark
+      ? "bg-white text-gray-800 hover:bg-white hover:text-gray-800"
+      : "text-white "
+  }`;
+
   if (singleChatLoading) {
     return <ProfileSkeleton />;
   }
@@ -190,14 +205,7 @@ const CreateGroup = () => {
       <div className=" flex items-center justify-between">
         <NavigateBack />
         <div>
-          <button
-            onClick={handleCreateGroup}
-            className={`text-lg  rounded-lg cursor-pointer px-3 pb-1  ${
-              dark
-                ? "bg-slate-100 text-gray-800"
-                : "bg-slate-900 text-slate-100"
-            }`}
-          >
+          <button onClick={handleCreateGroup} className={btnStyle}>
             {groupCreateLoading
               ? editMode
                 ? "Updating..."
@@ -286,6 +294,7 @@ const CreateGroup = () => {
             value={groupData.chatDescription}
             onChange={handleTextInput}
           ></textarea>
+          {error && <span className="text-red-500 text-sm ml-1">{error}</span>}
         </div>
         {/* added members */}
         <div className="">

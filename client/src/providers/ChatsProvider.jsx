@@ -1,17 +1,18 @@
 import { createContext, useState } from "react";
-import useGetChat from "../hooks/useGetChat";
+import useGetData from "../hooks/useGetData";
 
 export const ChatsContext = createContext({});
 
 const ChatsProvider = ({ children }) => {
   const [isSideChatOpen, setIsSideChatOpen] = useState(true);
   const [latestMessage, setLatestMessage] = useState({});
+  const [sessionExpired, setSessionExpired] = useState(false);
   const {
     data: myChats,
     isLoading: myChatsLoading,
     error: myChatsError,
     refetch: myChatsRefetch,
-  } = useGetChat("/api/chat");
+  } = useGetData("/api/chat");
 
   const lastSeen = (currentTime, previousTime) => {
     const msDifference = currentTime - previousTime;
@@ -64,6 +65,8 @@ const ChatsProvider = ({ children }) => {
     myChatsRefetch,
     latestMessage,
     setLatestMessage,
+    sessionExpired,
+    setSessionExpired,
   };
   return (
     <ChatsContext.Provider value={chatInfo}>{children}</ChatsContext.Provider>

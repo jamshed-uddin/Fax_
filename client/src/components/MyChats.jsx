@@ -1,4 +1,4 @@
-import useGetChat from "../hooks/useGetChat";
+import useGetData from "../hooks/useGetData";
 import CardSkeleton from "./CardSkeleton";
 import WentWrong from "./WentWrong";
 import Chats from "./Chats";

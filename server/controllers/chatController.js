@@ -173,7 +173,7 @@ const createGroup = asyncHandler(async (req, res) => {
   if (users.length < 2) {
     return res
       .send(400)
-      .send({ message: "At two members required to create a group. " });
+      .send({ message: "At least 2 members required to create a group. " });
   }
   const groupData = {
     ...req.body,
@@ -193,6 +193,7 @@ const createGroup = asyncHandler(async (req, res) => {
       content: "created this group",
       type: "event",
       chat: newCreatedGroup._id,
+      sender: req.user._id,
     };
     await Message.create(newEventMessage);
     console.log("group", newCreatedGroup);
