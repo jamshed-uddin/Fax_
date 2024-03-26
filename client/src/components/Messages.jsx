@@ -71,8 +71,11 @@ const Messages = ({ messages, singleChat }) => {
                       {isUsersLastMessage(msgArr, index, message) && (
                         <img
                           className="w-full h-full object-cover rounded-full"
-                          src={message?.sender?.photoURL}
-                          alt={`Profile photo of `}
+                          src={
+                            message?.sender?.photoURL ||
+                            "https://i.ibb.co/Twp960D/default-profile-400x400.png"
+                          }
+                          alt={`Chat participent's profile picture`}
                         />
                       )}
                     </div>

@@ -102,7 +102,17 @@ const EditUserProfile = ({ userRefetch, handleModalClose }) => {
     if (!passForDeleting) {
       return setDeleteAccError("Password is required");
     }
-    console.log("delete account");
+    try {
+      setLoading(true);
+      const result = await axios.delete("/api/user/deleteUser", {
+        data: { password: passForDeleting },
+      });
+      console.log(result);
+      setLoading(false);
+    } catch (error) {
+      setDeleteAccError(error?.response?.data?.message);
+      setLoading(false);
+    }
   };
   return (
     <div>
@@ -127,7 +137,7 @@ const EditUserProfile = ({ userRefetch, handleModalClose }) => {
               name="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              autoComplete="nope"
+              autoComplete="new-password"
             />
             <input
               type="text"
@@ -136,7 +146,7 @@ const EditUserProfile = ({ userRefetch, handleModalClose }) => {
               name="bio"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              autoComplete="off"
+              autoComplete="new-password"
             />
           </div>
 
@@ -166,7 +176,7 @@ const EditUserProfile = ({ userRefetch, handleModalClose }) => {
                     setError("");
                     setCurrentPassword(e.target.value);
                   }}
-                  autoComplete="off"
+                  autoComplete="new-password"
                 />
                 <div
                   onClick={() =>
@@ -191,7 +201,7 @@ const EditUserProfile = ({ userRefetch, handleModalClose }) => {
                     setError("");
                     setNewPassword(e.target.value);
                   }}
-                  autoComplete="off"
+                  autoComplete="new-password"
                 />
                 <div
                   onClick={() =>
@@ -216,7 +226,7 @@ const EditUserProfile = ({ userRefetch, handleModalClose }) => {
                     setError("");
                     setConfirmNewPassword(e.target.value);
                   }}
-                  autoComplete="off"
+                  autoComplete="new-password"
                 />
                 <div
                   onClick={() =>
@@ -252,7 +262,7 @@ const EditUserProfile = ({ userRefetch, handleModalClose }) => {
         <div className="mt-6 ">
           <h3
             onClick={() => setShowDeleteOptions(true)}
-            className="text-red-500 font-semibold cursor-pointer"
+            className="text-red-500 font-semibold cursor-pointer text-lg"
           >
             Delete account
           </h3>
@@ -271,10 +281,10 @@ const EditUserProfile = ({ userRefetch, handleModalClose }) => {
                   className={inputStyle}
                   value={passForDeleting}
                   onChange={(e) => {
-                    setError("");
+                    setDeleteAccError("");
                     setPassForDeleting(e.target.value);
                   }}
-                  autoComplete="off"
+                  autoComplete="new-password"
                 />
                 <div
                   onClick={() =>

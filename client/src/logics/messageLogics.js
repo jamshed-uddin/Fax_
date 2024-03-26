@@ -1,5 +1,7 @@
 const isOwnMessage = (sender, userId) => {
-  return sender?._id === userId;
+  const isOwn = (sender?._id || sender) === userId;
+  console.log(isOwn);
+  return isOwn;
 };
 
 const isUsersLastMessage = (messages, index, message, position = "last") => {
@@ -9,25 +11,26 @@ const isUsersLastMessage = (messages, index, message, position = "last") => {
   if (messages.at(index + 1)?.type === "event") return true;
 
   return (
-    message?.sender?._id !==
-    messages?.at(position === "last" ? index + 1 : index - 1)?.sender?._id
+    (message?.sender?._id || message?.sender) !==
+    (messages?.at(position === "last" ? index + 1 : index - 1)?.sender?._id ||
+      messages?.at(position === "last" ? index + 1 : index - 1)?.sender)
   );
 };
 
 const chatPhotoHandler = (singleChat, user) => {
   if (singleChat?.isGroupChat) return singleChat?.chatPhotoURL;
-
+  const defaultPhoto = "https://i.ibb.co/Twp960D/default-profile-400x400.png";
   return singleChat?.users[0]?._id === user?._id
-    ? singleChat?.users[1]?.photoURL
-    : singleChat?.users[0]?.photoURL;
+    ? singleChat?.users[1]?.photoURL || defaultPhoto
+    : singleChat?.users[0]?.photoURL || defaultPhoto;
 };
 
 const chatNameHandler = (singleChat, user) => {
   if (singleChat?.isGroupChat) return singleChat?.chatName;
-
+  const defaultName = "Fax user";
   return singleChat?.users[0]._id === user?._id
-    ? singleChat?.users[1].name
-    : singleChat?.users[0].name;
+    ? singleChat?.users[1].name || defaultName
+    : singleChat?.users[0].name || defaultName;
 };
 
 const messageTime = (messageDate) => {

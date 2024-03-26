@@ -19,6 +19,7 @@ const Searchbar = ({ searchQuery, setSearchQuery }) => {
           onChange={(e) => {
             setSearchQuery(e.target.value);
           }}
+          autoComplete="new-password"
         />
         {searchQuery && (
           <span

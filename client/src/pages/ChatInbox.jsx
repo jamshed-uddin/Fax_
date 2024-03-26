@@ -29,6 +29,8 @@ const ChatInbox = () => {
     error: singleChatError,
     refetch: singleChatRefetch,
   } = useGetData(`/api/chat/${chatId}`);
+  console.log(singleChat);
+  console.log(messages);
 
   // fetching messages
   useEffect(() => {
@@ -73,7 +75,6 @@ const ChatInbox = () => {
 
   // recieve message from socket
   useEffect(() => {
-    console.log(socket);
     socket?.on("recieveMessage", (data) => {
       if (data.chat._id === chatId) {
         setMessages([...messages, data]);

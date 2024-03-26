@@ -10,7 +10,7 @@ const userSchema = mongoose.Schema(
       type: "String",
       default: "https://i.ibb.co/Twp960D/default-profile-400x400.png",
     },
-    bio: { type: String },
+    bio: { type: String, default: "" },
     activeStatus: {
       status: { type: Boolean, default: true },
       lastSeen: { type: Date },

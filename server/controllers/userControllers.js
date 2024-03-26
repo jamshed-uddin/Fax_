@@ -17,6 +17,7 @@ const authUser = asyncHandler(async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      bio: user.bio,
     });
   } else {
     res.status(400);
@@ -248,6 +249,30 @@ const changePassword = asyncHandler(async (req, res) => {
   }
 });
 
+//@desc delete user
+//route Delete api/user/deleteUser
+//access private
+const deleteUser = asyncHandler(async (req, res) => {
+  const { password } = req.body;
+
+  try {
+    const user = await User.findOne({ _id: req.user._id });
+    if (!(await user.matchPassword(password))) {
+      return res
+        .status(401)
+        .send({ message: "Couldn't delete account.Wait before trying again." });
+    }
+
+    const updateAllChat = await Chat.find({ users: req.user._id });
+    console.log(updateAllChat);
+
+    res.send(updateAllChat);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
 module.exports = {
   authUser,
   registerUser,
@@ -258,4 +283,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   changePassword,
+  deleteUser,
 };
