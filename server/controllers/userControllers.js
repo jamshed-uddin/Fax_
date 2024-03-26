@@ -141,7 +141,7 @@ const updateUser = asyncHandler(async (req, res) => {
 //route POST api/user/forgotPassword
 const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
-  console.log(email);
+
   try {
     const user = await User.findOne({ email });
     if (!user) {
@@ -151,7 +151,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     }
 
     const resetToken = await user.getResetPasswordToken();
-    console.log("resettoken", resetToken);
+
     await user.save();
 
     const resetURL = `http://localhost:5173/resetPassword/${resetToken}`;
@@ -175,7 +175,7 @@ Reset your Fax password by clicking the link below.If you did not request for pa
       console.log(error);
       user.resetPasswordToken = undefined;
       user.resetPasswordTokenExpire = undefined;
-      user.save();
+      await user.save();
       return res.status(401).send({
         message: "Couldn't send sign in link.Wait before trying again.",
       });
@@ -210,8 +210,38 @@ const resetPassword = asyncHandler(async (req, res) => {
     user.password = newPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordTokenExpire = undefined;
-    user.save();
+    await user.save();
     res.status(200).send({ message: "Password reset success" });
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
+//@desc change password
+//route PUT api/user/changePassword
+//access private
+
+const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  console.log(req.body);
+  try {
+    const user = await User.findOne({ _id: req.user._id });
+    if (!user) {
+      return res.status(401).send({
+        message: "Unauthorized action",
+      });
+    }
+
+    if (!(await user.matchPassword(currentPassword))) {
+      return res.status(401).send({
+        message: "Couldn't change password.Wait before trying again.",
+      });
+    }
+
+    user.password = newPassword;
+    await user.save();
+    res.status(201).send({ message: "Password changed" });
   } catch (error) {
     res.status(400);
     throw new Error(error.message);
@@ -227,4 +257,5 @@ module.exports = {
   updateUser,
   forgotPassword,
   resetPassword,
+  changePassword,
 };

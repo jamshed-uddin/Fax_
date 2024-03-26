@@ -61,7 +61,6 @@ const Profile = () => {
     refetch: singleChatRefetch,
   } = useGetData(`/api/chat/${userId}`, !!state?.profileOf);
   //userId here is chatId.which comes with params when user navigate here in profile by clicking on group chat.
-  console.log(singleChat);
 
   const removeProfilePhoto = async () => {
     const response = await deletePhotoFromCloud(profilePhotoURL);
@@ -73,8 +72,6 @@ const Profile = () => {
 
     console.log(response);
   };
-
-  console.log(profilePhotoURL);
 
   const handleProfilePhotoChange = async (e) => {
     const file = e.target.files[0];
@@ -98,8 +95,6 @@ const Profile = () => {
       }
     }
   };
-
-  console.log(singleChat);
 
   if (userDataError || singleChatError) {
     return (

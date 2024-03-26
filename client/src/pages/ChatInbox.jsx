@@ -46,6 +46,12 @@ const ChatInbox = () => {
     fetchMessages();
   }, [chatId]);
 
+  useEffect(() => {
+    if (lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView({ block: "end" });
+    }
+  }, [messages]);
+
   // updating message readBy
   useEffect(() => {
     const updateMessageReadBy = async () => {
@@ -75,15 +81,11 @@ const ChatInbox = () => {
     });
   }, [chatId, messages, socket]);
 
-  console.log(messages);
-
   if (singleChatError) {
     return <WentWrong refetch={singleChatRefetch} />;
   }
 
   const themeWiseBg = `${dark ? "bg-slate-800" : "bg-slate-200"}`;
-
-  console.log(messages);
 
   return (
     <div className="h-full w-full flex flex-col  ">

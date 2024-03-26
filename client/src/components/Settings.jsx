@@ -19,6 +19,7 @@ const Settings = ({ placedIn, settingsFor, chatInfo, userRefetch }) => {
   const { user } = useAuthProvider();
   const navigate = useNavigate();
   const [modalFor, setModalFor] = useState("");
+  const [openModalForEdit, setOpenModalForEdit] = useState(false);
   const userLogoutHandler = () => {
     userLogout();
     navigate("/");
@@ -28,14 +29,18 @@ const Settings = ({ placedIn, settingsFor, chatInfo, userRefetch }) => {
 
   const { isMenuOpen: isModalOpen, setIsMenuOpen: setIsModalOpen } =
     useCloseMenu("modal");
-  console.log(chatInfo);
+
   return (
     <>
       <div id="modal">
         <Modal
           modalFor={modalFor}
-          isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
+          isModalOpen={
+            modalFor === "editProfile" ? openModalForEdit : isModalOpen
+          }
+          setIsModalOpen={
+            modalFor === "editProfile" ? setOpenModalForEdit : setIsModalOpen
+          }
           chat={chatInfo}
           userId={user?._id}
           userRefetch={userRefetch}
@@ -63,8 +68,9 @@ const Settings = ({ placedIn, settingsFor, chatInfo, userRefetch }) => {
               <li
                 onClick={() => {
                   setModalFor("editProfile");
-                  setIsModalOpen(true);
+                  // setIsModalOpen(true);
                   setIsMenuOpen(false);
+                  setOpenModalForEdit(true);
                 }}
                 className=" px-3 py-1 rounded-xl flex items-center gap-1 cursor-pointer"
               >

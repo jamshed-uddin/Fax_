@@ -58,7 +58,6 @@ const isYesterday = (messageDate) => {
     currentDate.getFullYear() === messageDate.getFullYear() &&
     currentDate.getMonth() === messageDate.getMonth() &&
     currentDate.getDate() - 1 === messageDate.getDate();
-  console.log(yesterday);
 
   return yesterday;
 };

@@ -185,6 +185,7 @@ const CreateGroup = () => {
       setGroupCreateLoading(false);
     }
   };
+  console.log(singleChat);
 
   const btnStyle = `btn btn-neutral btn-sm px-8 ${
     dark
@@ -285,6 +286,12 @@ const CreateGroup = () => {
             value={groupData.chatName}
             onChange={handleTextInput}
             required
+            disabled={
+              editMode &&
+              singleChat?.groupAdmin?.some(
+                (user) => user._id !== currentUser?._id
+              )
+            }
           />
           {/* description */}
           <textarea
@@ -293,6 +300,12 @@ const CreateGroup = () => {
             className="textarea text-lg border-0 border-b-[1px] border-slate-500 rounded-none focus:outline-0 focus:border-b-[1.3px] focus:border-slate-900  w-full lg:w-1/2"
             value={groupData.chatDescription}
             onChange={handleTextInput}
+            disabled={
+              editMode &&
+              singleChat?.groupAdmin?.some(
+                (user) => user._id !== currentUser?._id
+              )
+            }
           ></textarea>
           {error && <span className="text-red-500 text-sm ml-1">{error}</span>}
         </div>

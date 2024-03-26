@@ -3,7 +3,6 @@ import axios from "axios";
 
 import useChatProvider from "./useChatProvider";
 import useAuthProvider from "./useAuthProvider";
-import { response } from "express";
 
 const useGetData = (endpoint, enabled = true) => {
   const { user } = useAuthProvider();
@@ -26,19 +25,6 @@ const useGetData = (endpoint, enabled = true) => {
       }
     }
   };
-
-  axios.interceptors.response.use(
-    (response) => {
-      if (response.config.url === "/api/chat") {
-        console.log("intercepted chat response");
-      }
-      return response;
-    },
-    (error) => {
-      console.log(error);
-      return Promise.reject(error);
-    }
-  );
 
   return useQuery({ queryKey, queryFn: fetchData, enabled: enabled && !!user });
 };

@@ -3,19 +3,17 @@ import useAuthProvider from "../hooks/useAuthProvider";
 import axios from "axios";
 import useTheme from "../hooks/useTheme";
 import { useNavigate } from "react-router-dom";
+import EditUserProfile from "./EditUserProfile";
 
 const Modal = ({
   modalFor,
   isModalOpen,
   setIsModalOpen,
   chat,
-  userId,
   userRefetch,
 }) => {
   const { dark } = useTheme();
   const { user } = useAuthProvider();
-  const [name, setName] = useState(user?.name || "");
-  const [bio, setBio] = useState(user?.bio || "");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const btnStyle = `btn btn-neutral btn-sm px-8 ${
@@ -25,28 +23,7 @@ const Modal = ({
   }`;
 
   const handleModalClose = () => {
-    if (modalFor === "editProfile") {
-      setName(user?.name);
-      setBio(user?.bio || "");
-    }
     setIsModalOpen((p) => !p);
-  };
-
-  const handleUserUpdate = async () => {
-    if (!name || !bio) return;
-
-    try {
-      setLoading(true);
-      const result = await axios.put("/api/user", { name, bio });
-      setLoading(false);
-      userRefetch();
-      handleModalClose();
-      console.log(result.data);
-    } catch (error) {
-      console.log(error?.response?.data);
-      setLoading(false);
-      console.log(error.message);
-    }
   };
 
   const leaveGroupHandler = async () => {
@@ -77,7 +54,7 @@ const Modal = ({
 
   return (
     <div
-      className={`w-11/12 p-3 lg:w-2/5 mx-auto h-fit   absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 rounded-xl ${
+      className={`w-11/12 p-3 lg:w-2/5 mx-auto h-fit max-h-[90vh] overflow-y-auto   absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 rounded-xl ${
         !isModalOpen && "hidden"
       }  ${
         dark ? "bg-slate-800 shadow-lg shadow-slate-700" : "bg-white shadow-2xl"
@@ -129,36 +106,10 @@ const Modal = ({
       )}
 
       {modalFor === "editProfile" && (
-        <div className=" flex flex-col ">
-          <h1 className="flex-grow text-xl font-medium">Edit profile</h1>
-          <div className="my-5 space-y-3">
-            <input
-              type="text"
-              placeholder="Name"
-              className="input input-bordered focus:outline-0 input-sm w-full "
-              name="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Bio"
-              className="input input-bordered focus:outline-0 input-sm w-full "
-              name="bio"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-            />
-          </div>
-
-          <div className="text-end space-x-2 ">
-            <button onClick={handleModalClose} className="btn btn-sm ">
-              Cancel
-            </button>
-            <button onClick={handleUserUpdate} className={btnStyle}>
-              {loading ? "Updating..." : "Update"}
-            </button>
-          </div>
-        </div>
+        <EditUserProfile
+          handleModalClose={handleModalClose}
+          userRefetch={userRefetch}
+        />
       )}
 
       {modalFor === "emailLinkSendModal" && (

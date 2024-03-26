@@ -16,6 +16,14 @@ const ChatCard = ({ chat, clickFunc }) => {
     chat?.latestMessage?.readBy?.includes(user?._id)
   );
 
+  const MsgCharLimitExceeded = (content) => {
+    if (content?.length > 35) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   return (
     <div
       onClick={clickFunc}
@@ -58,13 +66,23 @@ const ChatCard = ({ chat, clickFunc }) => {
               "font-bold"
             }`}
           >
-            {chat?.latestMessage?.sender?._id === user?._id
-              ? `You: ${chat?.latestMessage?.content?.slice(0, 35)}...`
+            {isOwnMessage(chat?.latestMessage?.sender, user._id)
+              ? `You: ${
+                  MsgCharLimitExceeded(chat?.latestMessage?.content)
+                    ? chat?.latestMessage?.content?.slice(0, 35) + "..."
+                    : chat?.latestMessage?.content
+                }`
               : chat.isGroupChat
-              ? `${
-                  chat?.latestMessage?.sender?.name
-                }: ${chat?.latestMessage?.content?.slice(0, 35)}...`
-              : `${chat?.latestMessage?.content?.slice(0, 35)}...`}
+              ? `${chat?.latestMessage?.sender?.name}: ${
+                  MsgCharLimitExceeded(chat?.latestMessage?.content)
+                    ? chat?.latestMessage?.content?.slice(0, 35) + "..."
+                    : chat?.latestMessage?.content
+                }`
+              : `${
+                  MsgCharLimitExceeded(chat?.latestMessage?.content)
+                    ? chat?.latestMessage?.content?.slice(0, 35) + "..."
+                    : chat?.latestMessage?.content
+                }`}
           </h2>
         ) : (
           <h2>{chat?.chatDescription?.slice(0, 35)}</h2>

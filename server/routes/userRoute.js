@@ -9,6 +9,7 @@ const {
   updateUser,
   forgotPassword,
   resetPassword,
+  changePassword,
 } = require("../controllers/userControllers");
 
 const router = express.Router();
@@ -21,5 +22,6 @@ router.get("/singleUser", singleUser);
 router.put("/", verifyJWT, updateUser);
 router.post("/forgotPassword", forgotPassword);
 router.put("/resetPassword", resetPassword);
+router.put("/changePassword", verifyJWT, changePassword);
 
 module.exports = router;
