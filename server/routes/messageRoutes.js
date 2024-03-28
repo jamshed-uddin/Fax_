@@ -5,11 +5,13 @@ const {
   createMessage,
   getAllMessages,
   updateMessageReadBy,
+  deleteMessage,
 } = require("../controllers/messageControllers");
 const router = express.Router();
 
 router.post("/newMessage", verifyJWT, createMessage);
 router.get("/:chatId", verifyJWT, getAllMessages);
 router.patch("/:messageId", verifyJWT, updateMessageReadBy);
+router.put("/deleteMessage/:messageId", verifyJWT, deleteMessage);
 
 module.exports = router;

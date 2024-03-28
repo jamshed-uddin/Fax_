@@ -1,7 +1,5 @@
 const isOwnMessage = (sender, userId) => {
-  const isOwn = (sender?._id || sender) === userId;
-  console.log(isOwn);
-  return isOwn;
+  return (sender?._id || sender) === userId;
 };
 
 const isUsersLastMessage = (messages, index, message, position = "last") => {

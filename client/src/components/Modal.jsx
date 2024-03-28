@@ -4,13 +4,16 @@ import axios from "axios";
 import useTheme from "../hooks/useTheme";
 import { useNavigate } from "react-router-dom";
 import EditUserProfile from "./EditUserProfile";
+import { TrashIcon } from "@heroicons/react/24/outline";
 
 const Modal = ({
   modalFor,
   isModalOpen,
   setIsModalOpen,
   chat,
+  message,
   userRefetch,
+  func,
 }) => {
   const { dark } = useTheme();
   const { user } = useAuthProvider();
@@ -50,6 +53,10 @@ const Modal = ({
       setLoading(false);
       console.log(error);
     }
+  };
+
+  const deleteMessageHandler = async (deleteFor) => {
+    func(message, deleteFor);
   };
 
   return (
@@ -122,6 +129,34 @@ const Modal = ({
             <button onClick={handleModalClose} className={btnStyle}>
               Ok
             </button>
+          </div>
+        </div>
+      )}
+
+      {modalFor === "deleteMessage" && (
+        <div className="my-5 ">
+          <div>
+            <h2 className="text-xl font-medium">Delete this message!</h2>
+            <div className="mt-3 space-y-1">
+              <h3
+                onClick={() => {
+                  deleteMessageHandler("own");
+                }}
+                className="text-lg font-medium cursor-pointer w-fit"
+              >
+                Delete for me <TrashIcon className="w-5 h-5 inline" />
+              </h3>
+              {message?.sender?._id === user?._id && (
+                <h3
+                  onClick={() => {
+                    deleteMessageHandler("everyone");
+                  }}
+                  className="text-lg font-medium cursor-pointer w-fit"
+                >
+                  Delete for everyone <TrashIcon className="w-5 h-5 inline" />
+                </h3>
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -9,7 +9,6 @@ const messageSchema = mongoose.Schema(
       type: String,
       trim: true,
       default: "message",
-      enum: ["image", "message"],
     },
     file: { type: String, default: null },
     deletedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],

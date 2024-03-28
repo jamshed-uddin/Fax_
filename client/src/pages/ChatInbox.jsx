@@ -145,7 +145,11 @@ const ChatInbox = () => {
         {singleChatLoading ? (
           <InboxSkeleton />
         ) : (
-          <Messages messages={messages} singleChat={singleChat} />
+          <Messages
+            messages={messages}
+            singleChat={singleChat}
+            setMessages={setMessages}
+          />
         )}
 
         {/* user typing indicator */}

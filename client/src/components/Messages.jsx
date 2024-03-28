@@ -7,11 +7,23 @@ import {
 } from "../logics/messageLogics";
 import useAuthProvider from "../hooks/useAuthProvider";
 import useTheme from "../hooks/useTheme";
+import { TrashIcon } from "@heroicons/react/24/outline";
+import Modal from "./Modal";
+import useCloseMenu from "../hooks/useCloseMenu";
+import useOnlineStatus from "../hooks/useOnlineStatus";
+import axios from "axios";
+import useLongPress from "../hooks/useLongPress";
 
-const Messages = ({ messages, singleChat }) => {
+const Messages = ({ messages, setMessages, singleChat }) => {
   const { user } = useAuthProvider();
   const { dark } = useTheme();
+  const { online } = useOnlineStatus();
   const [messageGroup, setMessageGroup] = useState([]);
+  const [hoveredMessageId, setHoveredMessageId] = useState(null);
+  const [showMessageOptions, setShowMessageOptions] = useState(false);
+  const [messageForDelete, setMessageForDelete] = useState(null);
+  const { isMenuOpen: isModalOpen, setIsMenuOpen: setIsModalOpen } =
+    useCloseMenu("message-modal");
   console.log(messages);
   useEffect(() => {
     const messageDate = (messageDate) =>
@@ -34,13 +46,46 @@ const Messages = ({ messages, singleChat }) => {
     setMessageGroup(group);
   }, [messages]);
 
+  const { start, stop } = useLongPress(() => {
+    console.log("longPressed");
+    setShowMessageOptions(true);
+  }, 800);
+
+  // deleting message func and passed it as props to message delete modal
+  const handleDeleteMessage = async (message, deleteFor) => {
+    if (!online) return;
+    setMessages((prev) =>
+      prev.filter((singleMsg) => singleMsg._id !== message._id)
+    );
+    setIsModalOpen(false);
+
+    try {
+      const result = await axios.put(
+        `/api/message/deleteMessage/${message._id}`,
+        { deleteFor }
+      );
+      console.log(result.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="h-max  my-2  w-full ">
+      <div id="message-modal">
+        <Modal
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+          modalFor={"deleteMessage"}
+          message={messageForDelete}
+          func={handleDeleteMessage}
+        />
+      </div>
       {Object.keys(messageGroup)?.map((date) => (
         <div key={date} className="relative">
           <div className="flex justify-center sticky top-1 left-0 right-0">
             <h3
-              className={`w-fit  rounded-xl px-3 py-[0.20rem] text-sm mb-1 ${
+              className={`w-fit  rounded-xl px-3 py-[0.20rem] text-xs lg:text-sm mb-1 ${
                 dark ? "bg-slate-800" : "bg-slate-200"
               }`}
             >
@@ -81,7 +126,27 @@ const Messages = ({ messages, singleChat }) => {
                     </div>
                   )}
                   {/* message text */}
-                  <div className=" ml-2 max-w-[75%] ">
+                  <div
+                    onTouchStart={() => {
+                      start();
+                      setHoveredMessageId(message._id);
+                    }}
+                    onTouchEnd={() => {
+                      stop();
+                    }}
+                    onTouchCancel={() => {
+                      stop();
+                    }}
+                    onMouseOver={() => {
+                      setHoveredMessageId(message._id);
+                      setShowMessageOptions(true);
+                    }}
+                    onMouseLeave={() => {
+                      setHoveredMessageId(null);
+                      setShowMessageOptions(false);
+                    }}
+                    className=" ml-2 max-w-[80%] "
+                  >
                     {!isOwnMessage(message?.sender, user?._id) &&
                       isUsersLastMessage(msgArr, index, message, "first") &&
                       singleChat?.isGroupChat && (
@@ -89,21 +154,50 @@ const Messages = ({ messages, singleChat }) => {
                           {message?.sender?.name}
                         </div>
                       )}
-                    <div
-                      className={`  w-full  text-sm md:text-base shadow-md px-3 py-[0.35rem]  rounded-lg flex items-end ${
-                        dark ? "bg-slate-800" : "bg-slate-200"
-                      } ${
-                        message?.type === "event"
-                          ? "bg-transparent shadow-none items-center "
-                          : ""
-                      }`}
-                    >
-                      <div className="flex-grow">
-                        {message?.type === "event" && message?.sender?.name}{" "}
-                        {message?.content}
+
+                    {/* message and message option flexed */}
+                    <div className="flex items-center gap-1">
+                      {/* message */}
+                      <div
+                        className={`  w-full  text-sm md:text-base shadow-md px-3 py-[0.35rem]  rounded-lg flex items-end ${
+                          dark ? "bg-slate-800" : "bg-slate-200"
+                        } ${
+                          message?.type === "event"
+                            ? "bg-transparent shadow-none items-center "
+                            : ""
+                        }`}
+                      >
+                        <div className="flex-grow">
+                          {message?.type === "event" && message?.sender?.name}{" "}
+                          {message?.content}
+                        </div>
+                        <div className="shrink-0 text-end  text-[0.60rem] ml-2 -mb-2 -mr-1 ">
+                          {messageTime(message?.createdAt)}
+                        </div>
                       </div>
-                      <div className="shrink-0 text-end  text-[0.60rem] ml-2 -mb-2 -mr-1 ">
-                        {messageTime(message?.createdAt)}
+                      {/* message options */}
+                      <div
+                        className={`${
+                          isOwnMessage(message?.sender, user?._id)
+                            ? "order-first"
+                            : "order-last"
+                        }`}
+                      >
+                        <div
+                          onClick={() => {
+                            setIsModalOpen(true);
+                            setMessageForDelete(message);
+                            setShowMessageOptions(false);
+                          }}
+                          className={`cursor-pointer transition-opacity duration-300 ${
+                            showMessageOptions &&
+                            hoveredMessageId === message._id
+                              ? "opacity-100"
+                              : "opacity-0"
+                          }`}
+                        >
+                          <TrashIcon className="w-5 h-5" />
+                        </div>
                       </div>
                     </div>
                   </div>
