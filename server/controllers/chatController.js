@@ -236,10 +236,40 @@ const updateGroup = asyncHandler(async (req, res) => {
   }
 });
 
+//@desc delete chat
+//@route PUT /api/chat/deleteChat/:chatId
+//@access private
+const deleteChat = asyncHandler(async (req, res) => {
+  const chatId = req.params.chatId;
+  const chat = await Chat.findOne({ _id: chatId });
+
+  try {
+    if (!chat) {
+      return res.status(404).send({ message: "Chat not found" });
+    }
+
+    await Message.updateMany(
+      { chat: chatId },
+      { $push: { deletedBy: req.user._id } }
+    );
+
+    await Chat.updateOne(
+      { _id: chatId },
+      { $push: { deletedBy: req.user._id } }
+    );
+
+    res.status(200).send({ message: "Chat deleted succesfully" });
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
 module.exports = {
   accessChat,
   getChats,
   getSignleChat,
   createGroup,
   updateGroup,
+  deleteChat,
 };

@@ -2,6 +2,7 @@ const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const generateToken = require("../utils/generateToken");
 const Chat = require("../models/chatModel");
+const Message = require("../models/messageModel");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 //@desc auth user
@@ -263,10 +264,33 @@ const deleteUser = asyncHandler(async (req, res) => {
         .send({ message: "Couldn't delete account.Wait before trying again." });
     }
 
-    const updateAllChat = await Chat.find({ users: req.user._id });
-    console.log(updateAllChat);
+    const chatFilterOption = {
+      users: { $size: 1, $in: [req.user._id] },
+    };
+    // getting all chat that's only participent is the user
+    const prevChat = await Chat.find(chatFilterOption);
 
-    res.send(updateAllChat);
+    // for (const chat of prevChat) {
+    //   await Message.deleteMany({ chat: chat._id });
+    // }
+
+    // deleteing messages of those chat where user is the only participent
+    await Message.deleteMany({
+      chat: { $in: prevChat.map((chat) => chat._id) },
+    });
+
+    // then deleting those chat
+    await Chat.deleteMany(chatFilterOption);
+
+    // pulling user from that chats or group where user is not the only participent
+    // await Chat.updateMany(
+    //   { users: req.user._id },
+    //   { $pull: { users: req.user._id } }
+    // );
+    // finally deleting the user
+    await User.deleteOne({ _id: req.user._id });
+
+    res.status(200).send({ message: "User deleted" });
   } catch (error) {
     res.status(400);
     throw new Error(error.message);
