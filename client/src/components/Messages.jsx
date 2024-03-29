@@ -24,7 +24,7 @@ const Messages = ({ messages, setMessages, singleChat }) => {
   const [messageForDelete, setMessageForDelete] = useState(null);
   const { isMenuOpen: isModalOpen, setIsMenuOpen: setIsModalOpen } =
     useCloseMenu("message-modal");
-  console.log(messages);
+  // console.log(messages);
   useEffect(() => {
     const messageDate = (messageDate) =>
       new Date(messageDate).toLocaleDateString("en-IN", {
@@ -47,16 +47,13 @@ const Messages = ({ messages, setMessages, singleChat }) => {
   }, [messages]);
 
   const { start, stop } = useLongPress(() => {
-    console.log("longPressed");
     setShowMessageOptions(true);
   }, 800);
 
   // deleting message func and passed it as props to message delete modal
-  const handleDeleteMessage = async (message, deleteFor) => {
+  const handleDeleteMessage = async (message, deleteFor, toastNotify) => {
     if (!online) return;
-    setMessages((prev) =>
-      prev.filter((singleMsg) => singleMsg._id !== message._id)
-    );
+
     setIsModalOpen(false);
 
     try {
@@ -64,9 +61,12 @@ const Messages = ({ messages, setMessages, singleChat }) => {
         `/api/message/deleteMessage/${message._id}`,
         { deleteFor }
       );
+      setMessages((prev) =>
+        prev.filter((singleMsg) => singleMsg._id !== message._id)
+      );
       console.log(result.data);
     } catch (error) {
-      console.log(error);
+      toastNotify();
     }
   };
 

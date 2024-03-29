@@ -90,11 +90,10 @@ const deleteMessage = asyncHandler(async (req, res) => {
   const { deleteFor } = req.body;
   const messageId = req.params.messageId;
 
-  console.log(req.body, messageId);
-
   try {
     const message = await Message.findOne({ _id: messageId });
-    const isOwnMessage = message.sender === req.user._id;
+    const isOwnMessage = message.sender.toString() === req.user._id.toString();
+
     // if message not found
     if (!message) {
       return res.status(404).send({ message: "Message not found" });

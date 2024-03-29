@@ -20,7 +20,7 @@ const MyChats = () => {
   return (
     <div>
       {myChats?.length ? (
-        <Chats chats={myChats} />
+        <Chats chats={myChats} placedIn={"chatList"} />
       ) : (
         <div className="text-center text-lg  mt-20">
           <div className="flex flex-col items-center">

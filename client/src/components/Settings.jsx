@@ -136,12 +136,11 @@ const Settings = ({ placedIn, settingsFor, chatInfo, userRefetch }) => {
                 onClick={() => {
                   setIsMenuOpen(false);
                   setIsModalOpen(true);
-                  setModalFor("leaveGroup");
+                  setModalFor("deleteChat");
                 }}
                 className=" px-3 py-1 rounded-xl flex items-center gap-1 cursor-pointer"
               >
-                <ArrowLeftStartOnRectangleIcon className="w-5 h-5 inline" />
-                Leave group
+                <TrashIcon className="w-5 h-5 inline" /> Delete conversation
               </li>
             </ul>
           )}

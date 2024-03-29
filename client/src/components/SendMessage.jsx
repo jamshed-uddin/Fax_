@@ -5,13 +5,19 @@ import useAuthProvider from "../hooks/useAuthProvider";
 
 import useSocketProvider from "../hooks/useSocketProvider";
 import useOnlineStatus from "../hooks/useOnlineStatus";
+import useTheme from "../hooks/useTheme";
 
 const SendMessage = ({ chat }) => {
   const { user } = useAuthProvider();
+  const { dark } = useTheme();
   const { online } = useOnlineStatus();
   const [message, setMessage] = useState("");
+  const [messageSending, setMessageSending] = useState(false);
 
   const { socket } = useSocketProvider();
+  const inputStyle = `input input-bordered focus:outline-0 focus:border-[1.3px] ${
+    dark ? "focus:border-white" : "focus:border-black"
+  }  input-sm w-full`;
 
   // input change handler
   const handleInputChange = (e) => {
@@ -35,6 +41,7 @@ const SendMessage = ({ chat }) => {
 
     // sending to DB
     try {
+      setMessageSending(true);
       const result = await axios.post("/api/message/newMessage", messageToSend);
       console.log(result.data);
       // sending message to socket
@@ -42,7 +49,9 @@ const SendMessage = ({ chat }) => {
 
       // setMessages([...messages, result.data]);
       setMessage("");
+      setMessageSending(false);
     } catch (error) {
+      setMessageSending(false);
       if (
         error.response &&
         (error.response.status === 400 || error.response.status === 401)
@@ -59,21 +68,27 @@ const SendMessage = ({ chat }) => {
   return (
     <div className=" flex items-center  gap-2 lg:px-3 mb-2">
       <span>
-        <PhotoIcon className="w-7 h-7 text-slate-600" />
+        <PhotoIcon
+          className={`w-7 h-7  active:scale-90 transition-transform duration-700 ${
+            dark ? "white" : "text-slate-600"
+          }`}
+        />
       </span>
       <input
         type="text"
         placeholder="Send message"
-        className={`input input-bordered focus:outline-0 input-sm w-full ${
-          !chat && "input-disabled"
-        }`}
+        className={`${inputStyle} ${!chat && "input-disabled"}`}
         value={message}
         name="messageInput"
         onChange={handleInputChange}
       />
 
-      <button disabled={!chat} onClick={sendMessageHandler}>
-        <PaperAirplaneIcon className="w-7 h-7 text-slate-600 active:scale-90 transition-transform duration-500" />
+      <button disabled={!chat || messageSending} onClick={sendMessageHandler}>
+        <PaperAirplaneIcon
+          className={`w-7 h-7  active:scale-90 transition-transform duration-700 ${
+            dark ? "white" : "text-slate-600"
+          }`}
+        />
       </button>
     </div>
   );

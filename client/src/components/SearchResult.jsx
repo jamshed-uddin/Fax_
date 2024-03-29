@@ -23,9 +23,9 @@ const SearchResult = ({ query, searchResult, searchLoading }) => {
       {!!chats?.length && (
         <div>
           <div className="flex justify-between items-center mb-1">
-            <h1 className="text-2xl font-semibold mb-2">Chats</h1>
+            <h1 className="text-xl font-semibold mb-2">Chats</h1>
           </div>
-          <Chats chats={chats} />
+          <Chats chats={chats} placedIn={"searchResult"} />
         </div>
       )}
     </div>

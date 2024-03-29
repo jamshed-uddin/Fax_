@@ -31,6 +31,11 @@ const accessChat = asyncHandler(async (req, res) => {
     .populate({ path: "latestMessage.sender", select: "name email pic" });
 
   if (chatExists.length) {
+    console.log("existing chat", chatExists[0]._id);
+    await Chat.updateOne(
+      { _id: chatExists[0]._id },
+      { $pull: { deletedBy: req.user._id } }
+    );
     res.status(200).send(chatExists[0]);
   } else {
     const chatData = {
@@ -78,6 +83,7 @@ const getChats = asyncHandler(async (req, res) => {
       {
         $match: {
           users: req.user._id,
+          deletedBy: { $nin: [req.user._id] },
         },
       },
       {

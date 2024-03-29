@@ -1,7 +1,6 @@
 import useAuthProvider from "../hooks/useAuthProvider";
 import SideChats from "../components/SideChats";
 import { Outlet, useLocation } from "react-router-dom";
-
 import useChatProvider from "../hooks/useChatProvider";
 import Hero from "../components/Hero";
 import { useEffect } from "react";

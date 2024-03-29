@@ -3,6 +3,9 @@ import useTheme from "../hooks/useTheme";
 
 const Searchbar = ({ searchQuery, setSearchQuery }) => {
   const { dark } = useTheme();
+  const inputStyle = `input input-bordered focus:outline-0 focus:border-[1.3px] ${
+    dark ? "focus:border-white" : "focus:border-black"
+  }  input-sm w-full`;
 
   return (
     <div className="form-control  ">
@@ -13,7 +16,7 @@ const Searchbar = ({ searchQuery, setSearchQuery }) => {
         <input
           type="text"
           placeholder="Search"
-          className="input input-bordered focus:outline-0 input-sm w-full "
+          className={inputStyle}
           name="searchInput"
           value={searchQuery}
           onChange={(e) => {

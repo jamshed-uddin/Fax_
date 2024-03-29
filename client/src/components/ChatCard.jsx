@@ -9,7 +9,7 @@ import {
 
 import { useState } from "react";
 
-const ChatCard = ({ chat, clickFunc }) => {
+const ChatCard = ({ chat, clickFunc, placedIn }) => {
   const { user } = useAuthProvider();
   const { isUserActive } = useSocketProvider();
   const [lastMessageRead, setLastMessageRead] = useState(
@@ -52,40 +52,48 @@ const ChatCard = ({ chat, clickFunc }) => {
             {chat?.isGroupChat ? chat?.chatName : chatNameHandler(chat, user)}
           </h1>
           {/* last message date */}
-          {chat?.latestMessage && (
-            <h4 className="text-sm font-semibold">
-              {chatDate(chat?.latestMessage?.createdAt)}
-            </h4>
+          {placedIn === "chatList" && (
+            <div>
+              {chat?.latestMessage && (
+                <h4 className="text-sm font-semibold">
+                  {chatDate(chat?.latestMessage?.createdAt)}
+                </h4>
+              )}
+            </div>
           )}
         </div>
-        {chat?.latestMessage ? (
-          <h2
-            className={`${
-              !lastMessageRead &&
-              !isOwnMessage(chat?.latestMessage?.sender, user._id) &&
-              "font-bold"
-            }`}
-          >
-            {isOwnMessage(chat?.latestMessage?.sender, user._id)
-              ? `You: ${
-                  MsgCharLimitExceeded(chat?.latestMessage?.content)
-                    ? chat?.latestMessage?.content?.slice(0, 35) + "..."
-                    : chat?.latestMessage?.content
-                }`
-              : chat.isGroupChat
-              ? `${chat?.latestMessage?.sender?.name}: ${
-                  MsgCharLimitExceeded(chat?.latestMessage?.content)
-                    ? chat?.latestMessage?.content?.slice(0, 35) + "..."
-                    : chat?.latestMessage?.content
-                }`
-              : `${
-                  MsgCharLimitExceeded(chat?.latestMessage?.content)
-                    ? chat?.latestMessage?.content?.slice(0, 35) + "..."
-                    : chat?.latestMessage?.content
+        {placedIn === "chatList" && (
+          <div>
+            {chat?.latestMessage ? (
+              <h2
+                className={`${
+                  !lastMessageRead &&
+                  !isOwnMessage(chat?.latestMessage?.sender, user._id) &&
+                  "font-bold"
                 }`}
-          </h2>
-        ) : (
-          <h2>{chat?.chatDescription?.slice(0, 35)}</h2>
+              >
+                {isOwnMessage(chat?.latestMessage?.sender, user._id)
+                  ? `You: ${
+                      MsgCharLimitExceeded(chat?.latestMessage?.content)
+                        ? chat?.latestMessage?.content?.slice(0, 35) + "..."
+                        : chat?.latestMessage?.content
+                    }`
+                  : chat.isGroupChat
+                  ? `${chat?.latestMessage?.sender?.name}: ${
+                      MsgCharLimitExceeded(chat?.latestMessage?.content)
+                        ? chat?.latestMessage?.content?.slice(0, 35) + "..."
+                        : chat?.latestMessage?.content
+                    }`
+                  : `${
+                      MsgCharLimitExceeded(chat?.latestMessage?.content)
+                        ? chat?.latestMessage?.content?.slice(0, 35) + "..."
+                        : chat?.latestMessage?.content
+                    }`}
+              </h2>
+            ) : (
+              <h2>{chat?.chatDescription?.slice(0, 35)}</h2>
+            )}
+          </div>
         )}
       </div>
     </div>
