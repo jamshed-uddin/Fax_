@@ -112,7 +112,7 @@ const Messages = ({ messages, setMessages, singleChat }) => {
                 <>
                   {/* user avatar */}
                   {!isOwnMessage(message?.sender, user?._id) && (
-                    <div className=" h-9 w-9 rounded-full overflow-hidden  ">
+                    <div className=" h-8 w-8 rounded-full overflow-hidden  ">
                       {isUsersLastMessage(msgArr, index, message) && (
                         <img
                           className="w-full h-full object-cover rounded-full"

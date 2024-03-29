@@ -53,27 +53,35 @@ io.on("connection", (socket) => {
   // send message
   socket.on("sendMessage", (data) => {
     const { chat } = data;
-    console.log("chat users", chat.users);
+    // console.log("chat users", chat.users);
 
-    console.log(data);
+    // console.log(data);
 
     if (chat.users.length) {
       chat.users.forEach((userId) => {
         // if (userId === data.sender._id) return;
         io.to(activeUsers[userId]).emit("recieveMessage", data);
-        console.log("message sent to", activeUsers[userId]);
+        // console.log("message sent to", activeUsers[userId]);
       });
     }
   });
 
   // typing status
-  let timer;
+  const typingUsers = new Map();
   socket.on("typingStatus", (data) => {
+    // typingUsers.set(data?.user._id, true);
+
+    clearTimeout(typingUsers.get(data?.user._id));
+
+    typingUsers.set(
+      data?.user._id,
+      setTimeout(() => {
+        io.emit("typing", { ...data, isTyping: false });
+        typingUsers.delete(data?.user._id);
+      }, 2500)
+    );
+
     io.emit("typing", data);
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      io.emit("typing", { ...data, isTyping: false });
-    }, 2500);
   });
 
   socket.on("disconnect", () => {

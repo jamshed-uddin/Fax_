@@ -160,7 +160,7 @@ const ChatInbox = () => {
             typingStatus?.chatId === singleChat?._id && (
               <div className="flex items-end gap-2 mb-2">
                 {/* user avatar */}
-                <div className=" h-10 w-10 rounded-full overflow-hidden  ">
+                <div className=" h-8 w-8 rounded-full overflow-hidden  ">
                   <img
                     className="w-full h-full object-cover rounded-full"
                     src={typingStatus?.user?.photoURL}
