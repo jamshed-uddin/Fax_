@@ -13,6 +13,8 @@ import useTheme from "../hooks/useTheme";
 
 import useSocketProvider from "../hooks/useSocketProvider";
 import Messages from "../components/Messages";
+import Image from "../components/Image";
+import { PaperAirplaneIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 const ChatInbox = () => {
   const { dark } = useTheme();
@@ -21,6 +23,7 @@ const ChatInbox = () => {
   const { socket, typingStatus, isUserActive } = useSocketProvider();
   const [messages, setMessages] = useState([]);
   const [messageFetched, setMessageFetched] = useState(false);
+  const [imageBlobURL, setImageBlobURL] = useState("");
   const lastMessageRef = useRef();
 
   const {
@@ -29,8 +32,9 @@ const ChatInbox = () => {
     error: singleChatError,
     refetch: singleChatRefetch,
   } = useGetData(`/api/chat/${chatId}`);
-  console.log(singleChat);
-  console.log(messages);
+  // console.log(singleChat);
+  // console.log(messages);
+  console.log(imageBlobURL);
 
   // fetching messages
   useEffect(() => {
@@ -151,9 +155,32 @@ const ChatInbox = () => {
             setMessages={setMessages}
           />
         )}
+        {/* image message preview */}
+        {imageBlobURL && (
+          <div>
+            <div className="flex flex-col items-end ">
+              <div className="w-fit relative">
+                <Image image={imageBlobURL} />
+                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                  <span className="loading loading-spinner loading-lg text-gray-100 "></span>
+                </span>
+              </div>
+              <div className="flex items-center w-fit  gap-6 mt-1">
+                <span
+                  onClick={() => setImageBlobURL("")}
+                  className="cursor-pointer"
+                >
+                  <XMarkIcon className="w-8 h-8 active:scale-90" />
+                </span>
+                <span>
+                  <PaperAirplaneIcon className="w-7 h-7 active:scale-90 cursor-pointer" />
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* user typing indicator */}
-
         <div id="last-message">
           {typingStatus?.isTyping &&
             typingStatus?.user._id !== user?._id &&
@@ -187,7 +214,11 @@ const ChatInbox = () => {
       </div>
       {/* send message input */}
 
-      <SendMessage chat={singleChat} messages={messages} />
+      <SendMessage
+        chat={singleChat}
+        messages={messages}
+        setImageBlobURL={setImageBlobURL}
+      />
     </div>
   );
 };

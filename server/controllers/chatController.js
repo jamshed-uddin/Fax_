@@ -138,7 +138,7 @@ const getChats = asyncHandler(async (req, res) => {
       },
       {
         $sort: {
-          "latestMessage.createdAt": -1,
+          updatedAt: -1,
         },
       },
     ]);

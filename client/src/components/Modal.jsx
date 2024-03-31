@@ -176,7 +176,7 @@ const Modal = ({
                   onClick={() => {
                     deleteMessageHandler("own");
                   }}
-                  className="text-lg font-medium cursor-pointer w-fit"
+                  className=" font-medium cursor-pointer w-fit"
                 >
                   Delete for me <TrashIcon className="w-5 h-5 inline" />
                 </h3>
@@ -185,7 +185,7 @@ const Modal = ({
                     onClick={() => {
                       deleteMessageHandler("everyone");
                     }}
-                    className="text-lg font-medium cursor-pointer w-fit"
+                    className=" font-medium cursor-pointer w-fit"
                   >
                     Delete for everyone <TrashIcon className="w-5 h-5 inline" />
                   </h3>

@@ -283,10 +283,10 @@ const deleteUser = asyncHandler(async (req, res) => {
     await Chat.deleteMany(chatFilterOption);
 
     // pulling user from that chats or group where user is not the only participent
-    // await Chat.updateMany(
-    //   { users: req.user._id },
-    //   { $pull: { users: req.user._id } }
-    // );
+    await Chat.updateMany(
+      { users: req.user._id },
+      { $pull: { users: req.user._id } }
+    );
     // finally deleting the user
     await User.deleteOne({ _id: req.user._id });
 

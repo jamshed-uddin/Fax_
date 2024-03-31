@@ -13,11 +13,13 @@ import useCloseMenu from "../hooks/useCloseMenu";
 import useOnlineStatus from "../hooks/useOnlineStatus";
 import axios from "axios";
 import useLongPress from "../hooks/useLongPress";
+import SocketProvider from "../providers/SocketProvider";
 
 const Messages = ({ messages, setMessages, singleChat }) => {
   const { user } = useAuthProvider();
   const { dark } = useTheme();
   const { online } = useOnlineStatus();
+  // const { socket } = SocketProvider();
   const [messageGroup, setMessageGroup] = useState([]);
   const [hoveredMessageId, setHoveredMessageId] = useState(null);
   const [showMessageOptions, setShowMessageOptions] = useState(false);
@@ -46,6 +48,16 @@ const Messages = ({ messages, setMessages, singleChat }) => {
     setMessageGroup(group);
   }, [messages]);
 
+  // useEffect(() => {
+  //   socket.on("getDeletedMessage", (data) => {
+  //     if (data.chatId === singleChat._id) {
+  //       setMessages((prev) =>
+  //         prev.filter((singleMsg) => singleMsg._id !== data.messageId)
+  //       );
+  //     }
+  //   });
+  // }, [setMessages, singleChat._id, socket]);
+
   const { start, stop } = useLongPress(() => {
     setShowMessageOptions(true);
   }, 800);
@@ -64,6 +76,10 @@ const Messages = ({ messages, setMessages, singleChat }) => {
       setMessages((prev) =>
         prev.filter((singleMsg) => singleMsg._id !== message._id)
       );
+      // socket.emit("deletedMessage", {
+      //   messageId: message._id,
+      //   chatId: singleChat._id,
+      // });
       console.log(result.data);
     } catch (error) {
       toastNotify();
@@ -104,9 +120,11 @@ const Messages = ({ messages, setMessages, singleChat }) => {
             >
               {message.type === "event" ? (
                 <h3 className="text-sm">{`${
-                  message?.sender?._id === user?._id
-                    ? "You"
-                    : message?.sender?.name
+                  message?.sender?._id
+                    ? message?.sender?._id === user?._id
+                      ? "You"
+                      : message?.sender?.name
+                    : "A fax user"
                 } ${message?.content}`}</h3>
               ) : (
                 <>

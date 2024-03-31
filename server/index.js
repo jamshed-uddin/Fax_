@@ -9,6 +9,7 @@ const chatRoute = require("./routes/chatRoutes");
 const messageRoute = require("./routes/messageRoutes");
 const dotenv = require("dotenv");
 const { notFound, errorHandler } = require("./middlewares/errorMiddlewares");
+const { configureCloudinary } = require("./config/cloudinaryConfig");
 dotenv.config();
 connectDB();
 
@@ -25,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors());
 const port = process.env.PORT || 5000;
-
+configureCloudinary();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -82,6 +83,11 @@ io.on("connection", (socket) => {
     );
 
     io.emit("typing", data);
+  });
+
+  // getting message that deleted for everyone to get it deleted immediatly
+  socket.on("deletedMessage", (deletedMessage) => {
+    io.emit("getDeletedMessage", deletedMessage);
   });
 
   socket.on("disconnect", () => {

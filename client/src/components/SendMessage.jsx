@@ -7,7 +7,7 @@ import useSocketProvider from "../hooks/useSocketProvider";
 import useOnlineStatus from "../hooks/useOnlineStatus";
 import useTheme from "../hooks/useTheme";
 
-const SendMessage = ({ chat }) => {
+const SendMessage = ({ chat, setImageBlobURL }) => {
   const { user } = useAuthProvider();
   const { dark } = useTheme();
   const { online } = useOnlineStatus();
@@ -65,15 +65,53 @@ const SendMessage = ({ chat }) => {
     }
   };
 
+  const SeleteFile = async (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      const blobURL = URL.createObjectURL(file);
+
+      setImageBlobURL(blobURL);
+    }
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+
+    try {
+      const result = await axios.post("/api/message/uploadImage", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className=" flex items-center  gap-2 lg:px-3 mb-2">
-      <span>
-        <PhotoIcon
-          className={`w-7 h-7  active:scale-90 transition-transform duration-700 ${
-            dark ? "white" : "text-slate-600"
-          }`}
-        />
-      </span>
+      <div>
+        <form encType="multipart/form-data">
+          <label htmlFor="imageFile">
+            <PhotoIcon
+              className={`w-7 h-7 cursor-pointer active:scale-90 transition-transform duration-700 ${
+                dark ? "white" : "text-slate-600"
+              }`}
+            />
+
+            <input
+              className="hidden"
+              type="file"
+              name="imageFile"
+              id="imageFile"
+              onChange={SeleteFile}
+              accept="image/*"
+            />
+          </label>
+        </form>
+      </div>
       <input
         type="text"
         placeholder="Send message"

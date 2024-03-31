@@ -54,7 +54,7 @@ const ChatCard = ({ chat, clickFunc, placedIn }) => {
           {/* last message date */}
           {placedIn === "chatList" && (
             <div>
-              {chat?.latestMessage && (
+              {chat?.latestMessage?.createdAt && (
                 <h4 className="text-sm font-semibold">
                   {chatDate(chat?.latestMessage?.createdAt)}
                 </h4>
@@ -64,7 +64,7 @@ const ChatCard = ({ chat, clickFunc, placedIn }) => {
         </div>
         {placedIn === "chatList" && (
           <div>
-            {chat?.latestMessage ? (
+            {chat?.latestMessage?.sender ? (
               <h2
                 className={`${
                   !lastMessageRead &&

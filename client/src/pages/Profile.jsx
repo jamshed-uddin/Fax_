@@ -164,7 +164,9 @@ const Profile = () => {
       </div>
       {state && (
         <div className="px-2 lg:px-4 mt-4">
-          <h1 className="text-xl font-semibold mb-2">Members</h1>
+          <h1 className="text-xl font-semibold mb-2">
+            Members . <span>{singleChat?.users?.length}</span>
+          </h1>
           <div>
             {singleChat?.users.map((member) => (
               <div key={member?._id} className="flex gap-3 w-fit ">

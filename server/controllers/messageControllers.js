@@ -92,8 +92,8 @@ const deleteMessage = asyncHandler(async (req, res) => {
 
   try {
     const message = await Message.findOne({ _id: messageId });
-    const isOwnMessage = message.sender.toString() === req.user._id.toString();
 
+    const isOwnMessage = message.sender.toString() === req.user._id.toString();
     // if message not found
     if (!message) {
       return res.status(404).send({ message: "Message not found" });
@@ -104,7 +104,6 @@ const deleteMessage = asyncHandler(async (req, res) => {
         { _id: messageId },
         { $addToSet: { deletedBy: req.user._id } }
       );
-
       // deleting for everyone.but first check if the message getting deleted by the sender
     } else {
       if (!isOwnMessage) {
@@ -121,9 +120,22 @@ const deleteMessage = asyncHandler(async (req, res) => {
   }
 });
 
+const uploadImage = asyncHandler(async (req, res) => {
+  const image = req.file;
+
+  try {
+    console.log("image", image);
+    res.status(200).send({ message: "Image recieved" });
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
+
 module.exports = {
   createMessage,
   getAllMessages,
   updateMessageReadBy,
   deleteMessage,
+  uploadImage,
 };
