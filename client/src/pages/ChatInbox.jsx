@@ -15,6 +15,7 @@ import useSocketProvider from "../hooks/useSocketProvider";
 import Messages from "../components/Messages";
 import Image from "../components/Image";
 import { PaperAirplaneIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import toast, { Toaster } from "react-hot-toast";
 
 const ChatInbox = () => {
   const { dark } = useTheme();
@@ -23,7 +24,10 @@ const ChatInbox = () => {
   const { socket, typingStatus, isUserActive } = useSocketProvider();
   const [messages, setMessages] = useState([]);
   const [messageFetched, setMessageFetched] = useState(false);
+  // image type messgae sending states
+  const [imageFile, setImageFile] = useState(null);
   const [imageBlobURL, setImageBlobURL] = useState("");
+  const [imageSendLoading, setImageSendLoading] = useState(false);
   const lastMessageRef = useRef();
 
   const {
@@ -85,6 +89,42 @@ const ChatInbox = () => {
       }
     });
   }, [chatId, messages, socket]);
+
+  // toast style
+  const toastStyle = {
+    style: dark
+      ? {
+          background: "rgb(15 23 42)",
+          color: "white",
+          borderRadius: "20px",
+          padding: "5px 10px",
+        }
+      : { borderRadius: "20px", padding: "5px 10px" },
+  };
+
+  // sending imageType message function
+  const sendImageMessageHandler = async (e) => {
+    if (!imageFile) {
+      return;
+    } else {
+      const formData = new FormData();
+      formData.append("file", imageFile);
+      try {
+        setImageSendLoading(true);
+        const result = await axios.post("/api/messages/uploadImage", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        console.log(result);
+        setImageSendLoading(false);
+      } catch (error) {
+        console.log(error);
+        toast("Something went wrong!", toastStyle);
+        setImageSendLoading(false);
+      }
+    }
+  };
 
   if (singleChatError) {
     return <WentWrong refetch={singleChatRefetch} />;
@@ -158,24 +198,25 @@ const ChatInbox = () => {
         {/* image message preview */}
         {imageBlobURL && (
           <div>
-            <div className="flex flex-col items-end ">
-              <div className="w-fit relative">
-                <Image image={imageBlobURL} />
-                <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <span className="loading loading-spinner loading-lg text-gray-100 "></span>
-                </span>
+            <div className="flex items-center">
+              <div className=" w-full">
+                <Image image={imageBlobURL} loading={imageSendLoading} />
               </div>
-              <div className="flex items-center w-fit  gap-6 mt-1">
-                <span
-                  onClick={() => setImageBlobURL("")}
-                  className="cursor-pointer"
-                >
-                  <XMarkIcon className="w-8 h-8 active:scale-90" />
-                </span>
-                <span>
-                  <PaperAirplaneIcon className="w-7 h-7 active:scale-90 cursor-pointer" />
-                </span>
-              </div>
+              {imageBlobURL && (
+                <div className="ml-2 flex flex-col gap-5 mt-1">
+                  <button
+                    type="button"
+                    disabled={imageSendLoading}
+                    onClick={() => setImageBlobURL("")}
+                    className="cursor-pointer"
+                  >
+                    <XMarkIcon className="w-8 h-8 active:scale-90" />
+                  </button>
+                  <button type="button" onClick={sendImageMessageHandler}>
+                    <PaperAirplaneIcon className="w-7 h-7 active:scale-90 cursor-pointer" />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -218,6 +259,7 @@ const ChatInbox = () => {
         chat={singleChat}
         messages={messages}
         setImageBlobURL={setImageBlobURL}
+        setImageFile={setImageFile}
       />
     </div>
   );

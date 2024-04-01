@@ -10,7 +10,7 @@ const messageSchema = mongoose.Schema(
       trim: true,
       default: "message",
     },
-    file: { type: String, default: null },
+    file: { type: Object, default: null },
     deletedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 
     readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],

@@ -2,6 +2,8 @@ const asyncHandler = require("express-async-handler");
 const Message = require("../models/messageModel");
 const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
+const getDataURI = require("../utils/getDataURI");
+const { uploadToCLoud } = require("../config/cloudinaryConfig");
 
 // @desc create new message
 // @route POST /api/message/newMessage
@@ -121,11 +123,14 @@ const deleteMessage = asyncHandler(async (req, res) => {
 });
 
 const uploadImage = asyncHandler(async (req, res) => {
-  const image = req.file;
+  const imageFile = req.file;
+  console.log(imageFile);
+  const fileUri = getDataURI(imageFile);
 
   try {
-    console.log("image", image);
-    res.status(200).send({ message: "Image recieved" });
+    const imageToCloud = await uploadToCLoud(fileUri.content);
+
+    res.status(200).send({ message: "Image recieved", data: imageToCloud });
   } catch (error) {
     res.status(500);
     throw new Error(error.message);

@@ -3,22 +3,28 @@ const cloudinary = require("cloudinary").v2;
 const configureCloudinary = () => {
   cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
-    api_key: process.env.API_KEY,
-    api_secret: process.env.API_SECRET,
+    api_key: process.env.CLOUD_APIKEY,
+    api_secret: process.env.CLOUD_API_SECRET,
   });
 };
 
 const uploadToCLoud = async (file) => {
-  if (!file) return;
   return new Promise((resolve, reject) => {
-    cloudinary.uploader.upload(file.path, (error, result) => {
-      if (error) {
-        console.log("uploading error", error);
-        reject(error);
-      } else {
-        resolve(result.secure_url);
+    if (!file) {
+      reject("No file found");
+    }
+    cloudinary.uploader.upload(
+      file,
+      { upload_preset: process.env.CLOUD_UPLOAD_PRESET },
+      (error, result) => {
+        if (error) {
+          console.log("uploading error", error);
+          reject(error);
+        } else {
+          resolve({ url: result.secure_url, publicId: result.public_id });
+        }
       }
-    });
+    );
   });
 };
 

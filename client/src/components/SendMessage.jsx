@@ -7,7 +7,7 @@ import useSocketProvider from "../hooks/useSocketProvider";
 import useOnlineStatus from "../hooks/useOnlineStatus";
 import useTheme from "../hooks/useTheme";
 
-const SendMessage = ({ chat, setImageBlobURL }) => {
+const SendMessage = ({ chat, setImageBlobURL, setImageFile }) => {
   const { user } = useAuthProvider();
   const { dark } = useTheme();
   const { online } = useOnlineStatus();
@@ -65,28 +65,13 @@ const SendMessage = ({ chat, setImageBlobURL }) => {
     }
   };
 
-  const SeleteFile = async (e) => {
+  const SeleteFile = (e) => {
     const file = e.target.files[0];
 
     if (file) {
       const blobURL = URL.createObjectURL(file);
-
       setImageBlobURL(blobURL);
-    }
-
-    const formData = new FormData();
-
-    formData.append("file", file);
-
-    try {
-      const result = await axios.post("/api/message/uploadImage", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      console.log(result);
-    } catch (error) {
-      console.log(error);
+      setImageFile(file);
     }
   };
 
