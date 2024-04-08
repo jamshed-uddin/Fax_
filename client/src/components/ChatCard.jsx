@@ -72,20 +72,26 @@ const ChatCard = ({ chat, clickFunc, placedIn }) => {
                   "font-bold"
                 }`}
               >
-                {isOwnMessage(chat?.latestMessage?.sender, user._id)
+                {isOwnMessage(chat?.latestMessage?.sender, user?._id)
                   ? `You: ${
-                      MsgCharLimitExceeded(chat?.latestMessage?.content)
+                      chat?.latestMessage?.type === "image"
+                        ? "sent an image"
+                        : MsgCharLimitExceeded(chat?.latestMessage?.content)
                         ? chat?.latestMessage?.content?.slice(0, 35) + "..."
                         : chat?.latestMessage?.content
                     }`
                   : chat.isGroupChat
                   ? `${chat?.latestMessage?.sender?.name}: ${
-                      MsgCharLimitExceeded(chat?.latestMessage?.content)
+                      chat?.latestMessage?.type === "image"
+                        ? "sent an image"
+                        : MsgCharLimitExceeded(chat?.latestMessage?.content)
                         ? chat?.latestMessage?.content?.slice(0, 35) + "..."
                         : chat?.latestMessage?.content
                     }`
                   : `${
-                      MsgCharLimitExceeded(chat?.latestMessage?.content)
+                      chat?.latestMessage?.type === "image"
+                        ? "sent an image"
+                        : MsgCharLimitExceeded(chat?.latestMessage?.content)
                         ? chat?.latestMessage?.content?.slice(0, 35) + "..."
                         : chat?.latestMessage?.content
                     }`}

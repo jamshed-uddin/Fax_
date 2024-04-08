@@ -11,10 +11,9 @@ const {
 const upload = require("../middlewares/multerUpload");
 const router = express.Router();
 
-router.post("/newMessage", verifyJWT, createMessage);
+router.post("/newMessage", verifyJWT, upload, createMessage);
 router.get("/:chatId", verifyJWT, getAllMessages);
 router.patch("/:messageId", verifyJWT, updateMessageReadBy);
 router.put("/deleteMessage/:messageId", verifyJWT, deleteMessage);
-router.post("/uploadImage", upload, uploadImage);
 
 module.exports = router;

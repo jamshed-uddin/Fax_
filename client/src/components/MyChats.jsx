@@ -8,7 +8,7 @@ import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 const MyChats = () => {
   const { myChats, myChatsLoading, myChatsError, myChatsRefetch } =
     useChatProvider();
-  console.log(myChats);
+
   if (myChatsLoading) {
     return <CardSkeleton cardAmount={5} />;
   }

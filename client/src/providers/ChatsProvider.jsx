@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import useGetData from "../hooks/useGetData";
 
 export const ChatsContext = createContext({});
@@ -7,8 +7,10 @@ const ChatsProvider = ({ children }) => {
   const [isSideChatOpen, setIsSideChatOpen] = useState(true);
   const [latestMessage, setLatestMessage] = useState({});
   const [sessionExpired, setSessionExpired] = useState(false);
+  const [myChats, setMyChats] = useState([]);
+
   const {
-    data: myChats,
+    data: chatData,
     isLoading: myChatsLoading,
     error: myChatsError,
     refetch: myChatsRefetch,
@@ -56,10 +58,15 @@ const ChatsProvider = ({ children }) => {
     }
   };
 
+  useEffect(() => {
+    setMyChats(chatData);
+  }, [chatData]);
+
   const chatInfo = {
     isSideChatOpen,
     setIsSideChatOpen,
     myChats,
+    setMyChats,
     myChatsLoading,
     myChatsError,
     myChatsRefetch,

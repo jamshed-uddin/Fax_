@@ -5,26 +5,61 @@ const User = require("../models/userModel");
 const getDataURI = require("../utils/getDataURI");
 const { uploadToCLoud } = require("../config/cloudinaryConfig");
 
+const uploadImage = asyncHandler(async (req, res) => {
+  const imageFile = req.file;
+
+  const fileUri = getDataURI(imageFile);
+
+  try {
+    const imageToCloud = await uploadToCLoud(fileUri.content);
+
+    res.status(200).send({ message: "Image recieved", data: imageToCloud });
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
+
 // @desc create new message
-// @route POST /api/message/newMessage
+// @route POST /api/message/newMessage?type=''
 // @access private
 
 const createMessage = asyncHandler(async (req, res) => {
-  const { content, chatId, type } = req.body;
-
-  if (!content || !chatId) {
-    return res.status(404).send({ message: "Content or chatId not found" });
-  }
-
-  const newMessage = {
-    sender: req.user._id,
-    content,
-    chat: chatId,
-    type: type || "",
-  };
+  const { content, chatId } = req.body;
+  const file = req.file;
+  const type = req.query.type;
 
   try {
-    const createNewMessage = await Message.create(newMessage);
+    if (type !== "image" && (!content || !chatId)) {
+      return res.status(404).send({ message: "Content or chatId not found" });
+    }
+
+    let createNewMessage;
+
+    if (type === "image") {
+      // operation(file upload, create message) for image type message
+      const fileUri = getDataURI(file);
+      const cloudFileObj = await uploadToCLoud(fileUri.content);
+
+      const newImageTypeMessage = {
+        sender: req.user._id,
+        chat: chatId,
+        type: "image",
+        file: cloudFileObj,
+      };
+
+      createNewMessage = await Message.create(newImageTypeMessage);
+    } else {
+      // operation for text type message
+      const newMessage = {
+        sender: req.user._id,
+        content,
+        chat: chatId,
+        type: "text",
+      };
+
+      createNewMessage = await Message.create(newMessage);
+    }
 
     const createdNewMessage = await Message.findOne({
       _id: createNewMessage._id,
@@ -38,7 +73,10 @@ const createMessage = asyncHandler(async (req, res) => {
     );
 
     res.status(201).send(createdNewMessage);
-  } catch (error) {}
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
 });
 
 // @desc get all message
@@ -58,7 +96,7 @@ const getAllMessages = asyncHandler(async (req, res) => {
 
     res.status(200).send(messages);
   } catch (error) {
-    res.status(401);
+    res.status(500);
     throw new Error(error.message);
   }
 });
@@ -73,13 +111,13 @@ const updateMessageReadBy = asyncHandler(async (req, res) => {
   try {
     await Message.findByIdAndUpdate(
       { _id: messageId },
-      { $push: { readBy: req.user._id } },
+      { $addToSet: { readBy: req.user._id } },
       { new: true }
     );
 
     res.status(200).send({ message: `Message read by user ${req.user._id}` });
   } catch (error) {
-    res.status(401);
+    res.status(500);
     throw new Error(error.message);
   }
 });
@@ -116,21 +154,6 @@ const deleteMessage = asyncHandler(async (req, res) => {
     }
 
     res.status(200).send({ message: "Message deleted successfully" });
-  } catch (error) {
-    res.status(401);
-    throw new Error(error.message);
-  }
-});
-
-const uploadImage = asyncHandler(async (req, res) => {
-  const imageFile = req.file;
-  console.log(imageFile);
-  const fileUri = getDataURI(imageFile);
-
-  try {
-    const imageToCloud = await uploadToCLoud(fileUri.content);
-
-    res.status(200).send({ message: "Image recieved", data: imageToCloud });
   } catch (error) {
     res.status(500);
     throw new Error(error.message);

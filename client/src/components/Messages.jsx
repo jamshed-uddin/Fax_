@@ -13,20 +13,26 @@ import useCloseMenu from "../hooks/useCloseMenu";
 import useOnlineStatus from "../hooks/useOnlineStatus";
 import axios from "axios";
 import useLongPress from "../hooks/useLongPress";
-import SocketProvider from "../providers/SocketProvider";
+import Image from "./Image";
+import useChatProvider from "../hooks/useChatProvider";
 
 const Messages = ({ messages, setMessages, singleChat }) => {
   const { user } = useAuthProvider();
   const { dark } = useTheme();
   const { online } = useOnlineStatus();
-  // const { socket } = SocketProvider();
+  const { setMyChats } = useChatProvider();
+
   const [messageGroup, setMessageGroup] = useState([]);
   const [hoveredMessageId, setHoveredMessageId] = useState(null);
   const [showMessageOptions, setShowMessageOptions] = useState(false);
   const [messageForDelete, setMessageForDelete] = useState(null);
   const { isMenuOpen: isModalOpen, setIsMenuOpen: setIsModalOpen } =
     useCloseMenu("message-modal");
-  // console.log(messages);
+
+  const { start, stop } = useLongPress(() => {
+    setShowMessageOptions(true);
+  }, 800);
+
   useEffect(() => {
     const messageDate = (messageDate) =>
       new Date(messageDate).toLocaleDateString("en-IN", {
@@ -48,19 +54,24 @@ const Messages = ({ messages, setMessages, singleChat }) => {
     setMessageGroup(group);
   }, [messages]);
 
-  // useEffect(() => {
-  //   socket.on("getDeletedMessage", (data) => {
-  //     if (data.chatId === singleChat._id) {
-  //       setMessages((prev) =>
-  //         prev.filter((singleMsg) => singleMsg._id !== data.messageId)
-  //       );
-  //     }
-  //   });
-  // }, [setMessages, singleChat._id, socket]);
+  useEffect(() => {
+    setMyChats((prev) =>
+      prev?.map((chat) =>
+        chat?._id === messages?.at(-1)?.chat?._id
+          ? { ...chat, latestMessage: messages?.at(-1) }
+          : chat
+      )
+    );
 
-  const { start, stop } = useLongPress(() => {
-    setShowMessageOptions(true);
-  }, 800);
+    setMyChats((prev) =>
+      prev?.sort((a, b) => {
+        const chatA = new Date(a?.latestMessage?.createdAt);
+        const chatB = new Date(b?.latestMessage?.createdAt);
+
+        return chatB - chatA;
+      })
+    );
+  }, [messages, setMyChats]);
 
   // deleting message func and passed it as props to message delete modal
   const handleDeleteMessage = async (message, deleteFor, toastNotify) => {
@@ -99,7 +110,7 @@ const Messages = ({ messages, setMessages, singleChat }) => {
       </div>
       {Object.keys(messageGroup)?.map((date) => (
         <div key={date} className="relative">
-          <div className="flex justify-center sticky top-1 left-0 right-0">
+          <div className="flex justify-center sticky top-1 left-0 right-0 z-20">
             <h3
               className={`w-fit  rounded-xl px-3 py-[0.20rem] text-xs lg:text-sm mb-1 ${
                 dark ? "bg-slate-800" : "bg-slate-200"
@@ -176,23 +187,36 @@ const Messages = ({ messages, setMessages, singleChat }) => {
                     {/* message and message option flexed */}
                     <div className="flex items-center gap-1">
                       {/* message */}
-                      <div
-                        className={`  w-full  text-sm md:text-base shadow-md px-3 py-[0.35rem]  rounded-lg flex items-end ${
-                          dark ? "bg-slate-800" : "bg-slate-200"
-                        } ${
-                          message?.type === "event"
-                            ? "bg-transparent shadow-none items-center "
-                            : ""
-                        }`}
-                      >
-                        <div className="flex-grow">
-                          {message?.type === "event" && message?.sender?.name}{" "}
-                          {message?.content}
+                      {/* image type message */}
+                      {message.type === "image" ? (
+                        <div className="relative rounded-lg overflow-hidden">
+                          <div>
+                            <Image image={message?.file.url} />
+                          </div>
+                          <div className="absolute bottom-0 text-[0.60rem] bg-gradient-to-t from-slate-900 px-1 text-white w-full text-end">
+                            {messageTime(message?.createdAt)}
+                          </div>
                         </div>
-                        <div className="shrink-0 text-end  text-[0.60rem] ml-2 -mb-2 -mr-1 ">
-                          {messageTime(message?.createdAt)}
+                      ) : (
+                        // text type message
+                        <div
+                          className={`  w-full  text-sm md:text-base shadow-md px-3 py-[0.35rem]  rounded-lg flex items-end ${
+                            dark ? "bg-slate-800" : "bg-slate-200"
+                          } ${
+                            message?.type === "event"
+                              ? "bg-transparent shadow-none items-center "
+                              : ""
+                          }`}
+                        >
+                          <div className="flex-grow">
+                            {message?.type === "event" && message?.sender?.name}{" "}
+                            {message?.content}
+                          </div>
+                          <div className="shrink-0 text-end  text-[0.60rem] ml-2 -mb-2 -mr-1 ">
+                            {messageTime(message?.createdAt)}
+                          </div>
                         </div>
-                      </div>
+                      )}
                       {/* message options */}
                       <div
                         className={`${

@@ -1,6 +1,6 @@
 import { PaperAirplaneIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useAuthProvider from "../hooks/useAuthProvider";
 
 import useSocketProvider from "../hooks/useSocketProvider";
@@ -13,11 +13,16 @@ const SendMessage = ({ chat, setImageBlobURL, setImageFile }) => {
   const { online } = useOnlineStatus();
   const [message, setMessage] = useState("");
   const [messageSending, setMessageSending] = useState(false);
-
   const { socket } = useSocketProvider();
-  const inputStyle = `input input-bordered focus:outline-0 focus:border-[1.3px] ${
-    dark ? "focus:border-white" : "focus:border-black"
-  }  input-sm w-full`;
+  const textAreaRef = useRef(null);
+
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height = "auto";
+      textAreaRef.current.style.height =
+        textAreaRef.current.scrollHeight + "px";
+    }
+  }, [message]);
 
   // input change handler
   const handleInputChange = (e) => {
@@ -76,12 +81,12 @@ const SendMessage = ({ chat, setImageBlobURL, setImageFile }) => {
   };
 
   return (
-    <div className=" flex items-center  gap-2 lg:px-3 mb-2">
+    <div className=" flex items-end  gap-2 lg:px-3 mb-2 ">
       <div>
         <form encType="multipart/form-data">
           <label htmlFor="imageFile">
             <PhotoIcon
-              className={`w-7 h-7 cursor-pointer active:scale-90 transition-transform duration-700 ${
+              className={`w-8 h-8 cursor-pointer active:scale-90 transition-transform duration-700 ${
                 dark ? "white" : "text-slate-600"
               }`}
             />
@@ -97,10 +102,16 @@ const SendMessage = ({ chat, setImageBlobURL, setImageFile }) => {
           </label>
         </form>
       </div>
-      <input
+      <textarea
+        ref={textAreaRef}
         type="text"
         placeholder="Send message"
-        className={`${inputStyle} ${!chat && "input-disabled"}`}
+        className={`input w-full max-h-24  ${
+          dark ? "" : "bg-gray-100"
+        } py-1 overflow-auto focus:outline-0  ${
+          !chat && "input-disabled"
+        } resize-none`}
+        rows={1}
         value={message}
         name="messageInput"
         onChange={handleInputChange}
@@ -108,7 +119,7 @@ const SendMessage = ({ chat, setImageBlobURL, setImageFile }) => {
 
       <button disabled={!chat || messageSending} onClick={sendMessageHandler}>
         <PaperAirplaneIcon
-          className={`w-7 h-7  active:scale-90 transition-transform duration-700 ${
+          className={`w-8 h-8  active:scale-90 transition-transform duration-700 ${
             dark ? "white" : "text-slate-600"
           }`}
         />

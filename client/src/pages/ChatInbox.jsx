@@ -38,7 +38,7 @@ const ChatInbox = () => {
   } = useGetData(`/api/chat/${chatId}`);
   // console.log(singleChat);
   // console.log(messages);
-  console.log(imageBlobURL);
+  // console.log(imageBlobURL);
 
   // fetching messages
   useEffect(() => {
@@ -103,21 +103,28 @@ const ChatInbox = () => {
   };
 
   // sending imageType message function
-  const sendImageMessageHandler = async (e) => {
+  const sendImageMessageHandler = async () => {
     if (!imageFile) {
       return;
     } else {
       const formData = new FormData();
+      formData.append("chatId", chatId);
       formData.append("file", imageFile);
       try {
         setImageSendLoading(true);
-        const result = await axios.post("/api/messages/uploadImage", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        console.log(result);
+        const result = await axios.post(
+          "/api/message/newMessage?type=image",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        console.log(result.data);
         setImageSendLoading(false);
+        socket?.emit("sendMessage", result?.data);
+        setImageBlobURL("");
       } catch (error) {
         console.log(error);
         toast("Something went wrong!", toastStyle);
@@ -199,7 +206,7 @@ const ChatInbox = () => {
         {imageBlobURL && (
           <div>
             <div className="flex items-center">
-              <div className=" w-full">
+              <div className="ml-auto ">
                 <Image image={imageBlobURL} loading={imageSendLoading} />
               </div>
               {imageBlobURL && (
@@ -210,10 +217,22 @@ const ChatInbox = () => {
                     onClick={() => setImageBlobURL("")}
                     className="cursor-pointer"
                   >
-                    <XMarkIcon className="w-8 h-8 active:scale-90" />
+                    <XMarkIcon
+                      className={`w-8 h-8 active:scale-90 ${
+                        imageSendLoading ? "opacity-65" : "opacity-100"
+                      }`}
+                    />
                   </button>
-                  <button type="button" onClick={sendImageMessageHandler}>
-                    <PaperAirplaneIcon className="w-7 h-7 active:scale-90 cursor-pointer" />
+                  <button
+                    disabled={imageSendLoading}
+                    type="button"
+                    onClick={sendImageMessageHandler}
+                  >
+                    <PaperAirplaneIcon
+                      className={`w-7 h-7 active:scale-90 cursor-pointer ${
+                        imageSendLoading ? "opacity-65" : "opacity-100"
+                      }`}
+                    />
                   </button>
                 </div>
               )}

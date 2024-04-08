@@ -1,21 +1,31 @@
-import React, { useEffect } from "react";
+import { useState } from "react";
 
-const Image = ({ image, isOwn = true, loading = false }) => {
+const Image = ({ image, loading = false }) => {
+  const [orientation, setOrientation] = useState(0);
+
+  const handleImageDimension = (e) => {
+    const { naturalWidth, naturalHeight } = e.target;
+    setOrientation(naturalWidth / naturalHeight);
+  };
+
   if (!image) return null;
   return (
-    <div className={`flex  w-full ${isOwn ? "justify-end" : "justify-start"}`}>
-      <div className="w-60 h-60 rounded-lg relative">
-        <img
-          className="h-full w-full object-cover rounded-lg"
-          src={image}
-          alt="Image type message"
-        />
-        {loading && (
-          <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <span className="loading loading-spinner loading-lg text-gray-100 "></span>
-          </span>
-        )}
-      </div>
+    <div
+      className={`rounded-lg relative ${
+        orientation > 1 ? "max-w-80" : "max-w-48"
+      } `}
+    >
+      <img
+        onLoad={handleImageDimension}
+        className={` w-auto h-auto   object-cover rounded-lg`}
+        src={image}
+        alt="Image type message"
+      />
+      {loading && (
+        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <span className="loading loading-spinner loading-lg text-gray-100 "></span>
+        </span>
+      )}
     </div>
   );
 };
