@@ -193,7 +193,7 @@ const Messages = ({ messages, setMessages, singleChat }) => {
                           <div>
                             <Image image={message?.file.url} />
                           </div>
-                          <div className="absolute bottom-0 text-[0.60rem] bg-gradient-to-t from-slate-900 px-1 text-white w-full text-end">
+                          <div className="absolute bottom-0 text-[0.60rem] bg-gradient-to-t from-gray-800 px-1 text-white w-full text-end">
                             {messageTime(message?.createdAt)}
                           </div>
                         </div>

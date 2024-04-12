@@ -5,24 +5,31 @@ const Chat = require("../models/chatModel");
 const Message = require("../models/messageModel");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
+const getDataURI = require("../utils/getDataURI");
+const { uploadToCLoud } = require("../config/cloudinaryConfig");
 //@desc auth user
 //route POST/api/user/auth
 //access public
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email });
+  try {
+    const user = await User.findOne({ email });
 
-  if (user && (await user.matchPassword(password))) {
-    generateToken(res, user._id);
-    res.status(201).send({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      bio: user.bio,
-    });
-  } else {
-    res.status(400);
-    throw new Error("Invalid email or password");
+    if (user && (await user.matchPassword(password))) {
+      generateToken(res, user._id);
+      res.status(201).send({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        bio: user.bio,
+      });
+    } else {
+      res.status(400);
+      throw new Error("Invalid email or password");
+    }
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
   }
 });
 
@@ -44,7 +51,7 @@ const singleUser = asyncHandler(async (req, res) => {
       throw new Error("User not found");
     }
   } catch (error) {
-    res.status(404);
+    res.status(500);
     throw new Error(error.message);
   }
 });
@@ -67,29 +74,34 @@ const logoutUser = asyncHandler(async (req, res) => {
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
-  const userExists = await User.findOne({ email });
+  try {
+    const userExists = await User.findOne({ email });
 
-  if (userExists) {
-    res.status(400);
-    throw new Error("Account already exists with this email.");
-  }
+    if (userExists) {
+      res.status(400);
+      throw new Error("Account already exists with this email.");
+    }
 
-  const user = await User.create({
-    name,
-    email,
-    password,
-  });
-
-  if (user) {
-    generateToken(res, user._id);
-    res.status(201).send({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
+    const user = await User.create({
+      name,
+      email,
+      password,
     });
-  } else {
-    res.status(400);
-    throw new Error("Invalid user info");
+
+    if (user) {
+      generateToken(res, user._id);
+      res.status(201).send({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      });
+    } else {
+      res.status(400);
+      throw new Error("Invalid user info");
+    }
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
   }
 });
 
@@ -100,23 +112,28 @@ const registerUser = asyncHandler(async (req, res) => {
 const searchUsers = asyncHandler(async (req, res) => {
   const searchQuery = req.query.query;
 
-  if (searchQuery) {
-    const users = await User.find({
-      $or: [
-        { name: { $regex: new RegExp(searchQuery, "i") } },
-        { email: { $regex: new RegExp(searchQuery, "i") } },
-      ],
-    }).select("-password  -isAdmin -email");
+  try {
+    if (searchQuery) {
+      const users = await User.find({
+        $or: [
+          { name: { $regex: new RegExp(searchQuery, "i") } },
+          { email: { $regex: new RegExp(searchQuery, "i") } },
+        ],
+      }).select("-password  -isAdmin -email");
 
-    const chats = await Chat.find({
-      chatName: { $regex: new RegExp(searchQuery, "i") },
-    });
+      const chats = await Chat.find({
+        chatName: { $regex: new RegExp(searchQuery, "i") },
+      });
 
-    const searchResult = { users, chats };
+      const searchResult = { users, chats };
 
-    res.status(200).send(searchResult);
-  } else {
-    res.status(200).send({});
+      res.status(200).send(searchResult);
+    } else {
+      res.status(200).send({});
+    }
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
   }
 });
 
@@ -126,15 +143,39 @@ const searchUsers = asyncHandler(async (req, res) => {
 
 const updateUser = asyncHandler(async (req, res) => {
   const bodyToUpdate = req.body;
+  const file = req.file;
 
   try {
-    await User.findOneAndUpdate({ _id: req.user._id }, bodyToUpdate, {
-      new: true,
-    });
+    let updatedProfile;
 
-    res.status(200).send({ message: "User updated successfully" });
+    if (file) {
+      const fileUri = getDataURI(file);
+      const cloudFileObj = await uploadToCLoud(fileUri.content);
+      updatedProfile = await User.findOneAndUpdate(
+        { _id: req.user._id },
+        { photoURL: cloudFileObj },
+        {
+          new: true,
+        }
+      );
+      return res
+        .status(200)
+        .send({ message: "User updated successfully", data: updatedProfile });
+    }
+
+    updatedProfile = await User.findOneAndUpdate(
+      { _id: req.user._id },
+      bodyToUpdate,
+      {
+        new: true,
+      }
+    );
+
+    res
+      .status(200)
+      .send({ message: "User updated successfully", data: updatedProfile });
   } catch (error) {
-    res.status(400);
+    res.status(500);
     throw new Error(error.message);
   }
 });

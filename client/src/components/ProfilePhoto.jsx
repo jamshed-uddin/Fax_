@@ -15,7 +15,7 @@ const ProfilePhoto = ({
   photoUploading,
 }) => {
   const { user } = useAuthProvider();
-
+  console.log(profilePhotoURL);
   const { isMenuOpen: uploaderOpen, setIsMenuOpen: setUploaderOpen } =
     useCloseMenu("photoUploader");
 
@@ -51,7 +51,10 @@ const ProfilePhoto = ({
                     <PhotoIcon className="w-5 h-5" />
                   </label>
                   <input
-                    onChange={handleProfilePhotoChange}
+                    onChange={(e) => {
+                      handleProfilePhotoChange(e);
+                      setUploaderOpen(false);
+                    }}
                     type="file"
                     name="profilePhoto"
                     id="profilePhoto"

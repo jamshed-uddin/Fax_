@@ -7,8 +7,11 @@ const userSchema = mongoose.Schema(
     email: { type: "String", unique: true, required: true },
     password: { type: "String", required: true },
     photoURL: {
-      type: "String",
-      default: "https://i.ibb.co/Twp960D/default-profile-400x400.png",
+      url: {
+        type: String,
+        default: "https://i.ibb.co/Twp960D/default-profile-400x400.png",
+      },
+      publicId: { type: String },
     },
     bio: { type: String, default: "" },
     activeStatus: {

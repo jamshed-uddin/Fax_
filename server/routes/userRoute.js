@@ -12,6 +12,7 @@ const {
   changePassword,
   deleteUser,
 } = require("../controllers/userControllers");
+const upload = require("../middlewares/multerUpload");
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ router.post("/", registerUser);
 router.post("/logout", verifyJWT, logoutUser);
 router.get("/", verifyJWT, searchUsers);
 router.get("/singleUser", singleUser);
-router.put("/", verifyJWT, updateUser);
+router.put("/", verifyJWT, upload, updateUser);
 router.post("/forgotPassword", forgotPassword);
 router.put("/resetPassword", resetPassword);
 router.put("/changePassword", verifyJWT, changePassword);

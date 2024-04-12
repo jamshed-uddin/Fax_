@@ -38,7 +38,6 @@ const Profile = () => {
     queryFn: async () => {
       try {
         const result = await axios.get(`/api/user/singleUser?userId=${userId}`);
-        setProfilePhotoURL(result?.data.photoURL);
         return result.data;
       } catch (error) {
         if (
@@ -54,6 +53,7 @@ const Profile = () => {
     enabled: !!userId && state?.profileOf !== "group",
   });
 
+  console.log(userData);
   const {
     data: singleChat,
     isLoading: singleChatLoading,
@@ -62,17 +62,6 @@ const Profile = () => {
   } = useGetData(`/api/chat/${userId}`, !!state?.profileOf);
   //userId here is chatId.which comes with params when user navigate here in profile by clicking on group chat.
 
-  const removeProfilePhoto = async () => {
-    const response = await deletePhotoFromCloud(profilePhotoURL);
-    await axios.put("/api/user", {
-      photoURL: "https://i.ibb.co/Twp960D/default-profile-400x400.png",
-    });
-    setProfilePhotoURL("");
-    // setUploaderOpen((p) => !p);
-
-    console.log(response);
-  };
-
   const handleProfilePhotoChange = async (e) => {
     const file = e.target.files[0];
     const previewURL = URL.createObjectURL(file);
@@ -80,21 +69,25 @@ const Profile = () => {
 
     // setUploaderOpen((p) => !p);
     if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
       try {
         setPhotoUploading(true);
-        await uploadPhotoToCloud(file).then(async (res) => {
-          console.log(res);
-          const cloudImageUrl = res.data.secure_url;
-          setPhotoUploading(false);
-          setProfilePhotoURL(cloudImageUrl);
 
-          await axios.put("/api/user", { photoURL: cloudImageUrl });
-        });
+        const result = await axios.put("/api/user", formData);
+
+        console.log(result);
+        console.log(result?.data?.data?.photoURL.url);
+        setProfilePhotoURL(result?.data?.data?.photoURL.url);
+        setPhotoUploading(false);
       } catch (error) {
         setPhotoUploading(false);
       }
     }
   };
+
+  console.log(userData?.photoURL.url);
+  console.log(profilePhotoURL);
 
   if (userDataError || singleChatError) {
     return (
@@ -144,7 +137,11 @@ const Profile = () => {
           <ProfilePhoto
             placedIn={"userProfile"}
             userId={userData?._id}
-            profilePhotoURL={profilePhotoURL || singleChat?.chatPhotoURL}
+            profilePhotoURL={
+              profilePhotoURL ||
+              userData?.photoURL.url ||
+              singleChat?.chatPhotoURL
+            }
             photoUploading={photoUploading}
             handleProfilePhotoChange={handleProfilePhotoChange}
           />
