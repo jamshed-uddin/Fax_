@@ -4,7 +4,12 @@ const chatSchema = mongoose.Schema(
   {
     chatName: { type: String, trim: true },
     chatDescription: { type: String, trim: true },
-    chatPhotoURL: { type: String },
+    chatPhotoURL: {
+      url: {
+        type: String,
+      },
+      publicId: { type: String },
+    },
     isGroupChat: { type: Boolean, default: false },
     users: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     latestMessage: {
@@ -22,7 +27,7 @@ chatSchema.pre("save", async function (next) {
     next();
   }
 
-  this.chatPhotoURL = "https://i.ibb.co/mz6J26q/usergroup.png";
+  this.chatPhotoURL.url = "https://i.ibb.co/mz6J26q/usergroup.png";
 });
 
 module.exports = mongoose.model("Chat", chatSchema);

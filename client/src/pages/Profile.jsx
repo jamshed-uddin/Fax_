@@ -140,7 +140,7 @@ const Profile = () => {
             profilePhotoURL={
               profilePhotoURL ||
               userData?.photoURL.url ||
-              singleChat?.chatPhotoURL
+              singleChat?.chatPhotoURL.url
             }
             photoUploading={photoUploading}
             handleProfilePhotoChange={handleProfilePhotoChange}

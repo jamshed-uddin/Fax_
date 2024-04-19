@@ -3,6 +3,8 @@ const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
 const Message = require("../models/messageModel");
+const getDataURI = require("../utils/getDataURI");
+const { uploadToCLoud } = require("../config/cloudinaryConfig");
 
 //@desc access or create chat
 // route POST /api/chat/accessChat
@@ -31,7 +33,6 @@ const accessChat = asyncHandler(async (req, res) => {
     .populate({ path: "latestMessage.sender", select: "name email pic" });
 
   if (chatExists.length) {
-    console.log("existing chat", chatExists[0]._id);
     await Chat.updateOne(
       { _id: chatExists[0]._id },
       { $pull: { deletedBy: req.user._id } }
@@ -51,7 +52,7 @@ const accessChat = asyncHandler(async (req, res) => {
         path: "users",
         select: " -password -email",
       });
-      console.log("new chat", newCreatedChat);
+
       res.status(201).send(newCreatedChat);
     } catch (error) {
       res.status(400);
@@ -173,21 +174,35 @@ const getSignleChat = asyncHandler(async (req, res) => {
 //@access private
 
 const createGroup = asyncHandler(async (req, res) => {
-  const { chatName, chatDescription, users, chatPhtoURL } = req.body;
+  const { chatName, chatDescription, users } = req.body;
+  const file = req.file;
 
-  console.log(req.body);
+  // console.log(req.body);
+  // console.log(file);
+  // console.log(JSON.parse(users));
+
   if (users.length < 2) {
     return res
       .send(400)
       .send({ message: "At least 2 members required to create a group. " });
   }
-  const groupData = {
-    ...req.body,
-    groupAdmin: [req.user._id],
-    isGroupChat: true,
-  };
 
   try {
+    let cloudFileObj;
+
+    if (file) {
+      const fileUri = getDataURI(file);
+      cloudFileObj = await uploadToCLoud(fileUri.content);
+    }
+
+    const groupData = {
+      chatName,
+      chatDescription,
+      users: JSON.parse(users),
+      chatPhotoURL: cloudFileObj,
+      groupAdmin: [req.user._id],
+      isGroupChat: true,
+    };
     const newGroup = await Chat.create(groupData);
 
     const newCreatedGroup = await Chat.findOne({ _id: newGroup._id }).populate({
@@ -205,7 +220,7 @@ const createGroup = asyncHandler(async (req, res) => {
     console.log("group", newCreatedGroup);
     res.status(201).send(newCreatedGroup);
   } catch (error) {
-    res.status(400);
+    res.status(500);
     throw new Error(error.message);
   }
 });
@@ -216,18 +231,40 @@ const createGroup = asyncHandler(async (req, res) => {
 
 const updateGroup = asyncHandler(async (req, res) => {
   const groupId = req.params.groupId;
-  const { chatName, users, chatPhotoURL, groupAdmin } = req.body;
+  const { chatName, users, chatDescription, deleteCurrentPhoto } = req.body;
 
-  // if (!groupAdmin.map((admin) => admin._id).includes(req.user._id.toString())) {
-  //   return res.status(401).send({ message: "Unauthorized action" });
-  // }
+  const file = req.file;
 
   try {
+    let photoURLObj;
     const group = await Chat.findOne({ _id: groupId });
+
+    // if (
+    //   !group?.groupAdmin
+    //     ?.map((admin) => admin._id)
+    //     .includes(req.user._id.toString())
+    // ) {
+    //   return res.status(401).send({ message: "Unauthorized action" });
+    // }
+
+    if (file) {
+      const fileUri = getDataURI(file);
+      photoURLObj = await uploadToCLoud(fileUri.content);
+    }
+
+    if (!deleteCurrentPhoto) {
+      //todo: delete current photo from cloud
+      photoURLObj = {
+        url: null,
+        publicId: "",
+      };
+    }
+
     const groupInfoToUpdate = {
       chatName: chatName || group.chatName,
+      chatDescription: chatDescription || group.chatDescription,
       users: users,
-      chatPhotoURL: chatPhotoURL || group.chatPhotoURL,
+      chatPhotoURL: photoURLObj || group.chatPhotoURL,
     };
 
     const updatedGroup = await Chat.findByIdAndUpdate(
@@ -266,7 +303,7 @@ const deleteChat = asyncHandler(async (req, res) => {
 
     res.status(200).send({ message: "Chat deleted succesfully" });
   } catch (error) {
-    res.status(400);
+    res.status(500);
     throw new Error(error.message);
   }
 });

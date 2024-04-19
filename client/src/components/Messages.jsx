@@ -53,7 +53,7 @@ const Messages = ({ messages, setMessages, singleChat }) => {
 
     setMessageGroup(group);
   }, [messages]);
-
+  console.log(messages);
   useEffect(() => {
     setMyChats((prev) =>
       prev?.map((chat) =>

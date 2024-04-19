@@ -12,7 +12,7 @@ const UserCard = ({ user, clickFunc = () => {} }) => {
         <div className="h-11 w-11 rounded-full overflow-hidden">
           <img
             className="w-full h-full object-cover  rounded-full"
-            src={user?.photoURL}
+            src={user?.photoURL.url}
             alt={user && `Profile image of ${user?.name}`}
             draggable="false"
           />

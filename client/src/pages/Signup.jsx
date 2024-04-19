@@ -61,8 +61,16 @@ const Signup = () => {
       : "text-white "
   }`;
 
+  const inputStyle = `input input-bordered focus:outline-0 focus:border-[1.3px] ${
+    dark ? "focus:border-white" : "focus:border-black"
+  }  input-md w-full`;
+
   return (
-    <div className=" my-container">
+    <div
+      className={`h-screen ${
+        dark ? "bg-slate-900 text-white" : "bg-white text-gray-800 "
+      }`}
+    >
       <div className=" h-[calc(100vh-7rem)] grid place-items-center">
         <div className=" w-full lg:w-[40%] mx-auto lg:shadow-md  p-8 rounded-2xl">
           <h1 className="text-center text-3xl font-bold">Sign up</h1>
@@ -74,7 +82,7 @@ const Signup = () => {
               <input
                 type="text"
                 placeholder="Name"
-                className="input input-bordered"
+                className={inputStyle}
                 value={name}
                 onChange={(e) => {
                   setError("");
@@ -89,12 +97,13 @@ const Signup = () => {
               <input
                 type="email"
                 placeholder="email"
-                className="input input-bordered"
+                className={inputStyle}
                 value={email}
                 onChange={(e) => {
                   setError("");
                   setEmail(e.target.value);
                 }}
+                autoComplete="none"
               />
             </div>
             <div className="form-control">
@@ -105,12 +114,13 @@ const Signup = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="password"
-                  className="input input-bordered w-full"
+                  className={inputStyle}
                   value={password}
                   onChange={(e) => {
                     setError("");
                     setPassword(e.target.value);
                   }}
+                  autoComplete="new-password"
                 />
                 <div
                   onClick={() => setShowPassword((p) => !p)}
@@ -132,12 +142,13 @@ const Signup = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Confirm password"
-                  className="input input-bordered w-full "
+                  className={inputStyle}
                   value={confirmPassword}
                   onChange={(e) => {
                     setError("");
                     setConfirmPassword(e.target.value);
                   }}
+                  autoComplete="new-password"
                 />
                 <div
                   onClick={() => setShowPassword((p) => !p)}

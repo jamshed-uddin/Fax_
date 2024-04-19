@@ -40,7 +40,7 @@ const ForgotPassword = () => {
   };
   return (
     <div
-      className={`my-container flex justify-center items-center  h-screen  ${
+      className={` flex justify-center items-center  h-screen  ${
         dark ? "bg-slate-900 text-white" : "bg-white text-gray-800 "
       } `}
     >
@@ -51,7 +51,7 @@ const ForgotPassword = () => {
       ></Modal>
       <div className="w-[85%] lg:w-2/5 mx-auto ">
         <h1 className="text-2xl font-semibold text-center mb-6">
-          Having problem siging in?
+          Having problem signing in?
         </h1>
         <div className="form-control">
           <label className="label">

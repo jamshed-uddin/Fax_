@@ -16,6 +16,8 @@ const ChatCard = ({ chat, clickFunc, placedIn }) => {
     chat?.latestMessage?.readBy?.includes(user?._id)
   );
 
+  console.log(chat);
+
   const MsgCharLimitExceeded = (content) => {
     if (content?.length > 35) {
       return true;
@@ -32,12 +34,8 @@ const ChatCard = ({ chat, clickFunc, placedIn }) => {
       {/* image */}
       <div className="h-11 w-11 rounded-full relative">
         <img
-          className="w-full h-full object-cover rounded-full"
-          src={
-            chat?.isGroupChat
-              ? chat?.chatPhotoURL
-              : chatPhotoHandler(chat, user)
-          }
+          className="w-full h-full object-cover rounded-full pointer-events-none"
+          src={chatPhotoHandler(chat, user)}
           alt=""
           draggable="false"
         />

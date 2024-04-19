@@ -16,11 +16,11 @@ const isUsersLastMessage = (messages, index, message, position = "last") => {
 };
 
 const chatPhotoHandler = (singleChat, user) => {
-  if (singleChat?.isGroupChat) return singleChat?.chatPhotoURL;
+  if (singleChat?.isGroupChat) return singleChat?.chatPhotoURL.url;
   const defaultPhoto = "https://i.ibb.co/Twp960D/default-profile-400x400.png";
   return singleChat?.users[0]?._id === user?._id
-    ? singleChat?.users[1]?.photoURL || defaultPhoto
-    : singleChat?.users[0]?.photoURL || defaultPhoto;
+    ? singleChat?.users[1]?.photoURL.url || defaultPhoto
+    : singleChat?.users[0]?.photoURL.url || defaultPhoto;
 };
 
 const chatNameHandler = (singleChat, user) => {

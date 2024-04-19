@@ -38,9 +38,9 @@ const CreateGroup = () => {
   const { user: currentUser } = useAuthProvider();
   const [searchQuery, setSearchQuery] = useState("");
   const bouncedQuery = useDebounce(searchQuery, 600);
-  const [photoUploading, setPhotoUploading] = useState("");
   const [profilePhotoURL, setProfilePhotoURL] = useState("");
-  const [profilePhotoFile, setProfilePhotoFile] = useState();
+  const [profilePhotoFile, setProfilePhotoFile] = useState(null);
+  const [deleteCurrentPhoto, setDeleteCurrentPhoto] = useState(false); //a delete flag to sent to server for removing current photo from cloud and set null to photourl
   const [groupCreateLoading, setGroupCreateLoading] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([currentUser]);
   const [groupData, setGroupData] = useState({
@@ -67,15 +67,15 @@ const CreateGroup = () => {
 
     const { chatName, chatDescription, chatPhotoURL, users } = singleChat;
 
-    setProfilePhotoURL(singleChat?.chatPhotoURL);
+    setProfilePhotoURL(singleChat?.chatPhotoURL.url);
     setSelectedUsers(users);
     setGroupData({
       chatName,
       chatDescription,
-      chatPhotoURL,
+      chatPhotoURL: chatPhotoURL?.url,
     });
   }, [singleChat, currentUser]);
-  // console.log(singleChat);
+  console.log(singleChat);
   // editing group section ends ----------
 
   const { data: searchResult, isLoading: searchLoading } =
@@ -119,9 +119,10 @@ const CreateGroup = () => {
   const removeProfilePhoto = async () => {
     setProfilePhotoURL("");
     setUploaderOpen((p) => !p);
-    const response = await deletePhotoFromCloud(profilePhotoURL);
-    console.log(response);
+    setDeleteCurrentPhoto(true);
   };
+
+  console.log(groupData);
 
   const handleProfilePhotoChange = async (e) => {
     const file = e.target.files[0];
@@ -130,19 +131,6 @@ const CreateGroup = () => {
     setProfilePhotoFile(file);
 
     setUploaderOpen((p) => !p);
-    // if (file) {
-    //   try {
-    //     setPhotoUploading(true);
-    //     await uploadPhotoToCloud(file).then((res) => {
-    //       console.log(res);
-    //       const cloudImageUrl = res.data.secure_url;
-    //       setPhotoUploading(false);
-    //       setProfilePhotoURL(cloudImageUrl);
-    //     });
-    //   } catch (error) {
-    //     setPhotoUploading(false);
-    //   }
-    // }
   };
 
   // create or  update group handler
@@ -156,26 +144,17 @@ const CreateGroup = () => {
     if (!online) return;
 
     setGroupCreateLoading(true);
-    if (profilePhotoFile) {
-      try {
-        await uploadPhotoToCloud(profilePhotoFile).then((res) => {
-          const cloudImageUrl = res.data.secure_url;
-          setPhotoUploading(false);
-
-          setGroupData((p) => ({ ...p, chatPhotoURL: cloudImageUrl }));
-        });
-      } catch (error) {
-        setGroupData((p) => ({ ...p, chatPhotoURL: "" }));
-      }
-    }
+    const groupDataForm = new FormData();
+    groupDataForm.append("chatName", groupData.chatName);
+    groupDataForm.append("chatDescription", groupData.chatDescription);
+    groupDataForm.append("users", JSON.stringify(groupData.users));
+    groupDataForm.append("file", profilePhotoFile);
+    groupDataForm.append("deleteCurrentPhoto", deleteCurrentPhoto);
 
     try {
       const result = editMode
-        ? await axios.put(`/api/chat/group/${singleChat?._id}`, {
-            ...groupData,
-            groupAdmin: singleChat?.groupAdmin,
-          })
-        : await axios.post(`/api/chat/group`, groupData);
+        ? await axios.put(`/api/chat/group/${singleChat?._id}`, groupDataForm)
+        : await axios.post(`/api/chat/group`, groupDataForm);
 
       navigate(`/inbox/${result?.data._id}`, { replace: true });
 
@@ -185,7 +164,7 @@ const CreateGroup = () => {
       setGroupCreateLoading(false);
     }
   };
-  console.log(singleChat);
+  // console.log(singleChat);
 
   const btnStyle = `btn btn-neutral btn-sm px-8 ${
     dark
@@ -268,12 +247,6 @@ const CreateGroup = () => {
                 )}
               </div>
             </div>
-
-            {photoUploading ? (
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                <span className="loading loading-spinner  w-12 text-slate-300"></span>
-              </div>
-            ) : null}
           </div>
         </div>
         {/* name */}
