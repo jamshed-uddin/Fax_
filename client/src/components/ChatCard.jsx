@@ -16,8 +16,6 @@ const ChatCard = ({ chat, clickFunc, placedIn }) => {
     chat?.latestMessage?.readBy?.includes(user?._id)
   );
 
-  console.log(chat);
-
   const MsgCharLimitExceeded = (content) => {
     if (content?.length > 35) {
       return true;

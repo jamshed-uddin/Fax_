@@ -9,13 +9,13 @@ import {
 const ProfilePhoto = ({
   placedIn,
   userId,
-  profilePhotoURL,
+  profilePhotoURL = "https://i.ibb.co/Twp960D/default-profile-400x400.png",
   handleProfilePhotoChange,
   removeProfilePhoto,
   photoUploading,
 }) => {
   const { user } = useAuthProvider();
-  console.log(profilePhotoURL);
+
   const { isMenuOpen: uploaderOpen, setIsMenuOpen: setUploaderOpen } =
     useCloseMenu("photoUploader");
 

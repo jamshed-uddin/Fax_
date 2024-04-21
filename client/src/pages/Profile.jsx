@@ -38,7 +38,8 @@ const Profile = () => {
     queryFn: async () => {
       try {
         const result = await axios.get(`/api/user/singleUser?userId=${userId}`);
-        return result.data;
+        setProfilePhotoURL(result?.data.photoURL.url);
+        return result?.data;
       } catch (error) {
         if (
           error.response &&
@@ -53,7 +54,7 @@ const Profile = () => {
     enabled: !!userId && state?.profileOf !== "group",
   });
 
-  console.log(userData);
+  // console.log(userData);
   const {
     data: singleChat,
     isLoading: singleChatLoading,
@@ -71,13 +72,11 @@ const Profile = () => {
     if (file) {
       const formData = new FormData();
       formData.append("file", file);
+
       try {
         setPhotoUploading(true);
 
         const result = await axios.put("/api/user", formData);
-
-        console.log(result);
-        console.log(result?.data?.data?.photoURL.url);
         setProfilePhotoURL(result?.data?.data?.photoURL.url);
         setPhotoUploading(false);
       } catch (error) {
@@ -86,8 +85,10 @@ const Profile = () => {
     }
   };
 
-  console.log(userData?.photoURL.url);
-  console.log(profilePhotoURL);
+  const removeProfilePhoto = async () => {
+    setProfilePhotoURL("");
+    await axios.put("/api/user", { deleteCurrentPhoto: true });
+  };
 
   if (userDataError || singleChatError) {
     return (
@@ -137,13 +138,10 @@ const Profile = () => {
           <ProfilePhoto
             placedIn={"userProfile"}
             userId={userData?._id}
-            profilePhotoURL={
-              profilePhotoURL ||
-              userData?.photoURL.url ||
-              singleChat?.chatPhotoURL.url
-            }
+            profilePhotoURL={profilePhotoURL || singleChat?.chatPhotoURL.url}
             photoUploading={photoUploading}
             handleProfilePhotoChange={handleProfilePhotoChange}
+            removeProfilePhoto={removeProfilePhoto}
           />
         </div>
         <div className="mt-4 text-center">
@@ -186,7 +184,7 @@ const Profile = () => {
                 <ArrowLeftStartOnRectangleIcon className="w-5 h-5 inline mr-1" />
                 Leave group
               </button>
-              {singleChat?.groupAdmin.map((a) => a._id).includes(user?._id) && (
+              {/* {singleChat?.groupAdmin.map((a) => a._id).includes(user?._id) && (
                 <button
                   onClick={() => {
                     setModalAction("deleteChat");
@@ -197,7 +195,7 @@ const Profile = () => {
                   <TrashIcon className="w-5 h-5 inline mr-1" />
                   Delete group
                 </button>
-              )}
+              )} */}
             </div>
           </div>
         </div>

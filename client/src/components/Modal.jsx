@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useAuthProvider from "../hooks/useAuthProvider";
 import axios from "axios";
 import useTheme from "../hooks/useTheme";
@@ -20,6 +20,7 @@ const Modal = ({
   const { user } = useAuthProvider();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
   const btnStyle = `btn btn-neutral btn-sm px-8 ${
     dark
       ? "bg-white text-gray-800 hover:bg-white hover:text-gray-800"
@@ -34,10 +35,6 @@ const Modal = ({
           padding: "5px 10px",
         }
       : { borderRadius: "20px", padding: "5px 10px" },
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen((p) => !p);
   };
 
   const toastNotify = () => {

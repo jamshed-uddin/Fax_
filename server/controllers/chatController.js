@@ -4,7 +4,10 @@ const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
 const Message = require("../models/messageModel");
 const getDataURI = require("../utils/getDataURI");
-const { uploadToCLoud } = require("../config/cloudinaryConfig");
+const {
+  uploadToCLoud,
+  deleteFromCloud,
+} = require("../config/cloudinaryConfig");
 
 //@desc access or create chat
 // route POST /api/chat/accessChat
@@ -232,7 +235,6 @@ const createGroup = asyncHandler(async (req, res) => {
 const updateGroup = asyncHandler(async (req, res) => {
   const groupId = req.params.groupId;
   const { chatName, users, chatDescription, deleteCurrentPhoto } = req.body;
-
   const file = req.file;
 
   try {
@@ -250,12 +252,18 @@ const updateGroup = asyncHandler(async (req, res) => {
     if (file) {
       const fileUri = getDataURI(file);
       photoURLObj = await uploadToCLoud(fileUri.content);
+
+      if (group?.chatPhotoURL.publicId) {
+        await deleteFromCloud(group?.chatPhotoURL.publicId);
+      }
     }
 
-    if (!deleteCurrentPhoto) {
-      //todo: delete current photo from cloud
+    if (deleteCurrentPhoto === "true") {
+      console.log("got into only delete block");
+      const result = await deleteFromCloud(group?.chatPhotoURL.publicId);
+      console.log(result);
       photoURLObj = {
-        url: null,
+        url: "https://i.ibb.co/mz6J26q/usergroup.png",
         publicId: "",
       };
     }
@@ -263,15 +271,18 @@ const updateGroup = asyncHandler(async (req, res) => {
     const groupInfoToUpdate = {
       chatName: chatName || group.chatName,
       chatDescription: chatDescription || group.chatDescription,
-      users: users,
+      users: JSON.parse(users),
       chatPhotoURL: photoURLObj || group.chatPhotoURL,
     };
+
+    console.log(groupInfoToUpdate);
 
     const updatedGroup = await Chat.findByIdAndUpdate(
       { _id: groupId },
       groupInfoToUpdate,
       { new: true }
     );
+
     res.status(200).send(updatedGroup);
   } catch (error) {
     res.status(400);
@@ -284,9 +295,9 @@ const updateGroup = asyncHandler(async (req, res) => {
 //@access private
 const deleteChat = asyncHandler(async (req, res) => {
   const chatId = req.params.chatId;
-  const chat = await Chat.findOne({ _id: chatId });
 
   try {
+    const chat = await Chat.findOne({ _id: chatId });
     if (!chat) {
       return res.status(404).send({ message: "Chat not found" });
     }

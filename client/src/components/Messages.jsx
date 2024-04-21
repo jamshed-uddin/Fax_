@@ -53,7 +53,7 @@ const Messages = ({ messages, setMessages, singleChat }) => {
 
     setMessageGroup(group);
   }, [messages]);
-  console.log(messages);
+
   useEffect(() => {
     setMyChats((prev) =>
       prev?.map((chat) =>
@@ -146,7 +146,7 @@ const Messages = ({ messages, setMessages, singleChat }) => {
                         <img
                           className="w-full h-full object-cover rounded-full"
                           src={
-                            message?.sender?.photoURL ||
+                            message?.sender?.photoURL.url ||
                             "https://i.ibb.co/Twp960D/default-profile-400x400.png"
                           }
                           alt={`Chat participent's profile picture`}

@@ -6,9 +6,10 @@ import Hero from "../components/Hero";
 import { useEffect } from "react";
 import useTheme from "../hooks/useTheme";
 import OnlineStatus from "../components/OnlineStatus";
+import SessionExpired from "../components/SessionExpired";
 
 const ChatPage = () => {
-  const { isSideChatOpen, setIsSideChatOpen } = useChatProvider();
+  const { isSideChatOpen, setIsSideChatOpen, myChatsError } = useChatProvider();
   const { user, userLoading } = useAuthProvider();
   const { pathname } = useLocation();
   const { dark } = useTheme();
@@ -23,6 +24,14 @@ const ChatPage = () => {
 
   if (userLoading) {
     return <div className="h-screen bg-white"></div>;
+  }
+
+  if (
+    myChatsError?.data.message === "Unauthorized action,No token" ||
+    (myChatsError?.data.message === "Unauthorized action,invalid token" &&
+      myChatsError?.status === 401)
+  ) {
+    return <SessionExpired />;
   }
 
   if (!user) {

@@ -18,7 +18,6 @@ const uploadToCLoud = async (file) => {
       { upload_preset: process.env.CLOUD_UPLOAD_PRESET },
       (error, result) => {
         if (error) {
-          console.log("uploading error", error);
           reject(error);
         } else {
           resolve({ url: result.secure_url, publicId: result.public_id });
@@ -28,4 +27,27 @@ const uploadToCLoud = async (file) => {
   });
 };
 
-module.exports = { configureCloudinary, uploadToCLoud };
+const deleteFromCloud = async (publicId) => {
+  try {
+    const result = await cloudinary.uploader.destroy(publicId);
+    return result;
+  } catch (error) {
+    return error;
+  }
+};
+
+const deleteMultipleFromCloud = async (publicIdArr) => {
+  try {
+    const result = await cloudinary.api.delete_resources(publicIdArr);
+    return result;
+  } catch (error) {
+    return error;
+  }
+};
+
+module.exports = {
+  configureCloudinary,
+  uploadToCLoud,
+  deleteFromCloud,
+  deleteMultipleFromCloud,
+};

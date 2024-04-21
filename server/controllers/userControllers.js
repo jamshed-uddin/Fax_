@@ -6,7 +6,10 @@ const Message = require("../models/messageModel");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const getDataURI = require("../utils/getDataURI");
-const { uploadToCLoud } = require("../config/cloudinaryConfig");
+const {
+  uploadToCLoud,
+  deleteFromCloud,
+} = require("../config/cloudinaryConfig");
 //@desc auth user
 //route POST/api/user/auth
 //access public
@@ -143,14 +146,40 @@ const searchUsers = asyncHandler(async (req, res) => {
 
 const updateUser = asyncHandler(async (req, res) => {
   const bodyToUpdate = req.body;
+  const { deleteCurrentPhoto } = req.body;
   const file = req.file;
 
   try {
     let updatedProfile;
+    const user = await User.findOne({ _id: req.user._id });
 
+    // when user just delete the profile photo
+    if (deleteCurrentPhoto) {
+      if (user?.photoURL.publicId) {
+        await deleteFromCloud(user.photoURL.publicId);
+      }
+      updatedProfile = await User.findOneAndUpdate(
+        { _id: req.user._id },
+        {
+          photoURL: {
+            url: "https://i.ibb.co/Twp960D/default-profile-400x400.png",
+            publicId: "",
+          },
+        },
+        {
+          new: true,
+        }
+      );
+      return res
+        .status(200)
+        .send({ message: "User updated successfully", data: updatedProfile });
+    }
+
+    // when user change profile photo
     if (file) {
       const fileUri = getDataURI(file);
       const cloudFileObj = await uploadToCLoud(fileUri.content);
+      await deleteFromCloud(user.photoURL.publicId); // deleting current profile photo from cloud before updating with new one
       updatedProfile = await User.findOneAndUpdate(
         { _id: req.user._id },
         { photoURL: cloudFileObj },
@@ -163,6 +192,7 @@ const updateUser = asyncHandler(async (req, res) => {
         .send({ message: "User updated successfully", data: updatedProfile });
     }
 
+    // when user change name or bio
     updatedProfile = await User.findOneAndUpdate(
       { _id: req.user._id },
       bodyToUpdate,
@@ -320,7 +350,7 @@ const deleteUser = asyncHandler(async (req, res) => {
       chat: { $in: prevChat.map((chat) => chat._id) },
     });
 
-    // then deleting those chat
+    // then deleting those chat that only participent is the user
     await Chat.deleteMany(chatFilterOption);
 
     // pulling user from that chats or group where user is not the only participent

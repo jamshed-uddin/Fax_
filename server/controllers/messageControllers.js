@@ -3,7 +3,10 @@ const Message = require("../models/messageModel");
 const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
 const getDataURI = require("../utils/getDataURI");
-const { uploadToCLoud } = require("../config/cloudinaryConfig");
+const {
+  uploadToCLoud,
+  deleteFromCloud,
+} = require("../config/cloudinaryConfig");
 
 const uploadImage = asyncHandler(async (req, res) => {
   const imageFile = req.file;
@@ -148,6 +151,12 @@ const deleteMessage = asyncHandler(async (req, res) => {
     } else {
       if (!isOwnMessage) {
         return res.status(401).send({ message: "Failed to delete" });
+      }
+
+      if (message.type === "image") {
+        if (message?.file?.publicId) {
+          await deleteFromCloud(message?.file?.publicId);
+        }
       }
 
       await Message.deleteOne({ _id: messageId });

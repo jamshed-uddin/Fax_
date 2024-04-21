@@ -19,7 +19,7 @@ const useGetData = (endpoint, enabled = true) => {
         error.response &&
         (error.response.status === 400 || error.response.status === 401)
       ) {
-        throw new Error(error.response.data.message);
+        throw error.response;
       } else {
         throw new Error("Something went wrong");
       }

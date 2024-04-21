@@ -122,7 +122,7 @@ const CreateGroup = () => {
     setDeleteCurrentPhoto(true);
   };
 
-  console.log(groupData);
+  console.log(deleteCurrentPhoto);
 
   const handleProfilePhotoChange = async (e) => {
     const file = e.target.files[0];

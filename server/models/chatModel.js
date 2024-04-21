@@ -27,7 +27,7 @@ chatSchema.pre("save", async function (next) {
     next();
   }
 
-  this.chatPhotoURL.url = "https://i.ibb.co/mz6J26q/usergroup.png";
+  this.chatPhotoURL = { url: "https://i.ibb.co/mz6J26q/usergroup.png" };
 });
 
 module.exports = mongoose.model("Chat", chatSchema);
