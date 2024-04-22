@@ -9,9 +9,8 @@ const Users = ({ users, title = true }) => {
       const result = await axios.post(`/api/chat/accessChat`, {
         userId,
       });
-      console.log(result);
+
       if (result) {
-        console.log(result.data);
         navigate(`inbox/${result.data._id}`);
       }
     } catch (error) {

@@ -245,7 +245,6 @@ Reset your Fax password by clicking the link below.If you did not request for pa
 
       res.status(200).send({ message: "Email send" });
     } catch (error) {
-      console.log(error);
       user.resetPasswordToken = undefined;
       user.resetPasswordTokenExpire = undefined;
       await user.save();

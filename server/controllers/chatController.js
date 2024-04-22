@@ -159,13 +159,21 @@ const getChats = asyncHandler(async (req, res) => {
 //@access private
 const getSignleChat = asyncHandler(async (req, res) => {
   try {
-    const allChat = await Chat.findOne({ _id: req.params.chatId })
+    const chat = await Chat.findOne({ _id: req.params.chatId })
       .populate("latestMessage")
       .populate("users", "name photoURL")
       .populate({ path: "latestMessage.sender", select: "name photoURL" })
       .populate("groupAdmin");
 
-    res.status(200).send(allChat);
+    if (chat?.deletedBy.includes(req.user._id)) {
+      console.log("false");
+      await Chat.updateOne(
+        { _id: chat._id },
+        { $pull: { deletedBy: req.user._id } }
+      );
+    }
+
+    res.status(200).send(chat);
   } catch (error) {
     res.status(400);
     throw new Error(error.message);

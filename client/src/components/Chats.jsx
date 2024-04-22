@@ -8,7 +8,7 @@ const Chats = ({ chats, placedIn }) => {
         {chats?.map((chat, index) => (
           <div key={index}>
             <Link to={`inbox/${chat?._id}`}>
-              <ChatCard key={chat._id} chat={chat} placedIn={placedIn} />
+              <ChatCard key={chat?._id} chat={chat} placedIn={placedIn} />
             </Link>
           </div>
         ))}
