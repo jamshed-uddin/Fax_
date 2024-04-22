@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Searchbar from "../components/Searchbar";
 import useGetSearchResult from "../hooks/useGetSearchResult";
 import useDebounce from "../hooks/useDebouce";
@@ -14,8 +14,6 @@ import {
   TrashIcon,
 } from "@heroicons/react/24/outline";
 import useCloseMenu from "../hooks/useCloseMenu";
-import uploadPhotoToCloud from "../myFunctions/uploadPhotoToCloud";
-import deletePhotoFromCloud from "../myFunctions/deletePhotoFromCloud";
 import axios from "axios";
 import useAuthProvider from "../hooks/useAuthProvider";
 import { useNavigate, useParams } from "react-router-dom";

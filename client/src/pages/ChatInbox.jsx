@@ -15,7 +15,7 @@ import useSocketProvider from "../hooks/useSocketProvider";
 import Messages from "../components/Messages";
 import Image from "../components/Image";
 import { PaperAirplaneIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 const ChatInbox = () => {
   const { dark } = useTheme();
@@ -23,22 +23,17 @@ const ChatInbox = () => {
   const { chatId } = useParams();
   const { socket, typingStatus, isUserActive } = useSocketProvider();
   const [messages, setMessages] = useState([]);
-  const [messageFetched, setMessageFetched] = useState(false);
   // image type messgae sending states
   const [imageFile, setImageFile] = useState(null);
   const [imageBlobURL, setImageBlobURL] = useState("");
   const [imageSendLoading, setImageSendLoading] = useState(false);
-  const lastMessageRef = useRef();
-
+  const messageContainerRef = useRef(null);
   const {
     data: singleChat,
     isLoading: singleChatLoading,
     error: singleChatError,
     refetch: singleChatRefetch,
   } = useGetData(`/api/chat/${chatId}`);
-  // console.log(singleChat);
-  // console.log(messages);
-  // console.log(imageBlobURL);
 
   // fetching messages
   useEffect(() => {
@@ -47,7 +42,6 @@ const ChatInbox = () => {
         const result = await axios.get(`/api/message/${chatId}`);
 
         setMessages(result?.data);
-        setMessageFetched(!!result?.data);
       } catch (error) {
         console.log(error);
       }
@@ -55,12 +49,6 @@ const ChatInbox = () => {
 
     fetchMessages();
   }, [chatId]);
-
-  useEffect(() => {
-    if (lastMessageRef.current) {
-      lastMessageRef.current.scrollIntoView({ block: "end" });
-    }
-  }, [messages]);
 
   // updating message readBy
   useEffect(() => {
@@ -89,6 +77,15 @@ const ChatInbox = () => {
       }
     });
   }, [chatId, messages, socket]);
+
+  useEffect(() => {
+    const containerRef = messageContainerRef.current;
+
+    if (containerRef) {
+      containerRef.scrollTop = containerRef.scrollHeight;
+    }
+  });
+  console.log(typingStatus);
 
   // toast style
   const toastStyle = {
@@ -192,7 +189,10 @@ const ChatInbox = () => {
         </div>
       </div>
       {/* messages */}
-      <div className=" flex-grow overflow-y-auto lg:px-4 mb-2">
+      <div
+        ref={messageContainerRef}
+        className=" flex-grow overflow-y-auto lg:px-4 mb-2"
+      >
         {singleChatLoading ? (
           <InboxSkeleton />
         ) : (
@@ -250,7 +250,7 @@ const ChatInbox = () => {
                 <div className=" h-8 w-8 rounded-full overflow-hidden  ">
                   <img
                     className="w-full h-full object-cover rounded-full"
-                    src={typingStatus?.user?.photoURL}
+                    src={typingStatus?.user?.photoURL.url}
                     alt={`Profile photo of ${typingStatus?.user?.name}`}
                   />
                 </div>
@@ -270,7 +270,6 @@ const ChatInbox = () => {
               </div>
             )}
         </div>
-        <div ref={lastMessageRef}></div>
       </div>
       {/* send message input */}
 

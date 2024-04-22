@@ -37,6 +37,27 @@ const Modal = ({
       : { borderRadius: "20px", padding: "5px 10px" },
   };
 
+  const handleModalClose = useCallback(() => {
+    setIsModalOpen(false);
+  }, [setIsModalOpen]);
+
+  // closing the modal first when user navigates back in mobile phone
+
+  useEffect(() => {
+    const closeModalFirstHandler = (e) => {
+      if (isModalOpen) {
+        e.preventDefault();
+        handleModalClose();
+      }
+    };
+
+    window.addEventListener("popstate", closeModalFirstHandler);
+
+    return () => {
+      window.removeEventListener("popstate", closeModalFirstHandler);
+    };
+  }, [handleModalClose, isModalOpen]);
+
   const toastNotify = () => {
     toast("Something went wrong!", toastStyle);
   };

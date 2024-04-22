@@ -15,13 +15,14 @@ import axios from "axios";
 import useLongPress from "../hooks/useLongPress";
 import Image from "./Image";
 import useChatProvider from "../hooks/useChatProvider";
+import useSocketProvider from "../hooks/useSocketProvider";
 
 const Messages = ({ messages, setMessages, singleChat }) => {
   const { user } = useAuthProvider();
   const { dark } = useTheme();
   const { online } = useOnlineStatus();
   const { setMyChats } = useChatProvider();
-
+  const { socket } = useSocketProvider();
   const [messageGroup, setMessageGroup] = useState([]);
   const [hoveredMessageId, setHoveredMessageId] = useState(null);
   const [showMessageOptions, setShowMessageOptions] = useState(false);
@@ -33,6 +34,7 @@ const Messages = ({ messages, setMessages, singleChat }) => {
     setShowMessageOptions(true);
   }, 800);
 
+  // grouping messages according to the message date
   useEffect(() => {
     const messageDate = (messageDate) =>
       new Date(messageDate).toLocaleDateString("en-IN", {
@@ -54,6 +56,7 @@ const Messages = ({ messages, setMessages, singleChat }) => {
     setMessageGroup(group);
   }, [messages]);
 
+  //sorting chats according to latest message of the chat
   useEffect(() => {
     setMyChats((prev) =>
       prev?.map((chat) =>
@@ -73,6 +76,17 @@ const Messages = ({ messages, setMessages, singleChat }) => {
     );
   }, [messages, setMyChats]);
 
+  useEffect(() => {
+    socket?.on("deletedMessage", (data) => {
+      if (data.chatId === singleChat?._id) {
+        console.log("deleteMessage", data);
+        setMessages((prev) =>
+          prev.filter((singleMsg) => singleMsg._id !== data?.messageId)
+        );
+      }
+    });
+  }, [messages, setMessages, singleChat?._id, socket]);
+
   // deleting message func and passed it as props to message delete modal
   const handleDeleteMessage = async (message, deleteFor, toastNotify) => {
     if (!online) return;
@@ -87,15 +101,22 @@ const Messages = ({ messages, setMessages, singleChat }) => {
       setMessages((prev) =>
         prev.filter((singleMsg) => singleMsg._id !== message._id)
       );
-      // socket.emit("deletedMessage", {
-      //   messageId: message._id,
-      //   chatId: singleChat._id,
-      // });
+
+      if (deleteFor === "everyone") {
+        socket.emit("deletedMessage", {
+          messageId: message._id,
+          chatId: singleChat?._id,
+          users: singleChat?.users.map((user) => user._id),
+        });
+      }
+
       console.log(result.data);
     } catch (error) {
       toastNotify();
     }
   };
+
+  console.log(singleChat);
 
   return (
     <div className="h-max  my-2  w-full ">

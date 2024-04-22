@@ -67,6 +67,17 @@ io.on("connection", (socket) => {
     }
   });
 
+  // getting message that deleted for everyone to get it deleted immediatly
+  socket.on("deletedMessage", (deletedMessage) => {
+    const { users } = deletedMessage;
+
+    if (users.length) {
+      users.forEach((userId) => {
+        io.to(activeUsers[userId]).emit("deletedMessage", deletedMessage);
+      });
+    }
+  });
+
   // typing status
   const typingUsers = new Map();
   socket.on("typingStatus", (data) => {
@@ -83,11 +94,6 @@ io.on("connection", (socket) => {
     );
 
     io.emit("typing", data);
-  });
-
-  // getting message that deleted for everyone to get it deleted immediatly
-  socket.on("deletedMessage", (deletedMessage) => {
-    io.emit("getDeletedMessage", deletedMessage);
   });
 
   socket.on("disconnect", () => {

@@ -13,11 +13,8 @@ import UserCard from "../components/UserCard";
 import {
   ArrowLeftStartOnRectangleIcon,
   PencilSquareIcon,
-  TrashIcon,
 } from "@heroicons/react/24/outline";
 import Modal from "../components/Modal";
-import uploadPhotoToCloud from "../myFunctions/uploadPhotoToCloud";
-import deletePhotoFromCloud from "../myFunctions/deletePhotoFromCloud";
 
 const Profile = () => {
   const { userId } = useParams();

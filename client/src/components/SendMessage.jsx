@@ -17,6 +17,7 @@ const SendMessage = ({ chat, setImageBlobURL, setImageFile }) => {
   const textAreaRef = useRef(null);
 
   useEffect(() => {
+    // for giving the message textarea a certain height
     if (textAreaRef.current) {
       textAreaRef.current.style.height = "auto";
       textAreaRef.current.style.height =
