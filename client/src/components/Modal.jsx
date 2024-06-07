@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import EditUserProfile from "./EditUserProfile";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import toast, { Toaster } from "react-hot-toast";
+import useChatProvider from "../hooks/useChatProvider";
 
 const Modal = ({
   modalFor,
@@ -18,6 +19,7 @@ const Modal = ({
 }) => {
   const { dark } = useTheme();
   const { user } = useAuthProvider();
+  const { setMyChats } = useChatProvider();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -97,6 +99,9 @@ const Modal = ({
       setLoading(true);
       const result = await axios.put(`/api/chat/deleteChat/${chat._id}`);
       if (result.data.message === "Chat deleted succesfully") {
+        setMyChats((prev) =>
+          prev.filter((chatItem) => chatItem._id !== chat._id)
+        );
         navigate("/");
       }
       setLoading(false);

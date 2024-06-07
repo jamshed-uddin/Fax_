@@ -60,6 +60,8 @@ const ChatInbox = () => {
       }
     };
 
+    console.log(singleChat);
+
     if (
       singleChat &&
       singleChat?.latestMessage &&

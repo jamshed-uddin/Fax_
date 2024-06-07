@@ -76,6 +76,7 @@ const Messages = ({ messages, setMessages, singleChat }) => {
     );
   }, [messages, setMyChats]);
 
+  // getting the deleted for everyone message for deleting it real time
   useEffect(() => {
     socket?.on("deletedMessage", (data) => {
       if (data.chatId === singleChat?._id) {
