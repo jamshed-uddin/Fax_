@@ -56,15 +56,11 @@ const EditUserProfile = ({ userRefetch, handleModalClose }) => {
 
     try {
       setProifleUpdating(true);
-      const result = await axios.put("/api/user", { name, bio });
+      await axios.put("/api/user", { name, bio });
       setProifleUpdating(false);
       userRefetch();
-
-      console.log(result.data);
     } catch (error) {
-      console.log(error?.response?.data);
       setProifleUpdating(false);
-      console.log(error.message);
     }
   };
 
@@ -85,14 +81,13 @@ const EditUserProfile = ({ userRefetch, handleModalClose }) => {
     }
 
     const body = { currentPassword, newPassword };
-    console.log(body);
+
     setPassChanging(true);
     try {
-      const result = await axios.put("/api/user/changePassword", body);
-      console.log(result);
+      await axios.put("/api/user/changePassword", body);
+
       setPassChanging(false);
     } catch (error) {
-      console.log(error);
       setError(error?.response?.data?.message);
       setPassChanging(false);
     }
@@ -104,10 +99,10 @@ const EditUserProfile = ({ userRefetch, handleModalClose }) => {
     }
     try {
       setLoading(true);
-      const result = await axios.delete("/api/user/deleteUser", {
+      await axios.delete("/api/user/deleteUser", {
         data: { password: passForDeleting },
       });
-      console.log(result);
+
       setLoading(false);
     } catch (error) {
       setDeleteAccError(error?.response?.data?.message);

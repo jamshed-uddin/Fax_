@@ -22,10 +22,10 @@ const ForgotPassword = () => {
     }
     setLoading(true);
     try {
-      const result = await axios.post("/api/user/forgotPassword", {
+      await axios.post("/api/user/forgotPassword", {
         email,
       });
-      console.log(result.data);
+
       setModalOpen(true);
     } catch (error) {
       if (error.response.status === 401) {

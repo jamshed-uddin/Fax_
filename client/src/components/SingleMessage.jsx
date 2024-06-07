@@ -22,10 +22,7 @@ const SingleMessage = ({ message, index, msgArr, singleChat, setMessages }) => {
   const [showMessageOptions, setShowMessageOptions] = useState(false);
   const { isMenuOpen: isModalOpen, setIsMenuOpen: setIsModalOpen } =
     useCloseMenu("message-modal");
-  const { start, stop } = useLongPress(() => {
-    console.log("longPressed");
-  }, 2000);
-  console.log(user);
+  const { start, stop } = useLongPress(() => {}, 2000);
 
   // deleting message func and passed it as props to message delete modal
   const handleDeleteMessage = async (message, deleteFor) => {
@@ -35,13 +32,11 @@ const SingleMessage = ({ message, index, msgArr, singleChat, setMessages }) => {
     );
 
     try {
-      const result = await axios.put(
-        `/api/message/deleteMessage/${message._id}`,
-        { deleteFor }
-      );
-      console.log(result.data);
+      await axios.put(`/api/message/deleteMessage/${message._id}`, {
+        deleteFor,
+      });
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 

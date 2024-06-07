@@ -40,7 +40,7 @@ const ResetPassword = () => {
         resetToken,
         newPassword,
       });
-      console.log(result.data);
+
       if (result.data.message === "Password reset success") {
         navigate("/signin");
       }
@@ -48,7 +48,7 @@ const ResetPassword = () => {
       if (error.response.status === 401) {
         setError(error.response.data.message);
       }
-      console.log(error);
+
       setLoading(false);
     }
     setLoading(false);

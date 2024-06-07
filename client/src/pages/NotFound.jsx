@@ -3,7 +3,6 @@ import useTheme from "../hooks/useTheme";
 
 const NotFound = () => {
   const { dark } = useTheme();
-  console.log(dark);
 
   return (
     <div

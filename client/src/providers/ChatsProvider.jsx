@@ -59,7 +59,9 @@ const ChatsProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    setMyChats(chatData);
+    if (chatData) {
+      setMyChats(chatData);
+    }
   }, [chatData]);
 
   const chatInfo = {

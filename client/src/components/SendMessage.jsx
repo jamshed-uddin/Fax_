@@ -49,7 +49,7 @@ const SendMessage = ({ chat, setImageBlobURL, setImageFile }) => {
     try {
       setMessageSending(true);
       const result = await axios.post("/api/message/newMessage", messageToSend);
-      console.log(result.data);
+
       // sending message to socket
       socket?.emit("sendMessage", result?.data);
 
@@ -62,10 +62,8 @@ const SendMessage = ({ chat, setImageBlobURL, setImageFile }) => {
         error.response &&
         (error.response.status === 400 || error.response.status === 401)
       ) {
-        // console.log(error.response.data.message);
         throw new Error(error.response.data.message);
       } else {
-        // console.log(error);
         throw new Error("Something went wrong");
       }
     }

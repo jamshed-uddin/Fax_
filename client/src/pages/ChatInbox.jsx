@@ -43,7 +43,7 @@ const ChatInbox = () => {
 
         setMessages(result?.data);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     };
 
@@ -56,11 +56,9 @@ const ChatInbox = () => {
       try {
         await axios.patch(`/api/message/${singleChat?.latestMessage?._id}`);
       } catch (error) {
-        console.log(error?.response?.message);
+        // console.log(error?.response?.message);
       }
     };
-
-    console.log(singleChat);
 
     if (
       singleChat &&
@@ -87,7 +85,6 @@ const ChatInbox = () => {
       containerRef.scrollTop = containerRef.scrollHeight;
     }
   });
-  console.log(typingStatus);
 
   // toast style
   const toastStyle = {
@@ -120,12 +117,11 @@ const ChatInbox = () => {
             },
           }
         );
-        console.log(result.data);
+
         setImageSendLoading(false);
         socket?.emit("sendMessage", result?.data);
         setImageBlobURL("");
       } catch (error) {
-        console.log(error);
         toast("Something went wrong!", toastStyle);
         setImageSendLoading(false);
       }

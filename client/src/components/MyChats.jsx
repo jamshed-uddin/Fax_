@@ -1,4 +1,3 @@
-import useGetData from "../hooks/useGetData";
 import CardSkeleton from "./CardSkeleton";
 import WentWrong from "./WentWrong";
 import Chats from "./Chats";
@@ -8,6 +7,8 @@ import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 const MyChats = () => {
   const { myChats, myChatsLoading, myChatsError, myChatsRefetch } =
     useChatProvider();
+
+  console.log(myChats);
 
   if (myChatsLoading) {
     return <CardSkeleton cardAmount={5} />;

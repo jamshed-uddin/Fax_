@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const Counter = ({ minutes }) => {
   const [time, setTime] = useState({
     minutes,
     seconds: 60,
   });
-
-  console.log(time);
 
   useEffect(() => {
     let interval;

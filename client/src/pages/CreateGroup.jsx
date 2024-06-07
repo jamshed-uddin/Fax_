@@ -73,7 +73,7 @@ const CreateGroup = () => {
       chatPhotoURL: chatPhotoURL?.url,
     });
   }, [singleChat, currentUser]);
-  console.log(singleChat);
+
   // editing group section ends ----------
 
   const { data: searchResult, isLoading: searchLoading } =
@@ -88,7 +88,6 @@ const CreateGroup = () => {
   };
 
   const selectOrRemoveUser = (selectedUser, action) => {
-    console.log(selectedUser);
     if (action === "remove") {
       return setSelectedUsers((users) =>
         users.filter((user) => user._id !== selectedUser._id)
@@ -119,8 +118,6 @@ const CreateGroup = () => {
     setUploaderOpen((p) => !p);
     setDeleteCurrentPhoto(true);
   };
-
-  console.log(deleteCurrentPhoto);
 
   const handleProfilePhotoChange = async (e) => {
     const file = e.target.files[0];
@@ -158,7 +155,6 @@ const CreateGroup = () => {
 
       setGroupCreateLoading(false);
     } catch (error) {
-      console.log(error.response);
       setGroupCreateLoading(false);
     }
   };

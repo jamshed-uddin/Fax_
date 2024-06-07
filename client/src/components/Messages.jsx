@@ -80,7 +80,6 @@ const Messages = ({ messages, setMessages, singleChat }) => {
   useEffect(() => {
     socket?.on("deletedMessage", (data) => {
       if (data.chatId === singleChat?._id) {
-        console.log("deleteMessage", data);
         setMessages((prev) =>
           prev.filter((singleMsg) => singleMsg._id !== data?.messageId)
         );
@@ -95,10 +94,9 @@ const Messages = ({ messages, setMessages, singleChat }) => {
     setIsModalOpen(false);
 
     try {
-      const result = await axios.put(
-        `/api/message/deleteMessage/${message._id}`,
-        { deleteFor }
-      );
+      await axios.put(`/api/message/deleteMessage/${message._id}`, {
+        deleteFor,
+      });
       setMessages((prev) =>
         prev.filter((singleMsg) => singleMsg._id !== message._id)
       );
@@ -110,14 +108,10 @@ const Messages = ({ messages, setMessages, singleChat }) => {
           users: singleChat?.users.map((user) => user._id),
         });
       }
-
-      console.log(result.data);
     } catch (error) {
       toastNotify();
     }
   };
-
-  console.log(singleChat);
 
   return (
     <div className="h-max  my-2  w-full ">

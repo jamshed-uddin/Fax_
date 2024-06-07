@@ -73,8 +73,7 @@ const Modal = ({
           ...{ users: userLeft },
           groupAdmin: chat?.groupAdmin,
         })
-        .then(async (res) => {
-          console.log(res);
+        .then(async () => {
           setLoading(false);
           navigate("/");
           const newEventMessage = {
@@ -100,7 +99,7 @@ const Modal = ({
       const result = await axios.put(`/api/chat/deleteChat/${chat._id}`);
       if (result.data.message === "Chat deleted succesfully") {
         setMyChats((prev) =>
-          prev.filter((chatItem) => chatItem._id !== chat._id)
+          prev?.filter((chatItem) => chatItem?._id !== chat?._id)
         );
         navigate("/");
       }
