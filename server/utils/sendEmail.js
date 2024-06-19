@@ -23,7 +23,7 @@ const sendEmail = (options) => {
     if (err) {
       throw new Error(err);
     } else {
-      console.log(info);
+      // console.log(info);
     }
   });
 };

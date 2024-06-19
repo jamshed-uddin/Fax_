@@ -167,7 +167,7 @@ const ChatInbox = () => {
               ></div>
             ) : (
               <>
-                <h1 className="text-xl font-medium ">
+                <h1 className="text-xl font-medium">
                   {chatNameHandler(singleChat, user)}
                 </h1>
               </>

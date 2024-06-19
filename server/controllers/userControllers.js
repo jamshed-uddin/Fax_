@@ -253,7 +253,6 @@ Reset your Fax password by clicking the link below.If you did not request for pa
       });
     }
   } catch (error) {
-    console.log(error);
     res.status(400);
     throw new Error(error.message);
   }
@@ -296,7 +295,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 
 const changePassword = asyncHandler(async (req, res) => {
   const { currentPassword, newPassword } = req.body;
-  console.log(req.body);
+
   try {
     const user = await User.findOne({ _id: req.user._id });
     if (!user) {

@@ -10,6 +10,7 @@ const messageRoute = require("./routes/messageRoutes");
 const dotenv = require("dotenv");
 const { notFound, errorHandler } = require("./middlewares/errorMiddlewares");
 const { configureCloudinary } = require("./config/cloudinaryConfig");
+const path = require("path");
 dotenv.config();
 connectDB();
 
@@ -30,9 +31,26 @@ configureCloudinary();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-  res.status(200).send("mern chat is running");
+app.use("/api/*", (req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  next();
 });
+
+// setup for deployment-----
+
+if (process.env.NODE_ENV === "production") {
+  const __dirname1 = path.resolve();
+  app.use(express.static(path.join(__dirname1, "client/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname1, "client", "dist", "index.html"));
+  });
+} else {
+  app.get("/", (req, res) => {
+    res.status(200).send("mern chat is running");
+  });
+}
+// setup end for deployment
 
 app.use("/api/user", userRoute);
 app.use("/api/chat", chatRoute);
@@ -98,7 +116,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     delete activeUsers[userId];
-    console.log(`${userId} is disconnected`);
+    // console.log(`${userId} is disconnected`);
     io.emit("activeUsers", activeUsers);
   });
 });

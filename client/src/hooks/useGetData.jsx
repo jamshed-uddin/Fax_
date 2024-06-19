@@ -12,7 +12,11 @@ const useGetData = (endpoint, enabled = true) => {
 
   const fetchData = async () => {
     try {
-      const result = await axios.get(endpoint);
+      const result = await axios.get(endpoint, {
+        headers: {
+          Accept: "applicaton/json",
+        },
+      });
       return result.data;
     } catch (error) {
       if (

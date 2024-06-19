@@ -82,6 +82,7 @@ const getChats = asyncHandler(async (req, res) => {
     //     },
     //   })
     //   .exec();
+    console.log("hello");
 
     const allChat = await Chat.aggregate([
       {
@@ -147,7 +148,9 @@ const getChats = asyncHandler(async (req, res) => {
       },
     ]);
 
-    res.status(200).send(allChat);
+    console.log(allChat);
+
+    res.status(200).send([]);
   } catch (error) {
     res.status(400);
     throw new Error(error.message);
@@ -166,7 +169,6 @@ const getSignleChat = asyncHandler(async (req, res) => {
       .populate("groupAdmin");
 
     if (chat?.deletedBy.includes(req.user._id)) {
-      console.log("false");
       await Chat.updateOne(
         { _id: chat._id },
         { $pull: { deletedBy: req.user._id } }
@@ -228,7 +230,6 @@ const createGroup = asyncHandler(async (req, res) => {
       sender: req.user._id,
     };
     await Message.create(newEventMessage);
-    console.log("group", newCreatedGroup);
     res.status(201).send(newCreatedGroup);
   } catch (error) {
     res.status(500);
@@ -267,9 +268,7 @@ const updateGroup = asyncHandler(async (req, res) => {
     }
 
     if (deleteCurrentPhoto === "true") {
-      console.log("got into only delete block");
       const result = await deleteFromCloud(group?.chatPhotoURL.publicId);
-      console.log(result);
       photoURLObj = {
         url: "https://i.ibb.co/mz6J26q/usergroup.png",
         publicId: "",
@@ -282,8 +281,6 @@ const updateGroup = asyncHandler(async (req, res) => {
       users: JSON.parse(users),
       chatPhotoURL: photoURLObj || group.chatPhotoURL,
     };
-
-    console.log(groupInfoToUpdate);
 
     const updatedGroup = await Chat.findByIdAndUpdate(
       { _id: groupId },

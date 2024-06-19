@@ -176,8 +176,13 @@ const CreateGroup = () => {
 
   return (
     <div className="overflow-y-auto h-full w-full pt-3 px-2 lg:px-4 pb-10">
-      <div className=" flex items-center justify-between">
-        <NavigateBack />
+      <div className=" flex items-center  justify-between">
+        <div className="flex items-center gap-2">
+          <NavigateBack />
+          <h2 className="text-xl font-medium">
+            {editMode ? "Edit" : "Create"} group
+          </h2>
+        </div>
         <div>
           <button onClick={handleCreateGroup} className={btnStyle}>
             {groupCreateLoading

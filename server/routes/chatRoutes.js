@@ -12,7 +12,7 @@ const upload = require("../middlewares/multerUpload");
 const router = express.Router();
 
 router.post("/accessChat", verifyJWT, accessChat);
-router.get("/", verifyJWT, getChats);
+router.get("/", getChats);
 router.get("/:chatId", verifyJWT, getSignleChat);
 router.post("/group", verifyJWT, upload, createGroup);
 router.put("/group/:groupId", verifyJWT, upload, updateGroup);
