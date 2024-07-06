@@ -34,7 +34,7 @@ const Profile = () => {
     queryKey: [userId],
     queryFn: async () => {
       try {
-        const result = await axios.get(`/api/user/singleUser?userId=${userId}`);
+        const result = await axios.get(`/api/user/${userId}`);
         setProfilePhotoURL(result?.data.photoURL.url);
         return result?.data;
       } catch (error) {

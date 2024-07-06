@@ -45,6 +45,7 @@ const AuthProvider = ({ children }) => {
       setUser(result.data);
       return result.data;
     } catch (error) {
+      console.log(error);
       if (
         error.response &&
         (error.response.status === 400 || error.response.status === 401)

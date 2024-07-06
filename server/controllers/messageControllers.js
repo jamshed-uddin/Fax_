@@ -1,4 +1,3 @@
-const asyncHandler = require("express-async-handler");
 const Message = require("../models/messageModel");
 const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
@@ -7,34 +6,35 @@ const {
   uploadToCLoud,
   deleteFromCloud,
 } = require("../config/cloudinaryConfig");
+const customError = require("../utils/customError");
 
-const uploadImage = asyncHandler(async (req, res) => {
-  const imageFile = req.file;
+// const uploadImage = asyncHandler(async (req, res) => {
+//   const imageFile = req.file;
 
-  const fileUri = getDataURI(imageFile);
+//   const fileUri = getDataURI(imageFile);
 
-  try {
-    const imageToCloud = await uploadToCLoud(fileUri.content);
+//   try {
+//     const imageToCloud = await uploadToCLoud(fileUri.content);
 
-    res.status(200).send({ message: "Image recieved", data: imageToCloud });
-  } catch (error) {
-    res.status(500);
-    throw new Error(error.message);
-  }
-});
+//     res.status(200).send({ message: "Image recieved", data: imageToCloud });
+//   } catch (error) {
+//     res.status(500);
+//     throw new Error(error.message);
+//   }
+// });
 
 // @desc create new message
 // @route POST /api/message/newMessage?type=''
 // @access private
 
-const createMessage = asyncHandler(async (req, res) => {
+const createMessage = async (req, res, next) => {
   const { content, chatId } = req.body;
   const file = req.file;
   const type = req.query.type;
 
   try {
     if (type !== "image" && (!content || !chatId)) {
-      return res.status(404).send({ message: "Content or chatId not found" });
+      throw customError(404, "Content or chatId not found");
     }
 
     let createNewMessage;
@@ -77,16 +77,15 @@ const createMessage = asyncHandler(async (req, res) => {
 
     res.status(201).send(createdNewMessage);
   } catch (error) {
-    res.status(500);
-    throw new Error(error.message);
+    next(error);
   }
-});
+};
 
 // @desc get all message
 // @route GET /api/message/:chatId
 // @access private
 
-const getAllMessages = asyncHandler(async (req, res) => {
+const getAllMessages = async (req, res, next) => {
   const chatId = req.params.chatId;
 
   try {
@@ -99,16 +98,15 @@ const getAllMessages = asyncHandler(async (req, res) => {
 
     res.status(200).send(messages);
   } catch (error) {
-    res.status(500);
-    throw new Error(error.message);
+    next(error);
   }
-});
+};
 
 // @desc update message
 // @route PATCH /api/message/:messageId
 // @access private
 
-const updateMessageReadBy = asyncHandler(async (req, res) => {
+const updateMessageReadBy = async (req, res, next) => {
   const messageId = req.params.messageId;
 
   try {
@@ -120,16 +118,15 @@ const updateMessageReadBy = asyncHandler(async (req, res) => {
 
     res.status(200).send({ message: `Message read by user ${req.user._id}` });
   } catch (error) {
-    res.status(500);
-    throw new Error(error.message);
+    next(error);
   }
-});
+};
 
 // @desc delete message
 // @route put /api/message/deleteMessage/:messageId
 // @access private
 
-const deleteMessage = asyncHandler(async (req, res) => {
+const deleteMessage = async (req, res, next) => {
   const { deleteFor } = req.body;
   const messageId = req.params.messageId;
 
@@ -139,7 +136,7 @@ const deleteMessage = asyncHandler(async (req, res) => {
     const isOwnMessage = message.sender.toString() === req.user._id.toString();
     // if message not found
     if (!message) {
-      return res.status(404).send({ message: "Message not found" });
+      throw customError(404, "Message not found");
     }
     // deleting for only me.
     if (deleteFor === "own") {
@@ -150,7 +147,7 @@ const deleteMessage = asyncHandler(async (req, res) => {
       // deleting for everyone.but first check if the message getting deleted by the sender
     } else {
       if (!isOwnMessage) {
-        return res.status(401).send({ message: "Failed to delete" });
+        throw customError(401, "Failed to delete");
       }
 
       if (message.type === "image") {
@@ -164,15 +161,13 @@ const deleteMessage = asyncHandler(async (req, res) => {
 
     res.status(200).send({ message: "Message deleted successfully" });
   } catch (error) {
-    res.status(500);
-    throw new Error(error.message);
+    next(error);
   }
-});
+};
 
 module.exports = {
   createMessage,
   getAllMessages,
   updateMessageReadBy,
   deleteMessage,
-  uploadImage,
 };

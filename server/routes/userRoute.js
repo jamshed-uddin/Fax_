@@ -20,7 +20,7 @@ router.post("/auth", authUser);
 router.post("/", registerUser);
 router.post("/logout", logoutUser);
 router.get("/", verifyJWT, searchUsers);
-router.get("/singleUser", singleUser);
+router.get("/:userId", singleUser);
 router.put("/", verifyJWT, upload, updateUser);
 router.post("/forgotPassword", forgotPassword);
 router.put("/resetPassword", resetPassword);

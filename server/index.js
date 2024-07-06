@@ -19,7 +19,7 @@ const server = http.createServer(app);
 const io = socketIo(server, {
   pingtimeout: 60000,
   cors: {
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5174",
   },
 });
 app.use(express.json());
@@ -31,10 +31,10 @@ configureCloudinary();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/*", (req, res, next) => {
-  res.set("Cache-Control", "no-store");
-  next();
-});
+// APIs----
+app.use("/api/user", userRoute);
+app.use("/api/chat", chatRoute);
+app.use("/api/message", messageRoute);
 
 // setup for deployment-----
 
@@ -52,10 +52,7 @@ if (process.env.NODE_ENV === "production") {
 }
 // setup end for deployment
 
-app.use("/api/user", userRoute);
-app.use("/api/chat", chatRoute);
-app.use("/api/message", messageRoute);
-
+//  socket starts--------
 let activeUsers = {};
 
 io.on("connection", (socket) => {
@@ -120,6 +117,7 @@ io.on("connection", (socket) => {
     io.emit("activeUsers", activeUsers);
   });
 });
+// socket ends----------
 
 app.use(notFound);
 app.use(errorHandler);

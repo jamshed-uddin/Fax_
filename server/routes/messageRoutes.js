@@ -6,7 +6,6 @@ const {
   getAllMessages,
   updateMessageReadBy,
   deleteMessage,
-  uploadImage,
 } = require("../controllers/messageControllers");
 const upload = require("../middlewares/multerUpload");
 const router = express.Router();

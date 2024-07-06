@@ -27,8 +27,8 @@ const ChatPage = () => {
   }
 
   if (
-    myChatsError?.data.message === "Unauthorized action,No token" ||
-    (myChatsError?.data.message === "Unauthorized action,invalid token" &&
+    myChatsError?.data?.message === "Unauthorized action,No token" ||
+    (myChatsError?.data?.message === "Unauthorized action,invalid token" &&
       myChatsError?.status === 401)
   ) {
     return <SessionExpired />;

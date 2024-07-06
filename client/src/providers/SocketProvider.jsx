@@ -15,7 +15,9 @@ const SocketProvider = ({ children }) => {
   // const [sendMessage, setSendMessage] = useState(null);
 
   useEffect(() => {
-    if (!user && !myChats) return;
+    if (!user && !myChats) {
+      return;
+    }
 
     const newSocket = io("http://localhost:2000", {
       query: { userId: user?._id },

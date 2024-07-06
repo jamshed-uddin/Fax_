@@ -37,6 +37,7 @@ const EditUserProfile = ({ userRefetch, handleModalClose }) => {
   }  input-sm w-full`;
 
   const handleClose = () => {
+    setError("");
     handleModalClose();
     setCurrentPassword("");
     setConfirmNewPassword("");
@@ -264,9 +265,9 @@ const EditUserProfile = ({ userRefetch, handleModalClose }) => {
 
           {showDeleteOptions && (
             <div className="mt-1 mb-4">
-              <p>
+              <p className="text-sm">
                 This will also delete all you contact and you will not be able
-                to retrive the data you added.
+                to retrieve the data you added.
               </p>
 
               <div className="relative mb-2 mt-2">
