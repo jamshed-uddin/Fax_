@@ -42,12 +42,12 @@ const Hero = () => {
           </div>
         </div>
         <div className="flex flex-col lg:flex-row items-center h-[calc(100vh-4rem)] ">
-          <div className=" lg:w-[45%] shrink-0 order-last lg:order-first">
+          <div className=" lg:w-[45%] shrink-0 order-last lg:order-first pb-16">
             <h1 className="text-7xl font-bold lg:text-8xl lg:font-medium tracking-tighter ">
               <span className=" lg:block"> Connect </span>
               Empower Thrive
             </h1>
-            <div className="mt-4 ml-2">
+            <div className="mt-4 ">
               <Link to={"/signin"} className={signInBtnStyle}>
                 Sign in
               </Link>
