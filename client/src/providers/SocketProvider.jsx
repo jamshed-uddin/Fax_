@@ -19,7 +19,7 @@ const SocketProvider = ({ children }) => {
       return;
     }
 
-    const newSocket = io("http://localhost:2000", {
+    const newSocket = io("https://fax-pbi7.onrender.com", {
       query: { userId: user?._id },
     });
 

@@ -19,7 +19,7 @@ const server = http.createServer(app);
 const io = socketIo(server, {
   pingtimeout: 60000,
   cors: {
-    origin: "http://localhost:5174",
+    origin: "https://fax-pbi7.onrender.com",
   },
 });
 app.use(express.json());
