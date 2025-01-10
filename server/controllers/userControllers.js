@@ -214,8 +214,8 @@ const forgotPassword = async (req, res, next) => {
     const resetToken = await user.getResetPasswordToken();
 
     await user.save();
-
-    const resetURL = `http://localhost:5173/resetPassword/${resetToken}`;
+    const urlOrigin = req.headers.origin || "https://fax-pbi7.onrender.com";
+    const resetURL = `${urlOrigin}/resetPassword/${resetToken}`;
     const message = `
 <h3>Hey ${user.name}</h3>
 <p>
