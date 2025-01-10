@@ -7,11 +7,11 @@ const connectDB = require("./config/db");
 const userRoute = require("./routes/userRoute");
 const chatRoute = require("./routes/chatRoutes");
 const messageRoute = require("./routes/messageRoutes");
-const dotenv = require("dotenv");
+require("dotenv").config();
 const { notFound, errorHandler } = require("./middlewares/errorMiddlewares");
 const { configureCloudinary } = require("./config/cloudinaryConfig");
 const path = require("path");
-dotenv.config();
+
 connectDB();
 
 const app = express();

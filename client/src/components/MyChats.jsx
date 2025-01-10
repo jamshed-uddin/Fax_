@@ -8,8 +8,6 @@ const MyChats = () => {
   const { myChats, myChatsLoading, myChatsError, myChatsRefetch } =
     useChatProvider();
 
-  console.log(myChats);
-
   if (myChatsLoading) {
     return <CardSkeleton cardAmount={5} />;
   }

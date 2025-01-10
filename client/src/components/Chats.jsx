@@ -2,7 +2,6 @@ import ChatCard from "./ChatCard";
 import { Link } from "react-router-dom";
 
 const Chats = ({ chats, placedIn }) => {
-  console.log(chats);
   return (
     <div className="mb-3">
       <div className="space-y-2">

@@ -5,7 +5,6 @@ export const AuthContext = createContext(null);
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userLoading, setUserLoading] = useState(true);
-  console.log(userLoading);
 
   useEffect(() => {
     // setUserLoading(true);
@@ -45,7 +44,6 @@ const AuthProvider = ({ children }) => {
       setUser(result.data);
       return result.data;
     } catch (error) {
-      console.log(error);
       if (
         error.response &&
         (error.response.status === 400 || error.response.status === 401)

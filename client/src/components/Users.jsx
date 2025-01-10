@@ -14,7 +14,6 @@ const Users = ({ users, title = true }) => {
         navigate(`inbox/${result.data._id}`);
       }
     } catch (error) {
-      console.log(error);
       if (
         error.response &&
         (error.response.status === 400 || error.response.status === 401)
